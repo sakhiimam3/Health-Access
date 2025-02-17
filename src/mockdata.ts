@@ -1,0 +1,1 @@
+export cosnt navItems= ["home", "services", "how it works", "about us"]
