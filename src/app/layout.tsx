@@ -4,13 +4,11 @@ import "./globals.css";
 
 const robotoSlab = Roboto_Slab({
   variable: "--font-roboto-slab",
-  subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
 });
 
 const ubuntu = Ubuntu({
   variable: "--font-ubuntu",
-  subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
 });
 
@@ -27,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${robotoSlab.variable} ${ubuntu.variable} antialiased`}
+        className={`${robotoSlab.variable} ${ubuntu.variable}`}
       >
         {children}
       </body>

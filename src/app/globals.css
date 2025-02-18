@@ -16,19 +16,23 @@ body {
   font-family: var(--font-ubuntu);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6 ,button{
   font-family: var(--font-ubuntu);
 
 }
-
-p, span, a, li {
-  font-family: var(--font-ubuntu);
-
-}
-
-code {
+footer {
   font-family: var(--font-roboto-slab);
 }
+header li, header a {
+  font-family: var(--font-ubuntu);
+}
+
+
+
+
+
+
+
 
 /* @layer base {
   :root {
