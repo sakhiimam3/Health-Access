@@ -10,7 +10,6 @@ export default function Home() {
   return (
     <>
     <Header />
-     <div className="border-b border-[#DCDCDC] border-width-2"></div>
     <HowItWorks />
     <HomeServices />
     <PharmacySlider />

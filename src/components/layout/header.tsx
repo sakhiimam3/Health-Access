@@ -72,7 +72,7 @@ const Header = () => {
         </nav>
         <div
           className={`w-full bg-white transition-all duration-300 ${
-            isScrolled ? "py-2 shadow-md" : "py-6"
+            isScrolled ? "py-2":"py-6"
           }`}
         >
           <div className="max-w-4xl mx-auto px-4">
@@ -179,7 +179,10 @@ const Header = () => {
             </div>
           </div>
         </div>
+        
       </LayoutWrapper>
+           <div className="border-b border-[#DCDCDC] border-width-2"></div>
+
     </header>
   );
 };
