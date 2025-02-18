@@ -77,7 +77,7 @@ const homeServices = () => {
   ];
 
   return (
-    <section>
+    <section className="mb-12">
       <LayoutWrapper>
         <div>
           <DifferentServices

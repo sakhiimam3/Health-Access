@@ -66,7 +66,7 @@ const pharmacySlider = () => {
   ];
 
   return (
-    <section >
+    <section className="mb-12">
       <LayoutWrapper>
         <div className="mb-10">
           <CenterHeader

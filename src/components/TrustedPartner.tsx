@@ -8,15 +8,15 @@ import ButtonTheme from "./shared/ButtonTheme";
 
 const TrustedPartner = () => {
   return (
-    <section className="h-screen  flex items-center">
+    <section className="">
       <LayoutWrapper>
         <div
           style={{ backgroundImage: `url(${frameImage.src})` }}
-          className="grid grid-cols-1 md:grid-cols-2 items-center gap-12 bg-cover bg-center"
+          className="grid grid-cols-1 md:grid-cols-2 items-center gap-14 mb-12 bg-cover bg-center"
         >
           {/* Left Content */}
-          <div className="max-w-lg text-left space-y-4">
-            <h2 className="text-xl md:text-3xl font-bold leading-[76.8px]">
+          <div className=" space-y-4 ">
+            <h2 className="text-xl max-w-lg md:text-4xl font-bold leading-[76.8px]">
               Your Trusted Partner in Health Access Across the UK
             </h2>
             <p className="text-[#52525B] text-md">
@@ -37,12 +37,12 @@ const TrustedPartner = () => {
                 <p className="text-xl font-bold">24/7</p>
                 <p className="text-[#52525B] text-sm">Booking Access</p>
               </div>
-              <div>
+              <div className="mb-4">
                 <p className="text-xl font-bold">99%</p>
                 <p className="text-[#52525B] text-sm">Customer Satisfaction</p>
               </div>
             </div>
-            <div className="flex gap-4">
+            <div className="flex mt-4 gap-4">
               <ButtonTheme
                bgColor="bg-[#189BA3]"
                paddingX="px-4"
@@ -59,7 +59,7 @@ const TrustedPartner = () => {
             <Image src={ukMap} alt="UK Map" width={400} height={400} />
           </div>
         </div>
-        <div className="border-t-2 border-gray-200 mt-24"></div>
+        <div className="border-t-2 border-gray-200 "></div>
       </LayoutWrapper>
     </section>
   );
