@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import LayoutWrapper from "./wrapper";
 import Image from "next/image";
 

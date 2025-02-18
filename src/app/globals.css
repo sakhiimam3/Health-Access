@@ -23,9 +23,9 @@ h1, h2, h3, h4, h5, h6 ,button{
 footer {
   font-family: var(--font-roboto-slab);
 }
-header li, header a {
+/* header li, header a {
   font-family: var(--font-ubuntu);
-}
+} */
 
 
 

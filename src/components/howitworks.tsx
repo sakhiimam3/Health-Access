@@ -46,7 +46,7 @@ const HowItWorks = () => {
 
             <div className="pl-8">
               <h4 className="text-xl font-[700] mb-1">Compare Pharmacies</h4>
-              <p className="font-roboto text-sm text-[#52525B]">Browse nearby pharmacies, compare prices, check availability, and read reviews to make an informed decision.</p>
+              <p className="font-roboto text-sm text-[#52525B]">Browse nearby pharmacies compare prices, check availability, and read reviews to make an informed decision.</p>
             </div>
 
             <div className="pl-8">
@@ -57,7 +57,7 @@ const HowItWorks = () => {
            
             <div className="pl-8">
               <h4 className="text-xl font-[700] mb-1">Receive Confirmation</h4>
-              <p className="font-roboto text-sm">Your chosen pharmacy will receive a notification of your booking, and you'll get a confirmation email or SMS with all the details.</p>
+              <p className="font-roboto text-sm">Your chosen pharmacy will receive a notification of your booking, and you&apos;ll get a confirmation email or SMS with all the details.</p>
             </div>
           </div>
         </div>

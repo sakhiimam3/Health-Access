@@ -5,11 +5,13 @@ import "./globals.css";
 const robotoSlab = Roboto_Slab({
   variable: "--font-roboto-slab",
   weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
 });
 
 const ubuntu = Ubuntu({
   variable: "--font-ubuntu",
   weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {

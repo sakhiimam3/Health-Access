@@ -8,22 +8,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import ButtonTheme from "./shared/ButtonTheme";
-import { Car } from "lucide-react";
 
 interface PharmacyService {
   id: string;
   name: string;
 }
 
-interface Pharmacy {
-  id: string;
-  image: string;
-  address: string;
-  title: string;
-  services: PharmacyService[];
-}
+
 
 export const PharmacyCard = ({
   title,
@@ -31,11 +24,10 @@ export const PharmacyCard = ({
   services,
   image,
 }: {
-  name: string;
-  description: string;
+  title: string;
   address: string;
   services: PharmacyService[];
-  image: string;
+  image: StaticImageData | string;
 }) => {
   const colors = ["#63DBA3", "#79A6F2", "#AA23DB"];
 

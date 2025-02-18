@@ -83,7 +83,7 @@ const pharmacySlider = () => {
                   className="pl-2 md:basis-1/2 lg:basis-1/3"
                 >
                   <PharmacyCard
-                    image={pharmacy.imageSrc }
+                    image={pharmacy.imageSrc}
                     title={pharmacy.title}
                     address={pharmacy.address}
                     services={pharmacy.services || []}

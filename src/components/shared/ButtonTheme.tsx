@@ -2,14 +2,14 @@ import React from 'react';
 
 interface ButtonThemeProps {
   bgColor: string;
-  textColor?: string; // Optional text color
+  textColor?: string; 
   children: React.ReactNode;
-  
-  onClick?: () => void; // Optional click handler
-  paddingX?: string; // Optional horizontal padding
-  paddingY?: string; // Optional vertical padding
-  margin?: string; // Optional margin
-  border?: string; // Optional border
+  className?: string;
+  onClick?: () => void; 
+  paddingX?: string; 
+  paddingY?: string;
+  margin?: string; 
+  border?: string; 
 }
 
 const ButtonTheme: React.FC<ButtonThemeProps> = ({ bgColor, textColor = 'text-black', children, onClick, paddingX = 'px-4', paddingY = 'py-2', margin, border }) => {

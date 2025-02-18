@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -47,7 +47,7 @@ const Header = () => {
               <Link
                 key={item}
                 href="#"
-                className="capitalize font-[400] hover:text-teal-500 relative group"
+                className="capitalize font-[400] font-ubuntu relative group"
               >
                 {item}
                 <span className="absolute -bottom-1 left-0 w-full h-1 bg-teal-500 transform scale-x-0 transition-transform duration-500 group-hover:scale-x-100" />
@@ -56,7 +56,7 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <span className="hidden font-[400] md:inline text-gray-700">
+            <span className="hidden font-[400] md:inline text-gray-700 font-ubuntu">
               Manage Your Account
             </span>
             <div className="flex items-center gap-3 bg-white rounded-full shadow-sm px-3 py-2 border border-[#EBEBEB]">
@@ -115,7 +115,7 @@ const Header = () => {
                       fill="#189BA3"
                     />
                   </svg>
-                  <Select defaultValue="sinovac" className="h-10">
+                  <Select defaultValue="sinovac" >
                     <SelectTrigger className="border-0 focus:ring-0 p-2 h-full flex items-center">
                       <SelectValue placeholder="Select Service" />
                     </SelectTrigger>
@@ -141,7 +141,7 @@ const Header = () => {
                       </clipPath>
                     </defs>
                   </svg>
-                  <Select defaultValue="1" className="h-10">
+                  <Select defaultValue="1" >
                     <SelectTrigger className="border-0 focus:ring-0 p-2 h-full flex items-center">
                       <SelectValue placeholder="No of People" />
                     </SelectTrigger>
