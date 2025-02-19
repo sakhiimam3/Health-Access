@@ -5,13 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Menu, Search, Calendar } from "lucide-react";
 import LayoutWrapper from "./wrapper";
