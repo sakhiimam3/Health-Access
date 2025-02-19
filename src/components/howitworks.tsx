@@ -5,7 +5,7 @@ import LayoutWrapper from './layout/wrapper';
 
 const HowItWorks = () => {
   return (
-    <section className='mt-60 mb-4'> 
+    <section className='mt-80 mb-4'> 
         <LayoutWrapper>
        
       {/* Main Title */}
