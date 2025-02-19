@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -17,8 +17,13 @@ import { Menu, Search, Calendar } from "lucide-react";
 import LayoutWrapper from "./wrapper";
 import { NavItems } from "@/mockdata";
 
+
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const scrollPositionRef = useRef(0);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -27,8 +32,33 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (isDropdownOpen) {
+      scrollPositionRef.current = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPositionRef.current}px`;
+    } else {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      window.scrollTo(0, scrollPositionRef.current);
+    }
+  }, [isDropdownOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white z-50">
+    <header className="fixed top-0 left-0 right-0 bg-white z-10  ">
       <LayoutWrapper>
         <nav className="flex justify-between items-center h-20">
           <Link href="/" className="flex-shrink-0">
@@ -58,27 +88,30 @@ const Header = () => {
           )}
 
           {isScrolled && (
-            <div className="flex justify-between items-center bg-white p-4 rounded-[25px] shadow-lg w-[45%] mx-auto">
-              <div className="flex space-x-6">
+            <div className="flex justify-around items-center bg-white p-2 rounded-[25px] shadow-lg w-[30%] mx-auto">
+              <div
+                className="flex space-x-4"
+                onClick={() => setIsScrolled(false)}
+              >
                 <div className="text-black">
-                  <span className="font-semibold">Location</span>
-                  <div className="text-gray-400">Search Location</div>
+                  <span className="font-semibold text-xs">Location</span>
+                  <div className="text-gray-400 text-xs">Search Location</div>
                 </div>
                 <div className="text-black">
-                  <span className="font-semibold">Type Vaccine</span>
-                  <div className="text-gray-400">Add dates</div>
+                  <span className="font-semibold text-xs">Type Vaccine</span>
+                  <div className="text-gray-400 text-xs">Add dates</div>
                 </div>
                 <div className="text-black">
-                  <span className="font-semibold">Who</span>
-                  <div className="text-gray-400">Add guests</div>
+                  <span className="font-semibold text-xs">Who</span>
+                  <div className="text-gray-400 text-xs">Add guests</div>
                 </div>
               </div>
               <Button
                 size="icon"
-                className="bg-teal-500 hover:bg-teal-600 rounded-full h-10 w-10 ml-2"
+                className="bg-teal-500 hover:bg-teal-600 rounded-full h-8 w-8 ml-2"
               >
                 <span>
-                  <Search className="h-6 w-6 text-white" />
+                  <Search className="h-5 w-5 text-white" />
                 </span>
               </Button>
             </div>
@@ -89,7 +122,24 @@ const Header = () => {
               Manage Your Account
             </span>
             <div className="flex items-center gap-3 bg-white rounded-full shadow-sm px-3 py-2 border border-[#EBEBEB]">
-              <Menu className="h-5 w-5 text-gray-600 cursor-pointer" />
+              <div className="relative">
+                <button
+                  // onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center focus:outline-none"
+                >
+                  <Menu className="h-5 w-5 text-gray-600 cursor-pointer" />
+                </button>
+                {/* {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+                    <div className="px-4 py-2 text-gray-700">My Account</div>
+                    <div className="border-t border-gray-200"></div>
+                    <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      Profile
+                    </button>
+                  </div>
+                )} */}
+              </div>
+
               <div className="relative">
                 <Avatar className="h-10 w-10 bg-teal-500">
                   <AvatarFallback className="text-white text-sm">
@@ -102,7 +152,7 @@ const Header = () => {
           </div>
         </nav>
         <div
-          className={`w-full bg-white transition-all duration-300 ${
+          className={`w-full bg-white transition-all z-50 duration-300 ${
             isScrolled ? "py-2 opacity-0 h-0" : "py-6 opacity-100 h-auto"
           }`}
         >
@@ -126,12 +176,12 @@ const Header = () => {
                   <Input
                     type="text"
                     placeholder="Choose Location"
-                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-2 h-10"
+                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-2 h-10 transition-none"
                   />
                 </div>
               </div>
 
-              <div className="flex-1 flex flex-col items-start border-l border-gray-200 pl-4">
+              <div className="flex-1  flex flex-col items-start border-l border-gray-200 pl-4">
                 <label className="font-bold mb-1">Service</label>
                 <div className="flex items-center">
                   <svg
@@ -146,16 +196,14 @@ const Header = () => {
                       fill="#189BA3"
                     />
                   </svg>
-                  <Select defaultValue="sinovac">
-                    <SelectTrigger className="border-0 focus:ring-0 p-2 h-full flex items-center">
-                      <SelectValue placeholder="Select Service" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="sinovac">Sinovac</SelectItem>
-                      <SelectItem value="service2">Service 2</SelectItem>
-                      <SelectItem value="service3">Service 3</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="relative">
+                    <select defaultValue="service1" className="border-0 focus:ring-0 p-2 h-full flex items-center transition-none">
+                      <option value="service1">Service 1</option>
+                      <option value="service2">Service 2</option>
+                      <option value="service3">Service 3</option>
+                      <option value="service4">Service 4</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -186,18 +234,13 @@ const Header = () => {
                       </clipPath>
                     </defs>
                   </svg>
-                  <Select defaultValue="1">
-                    <SelectTrigger className="border-0 focus:ring-0 p-2 h-full flex items-center">
-                      <SelectValue placeholder="No of People" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1, 2, 3, 4, 5].map((num) => (
-                        <SelectItem key={num} value={num.toString()}>
-                          {num}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <select defaultValue="1" className="border-0 focus:ring-0 p-2 h-full flex items-center">
+                    {[1, 2, 3, 4, 5].map((num) => (
+                      <option key={num} value={num.toString()}>
+                        {num}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
