@@ -33,17 +33,17 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
           </div>
         )}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {services.map((service, index) => (
           <div key={index} className="rounded-lg overflow-hidden min-h-[200px]">
-            <div className="relative rounded">
+            <div className="relative rounded ">
               {index === 0 && type === "vaccination" ? (
-                <div className="absolute inset-0 bg-gradient-to-t from-[#189BA3]/80 via-[#189BA3]/40 to-transparent z-10 rounded-[16px]" />
+                <div className="absolute overf inset-0 bg-gradient-to-t from-[#189BA3]/80 via-[#189BA3]/40 to-transparent z-10 rounded-[16px]" />
               ) : null}
               <Image
                 src={service.image}
                 alt="Medical consultation"
-                width={330}
+                width={350}
                 height={200}
                 className="rounded-[16px] object-cover h-[200px]"
                 priority

@@ -51,7 +51,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white z-10  ">
+    <header className="fixed top-0 left-0 right-0 bg-white z-50  ">
       <LayoutWrapper>
         <nav className="flex justify-between items-center h-20">
           <Link href="/" className="flex-shrink-0">
