@@ -2,35 +2,66 @@ import React from 'react';
 import Image from 'next/image';
 import HowItWorksImage from '../../public/images/howitworks.png';
 import LayoutWrapper from './layout/wrapper';
+import { BookIcon, CompassIcon, Computer, GitCompareIcon, SearchIcon } from 'lucide-react';
+import { ComputerIcon, VerifyIcon } from './icons/icons';
+import HowItWorksCard from './howitworksCard';
+
 
 const HowItWorks = () => {
+
+  const howItWorks = [
+    {
+      icon: <SearchIcon />,
+      title: "Search for Services",
+      text: "Enter your postcode and the service you need, such as vaccinations, health checks, or consultations."
+    },
+    {
+      icon: <BookIcon   />,
+      title: "Compare Pharmacies",
+      text: "Browse nearby pharmacies, compare prices, check availability, and read reviews to make an informed decision."
+    },
+    {
+      icon: <ComputerIcon />,
+      title: "Book Online",
+      text: "Select your preferred pharmacy and schedule your appointment through our secure online booking system."
+    },
+    {
+      icon: <VerifyIcon />,
+      title: "Receive Confirmation",
+      text: "Your chosen pharmacy will receive a notification of your booking, and you'll get a confirmation email or SMS with all the details."
+    }
+  ]
+  
   return (
     <section className='mt-80 mb-4'> 
         <LayoutWrapper>
        
       {/* Main Title */}
-      <div className="text-center mb-20">
+      <div className="text-center mb-16">
         <h1 className="text-5xl font-bold">
           <span className="text-teal-500">Connecting</span>
           <span className="text-gray-700"> You To</span>
         </h1>
         <h2 className="text-4xl text-gray-700 font-bold mt-2">Health Services</h2>
       </div>
+        <div>
+          <h1 className='text-4xl font-bold text-center'>How it works</h1>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 my-8 gap-4'>
+          {howItWorks.map((item, index) => (
+            <HowItWorksCard key={index} {...item} />
+          ))}
+          </div>
+        </div>
+
 
       {/* Content Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 items-start">
-        {/* Image Section */}
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 items-start">
         <div className='w-full flex  items-start h-[100%] '>
           <Image
             src={HowItWorksImage}
             alt="how it works"
-            // layout='responsive'
             height={500}
             width={500}
-            
-            // objectFit='cover'
-            // objectPosition='top'
-            // priority
           />
         </div>
 
@@ -61,7 +92,7 @@ const HowItWorks = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
        <div className='border-t-2 border-gray-200 mt-10'></div>
         </LayoutWrapper>
     </section>

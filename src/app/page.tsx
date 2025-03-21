@@ -6,6 +6,7 @@ import PharmacySlider from "@/components/pharmacySlider";
 import HomeServices from "@/components/home-services";
 import HowItWorks from "@/components/howitworks";
 import TrustedPartner from "@/components/TrustedPartner";
+import FrequentlyAsked from "@/components/frequently-asked";
 export default function Home() {
   return (
     <>
@@ -16,6 +17,7 @@ export default function Home() {
     <TrustedPartner />
     <Blogs />
      <PartnerSection />
+     <FrequentlyAsked />
     <Footer />
     </>
    

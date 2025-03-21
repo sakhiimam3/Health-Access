@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Menu, Search, Calendar } from "lucide-react";
+import {  Search, Calendar } from "lucide-react";
 import LayoutWrapper from "./wrapper";
 import { NavItems } from "@/mockdata";
+import ButtonTheme from "../shared/ButtonTheme";
 
 
 const Header = () => {
@@ -67,13 +67,13 @@ const Header = () => {
             <div
               className={`hidden md:flex items-center space-x-12 transition-opacity duration-300 }`}
             >
-              {NavItems.map((item) => (
+              {NavItems.map((item,index) => (
                 <Link
-                  key={item}
-                  href="#"
-                  className="capitalize font-[400] font-ubuntu relative group"
+                  key={index}
+                  href={item.href}
+                  className="capitalize text-sm font-[400] font-ubuntu relative group"
                 >
-                  {item}
+                  {item.label}
                   <span className="absolute -bottom-1 left-0 w-full h-1 bg-teal-500 transform scale-x-0 transition-transform duration-500 group-hover:scale-x-100" />
                 </Link>
               ))}
@@ -111,37 +111,15 @@ const Header = () => {
           )}
 
           <div className="flex items-center space-x-4">
-            <span className="hidden font-[400] md:inline text-gray-700 font-ubuntu">
-              Manage Your Account
+            <Link href="/login">
+            <span className="hidden underline text-sm font-ubuntu font-[400] md:inline">
+             Sign In
             </span>
-            <div className="flex items-center gap-3 bg-white rounded-full shadow-sm px-3 py-2 border border-[#EBEBEB]">
-              <div className="relative">
-                <button
-                  // onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center focus:outline-none"
-                >
-                  <Menu className="h-5 w-5 text-gray-600 cursor-pointer" />
-                </button>
-                {/* {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
-                    <div className="px-4 py-2 text-gray-700">My Account</div>
-                    <div className="border-t border-gray-200"></div>
-                    <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                      Profile
-                    </button>
-                  </div>
-                )} */}
-              </div>
-
-              <div className="relative">
-                <Avatar className="h-10 w-10 bg-teal-500">
-                  <AvatarFallback className="text-white text-sm">
-                    U
-                  </AvatarFallback>
-                </Avatar>
-                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-1 ring-white" />
-              </div>
-            </div>
+            </Link>
+            
+             <ButtonTheme  bgColor="bg-[#189BA3]" textColor="text-white" >
+                Become a Partner
+              </ButtonTheme> 
           </div>
         </nav>
         <div
