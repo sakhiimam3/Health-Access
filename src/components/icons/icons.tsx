@@ -1,10 +1,10 @@
 import React from "react";
 
-const UserIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 37,
-  height = 37,
-  className = "",
-}) => {
+const UserIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 37, height = 37, className = "" }) => {
   return (
     <svg
       width={width}
@@ -33,43 +33,34 @@ const UserIcon: React.FC<{ width?: number; height?: number; className?: string }
   );
 };
 
-const SearchIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 24,
-  height = 24,
-  className = "",
-}) => {
+const SearchIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+  color?:string
+}> = ({ width = 42, height = 44, className = "",color }) => {
   return (
     <svg
       width={width}
       height={height}
-      viewBox="0 0 24 24"
+      viewBox="0 0 42 44"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
       <path
-        d="M10.5 19C14.6421 19 18 15.6421 18 11.5C18 7.35786 14.6421 4 10.5 4C6.35786 4 3 7.35786 3 11.5C3 15.6421 6.35786 19 10.5 19Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M21 21L16 16"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M1.23405 35.701L10.6767 26.0485L12.1455 27.5174L15.2931 24.3698C13.6144 21.8518 12.5653 18.914 12.5653 15.5567C12.5653 8.42223 18.2309 2.12712 25.3653 1.0779C35.2277 -0.181123 43.6211 8.42223 41.7326 18.4944C40.6834 24.3698 35.8572 28.9863 29.9817 30.0354C25.5751 30.8747 21.5882 29.6157 18.4407 27.3076L15.2931 30.4551L16.7619 32.1339L7.31926 41.7863C5.64053 43.4651 2.91268 43.4651 1.44385 41.7863C-0.444679 39.8977 -0.444679 37.3797 1.23405 35.701ZM27.2538 26.0485C33.1292 26.0485 37.7457 21.4321 37.7457 15.5566C37.7457 9.68106 33.1293 5.06477 27.2538 5.06477C21.3783 5.06477 16.7619 9.68116 16.7619 15.5567C16.7619 21.4322 21.3784 26.0485 27.2538 26.0485Z"
+        fill={color}
       />
     </svg>
   );
 };
 
-const BookIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 48,
-  height = 48,
-  className = "",
-}) => {
+const BookIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 48, height = 48, className = "" }) => {
   return (
     <svg
       width={width}
@@ -87,11 +78,12 @@ const BookIcon: React.FC<{ width?: number; height?: number; className?: string }
   );
 };
 
-const ComputerIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 40,
-  height = 37,
-  className = "",
-}) => {
+const ComputerIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+  color?:string
+}> = ({ width = 40, height = 37, className = "" ,color}) => {
   return (
     <svg
       width={width}
@@ -103,17 +95,18 @@ const ComputerIcon: React.FC<{ width?: number; height?: number; className?: stri
     >
       <path
         d="M35 0.5H5C3.80653 0.5 2.66193 0.974106 1.81802 1.81802C0.974106 2.66193 0.5 3.80653 0.5 5V26C0.5 27.1935 0.974106 28.3381 1.81802 29.182C2.66193 30.0259 3.80653 30.5 5 30.5H18.5V33.5H14C13.6022 33.5 13.2206 33.658 12.9393 33.9393C12.658 34.2206 12.5 34.6022 12.5 35C12.5 35.3978 12.658 35.7794 12.9393 36.0607C13.2206 36.342 13.6022 36.5 14 36.5H26C26.3978 36.5 26.7794 36.342 27.0607 36.0607C27.342 35.7794 27.5 35.3978 27.5 35C27.5 34.6022 27.342 34.2206 27.0607 33.9393C26.7794 33.658 26.3978 33.5 26 33.5H21.5V30.5H35C36.1935 30.5 37.3381 30.0259 38.182 29.182C39.0259 28.3381 39.5 27.1935 39.5 26V5C39.5 3.80653 39.0259 2.66193 38.182 1.81802C37.3381 0.974106 36.1935 0.5 35 0.5ZM35 27.5H5C4.60218 27.5 4.22064 27.342 3.93934 27.0607C3.65804 26.7794 3.5 26.3978 3.5 26V23H36.5V26C36.5 26.3978 36.342 26.7794 36.0607 27.0607C35.7794 27.342 35.3978 27.5 35 27.5Z"
-        fill="#189BA3"
+        fill={color}
       />
     </svg>
   );
 };
 
-const VerifyIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 38,
-  height = 44,
-  className = "",
-}) => {
+const VerifyIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+  color?:string
+}> = ({ width = 38, height = 44, className = "" ,color}) => {
   return (
     <svg
       width={width}
@@ -125,17 +118,17 @@ const VerifyIcon: React.FC<{ width?: number; height?: number; className?: string
     >
       <path
         d="M33.0943 4.98423L22.0523 0.840227C20.0683 0.0962266 17.9083 0.0962266 15.9483 0.840227L4.88228 4.98423C2.40028 5.92623 0.738281 8.33423 0.738281 10.9882V22.2042C0.738281 27.0922 2.97228 31.3102 5.89828 34.7602C8.80228 38.1842 12.3743 40.8402 15.0543 42.5522C16.2703 43.3222 17.6343 43.7182 19.0003 43.7182C20.3663 43.7182 21.7303 43.3222 22.9463 42.5522C28.2803 39.1282 37.2643 31.9562 37.2643 22.2042V10.9882C37.2643 8.33423 35.5743 5.92623 33.0943 4.98423ZM27.9823 17.8622L19.7943 26.0262C18.9503 26.8702 17.8343 27.2922 16.7423 27.2922C15.6263 27.2922 14.5083 26.8702 13.6663 26.0262L10.4643 22.8242C9.72028 22.1042 9.72028 20.9142 10.4643 20.1942C11.1843 19.4502 12.3503 19.4502 13.0943 20.1942L16.2943 23.3962C16.5423 23.6442 16.9143 23.6442 17.1623 23.3962L25.3503 15.2322C26.0703 14.4882 27.2363 14.4882 27.9803 15.2322C28.7003 15.9522 28.7023 17.1422 27.9823 17.8622Z"
-        fill="#189BA3"
+        fill={color}
       />
     </svg>
   );
 };
 
-const AccessibilityIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 48,
-  height = 48,
-  className = "",
-}) => {
+const AccessibilityIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 48, height = 48, className = "" }) => {
   return (
     <svg
       width={width}
@@ -153,11 +146,11 @@ const AccessibilityIcon: React.FC<{ width?: number; height?: number; className?:
   );
 };
 
-const InnovationIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 48,
-  height = 48,
-  className = "",
-}) => {
+const InnovationIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 48, height = 48, className = "" }) => {
   return (
     <svg
       width={width}
@@ -175,12 +168,11 @@ const InnovationIcon: React.FC<{ width?: number; height?: number; className?: st
   );
 };
 
-
-const TransparencyIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 48,
-  height = 48,
-  className = "",
-}) => {
+const TransparencyIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 48, height = 48, className = "" }) => {
   return (
     <svg
       width={width}
@@ -198,12 +190,11 @@ const TransparencyIcon: React.FC<{ width?: number; height?: number; className?: 
   );
 };
 
-
-const TrustIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 48,
-  height = 33,
-  className = "",
-}) => {
+const TrustIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 48, height = 33, className = "" }) => {
   return (
     <svg
       width={width}
@@ -220,11 +211,11 @@ const TrustIcon: React.FC<{ width?: number; height?: number; className?: string 
     </svg>
   );
 };
-const CommunityIcon: React.FC<{ width?: number; height?: number; className?: string }> = ({
-  width = 46,
-  height = 33,
-  className = "",
-}) => {
+const CommunityIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 46, height = 33, className = "" }) => {
   return (
     <svg
       width={width}
@@ -242,5 +233,44 @@ const CommunityIcon: React.FC<{ width?: number; height?: number; className?: str
   );
 };
 
+// ... existing code ...
 
-export { UserIcon, SearchIcon, BookIcon, ComputerIcon, VerifyIcon, AccessibilityIcon,InnovationIcon,TransparencyIcon,TrustIcon,CommunityIcon};
+const ConvinenceIcon: React.FC<{ width?: number; height?: number; className?: string ,color?:string}> = ({
+  width = 48,
+  height = 48,
+  className = "",
+  color
+}) => {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M15.5348 8.98837C15.5525 8.72887 15.6999 8.51531 15.9363 8.40693L22.8907 5.21812C23.1099 5.11752 23.3454 5.13355 23.5492 5.26284C23.753 5.39212 23.8676 5.59846 23.8699 5.83977L23.9424 13.4901C23.945 13.75 23.8144 13.9744 23.587 14.1007C23.3598 14.227 23.1003 14.2195 22.8807 14.0801L20.9945 12.8826C20.8591 13.5568 20.788 14.2543 20.788 14.9685C20.788 20.7955 25.5118 25.5193 31.3388 25.5193C37.1659 25.5193 41.8897 20.7955 41.8897 14.9685C41.8897 9.14146 37.1659 4.41768 31.3388 4.41768C29.0433 4.41768 26.9192 5.15099 25.1875 6.3959L25.1822 5.82721C25.1756 5.14115 24.8318 4.5223 24.2524 4.15462C23.8462 3.8968 23.3757 3.7963 22.916 3.85837C25.2558 2.08134 28.1739 1.02637 31.3388 1.02637C39.0388 1.02637 45.2809 7.26843 45.2809 14.9684C45.2809 22.6684 39.0388 28.9104 31.3388 28.9104C23.6389 28.9104 17.3968 22.6683 17.3968 14.9684C17.3968 13.5781 17.6003 12.2352 17.9792 10.9682L15.8537 9.61865C15.6341 9.47934 15.5169 9.24768 15.5346 8.98827L15.5348 8.98837ZM29.6591 19.8856C30.1047 19.9443 30.513 19.8056 30.8308 19.4878L38.0303 12.2883C38.5433 11.7754 38.5433 10.936 38.0303 10.4231C37.5174 9.91021 36.6781 9.91021 36.1652 10.4231L30.1073 16.481L28.4177 13.5545C28.0555 12.9272 27.2435 12.7095 26.6161 13.0717C25.9879 13.4345 25.7707 14.2451 26.1334 14.8733L28.6303 19.1981C28.855 19.5874 29.2135 19.8269 29.6591 19.8856ZM43.9219 29.736C40.1675 31.9035 34.2352 36.2516 29.261 36.4063C26.7147 36.4686 23.7264 35.8407 22.5127 35.209C21.9888 34.9367 21.9015 34.4259 22.0941 34.0557C22.2865 33.6854 22.8073 33.5359 23.1776 33.7283C24.2281 34.275 26.8845 34.8167 29.1933 34.7602C30.0773 34.7386 30.8907 34.6349 31.4944 34.4152C33.2901 33.7619 32.761 31.191 30.6027 31.2726C17.9117 31.2726 17.1955 21.5219 6.54394 34.1046C6.55106 34.1116 6.55837 34.1184 6.5655 34.1256L13.8788 41.4388C13.9083 41.4682 13.9368 41.4982 13.9648 41.5286C16.2818 40.4384 18.851 40.4166 21.6023 40.5812C23.7188 40.7077 26.2448 41.0134 28.5623 40.9622C31.8004 40.8906 33.7849 40.0117 36.6283 38.5055C39.8655 36.7907 45.4919 33.3752 46.4735 32.085C47.8781 30.2383 46.0646 28.4991 43.922 29.736H43.9219ZM5.4315 35.2596C4.82766 34.6558 3.83953 34.6558 3.23559 35.2596L1.03125 37.4639L10.5404 46.9731L12.7447 44.7688C13.3485 44.165 13.3485 43.1767 12.7447 42.5729L5.43131 35.2596H5.4315Z"
+        fill={color}
+      />
+    </svg>
+  );
+};
+
+// ... existing code ...
+
+
+export {
+  UserIcon,
+  SearchIcon,
+  BookIcon,
+  ComputerIcon,
+  VerifyIcon,
+  AccessibilityIcon,
+  InnovationIcon,
+  TransparencyIcon,
+  TrustIcon,
+  CommunityIcon,
+  ConvinenceIcon
+};

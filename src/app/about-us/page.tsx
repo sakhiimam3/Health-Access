@@ -4,6 +4,7 @@ import PagesBanner from "@/components/pagesBanner";
 import React from "react";
 import Image from "next/image";
 import CoreValues from "@/components/corevalues";
+import WhyChooseHealthAccess from "@/components/WhyChooseHealthAccess ";
 
 const Aboutus = () => {
   return (
@@ -62,7 +63,16 @@ const Aboutus = () => {
 
           <div className="my-10">
            <CoreValues />
+
           </div>
+          <div className="border-t-2  border-gray-200 "></div>
+
+          <div className="my-24">
+            <WhyChooseHealthAccess />
+          </div>
+          <div className="border-t-2  border-gray-200 "></div>
+
+
         </LayoutWrapper>
       </div>
     </PagesWrapper>

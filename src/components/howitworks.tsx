@@ -1,42 +1,39 @@
-import React from 'react';
+"use client"
+import React, { useState } from 'react';
 // import Image from 'next/image';
 // import HowItWorksImage from '../../public/images/howitworks.png';
 import LayoutWrapper from './layout/wrapper';
-import { BookIcon, CompassIcon, Computer, GitCompareIcon, SearchIcon } from 'lucide-react';
-import { ComputerIcon, VerifyIcon } from './icons/icons';
+import { BookIcon, CompassIcon, Computer, GitCompareIcon } from 'lucide-react';
+import { ComputerIcon, SearchIcon, VerifyIcon } from './icons/icons';
 import HowItWorksCard from './howitworksCard';
 
 
 const HowItWorks = () => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
 
-  const svg=<svg width="42" height="44" viewBox="0 0 42 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M1.23405 35.7009L10.6767 26.0484L12.1455 27.5173L15.2931 24.3697C13.6144 21.8517 12.5653 18.9139 12.5653 15.5565C12.5653 8.42211 18.2309 2.127 25.3653 1.07778C35.2277 -0.181245 43.6211 8.42211 41.7326 18.4943C40.6834 24.3697 35.8572 28.9862 29.9817 30.0353C25.5751 30.8746 21.5882 29.6156 18.4407 27.3074L15.2931 30.455L16.7619 32.1337L7.31926 41.7862C5.64053 43.4649 2.91268 43.4649 1.44385 41.7862C-0.444679 39.8976 -0.444679 37.3795 1.23405 35.7009ZM27.2538 26.0483C33.1292 26.0483 37.7457 21.4319 37.7457 15.5564C37.7457 9.68093 33.1293 5.06465 27.2538 5.06465C21.3783 5.06465 16.7619 9.68103 16.7619 15.5565C16.7619 21.432 21.3784 26.0483 27.2538 26.0483Z" fill="white"/>
-  </svg>
-  
-
-  const howItWorks = [
-    {
-      icon: <SearchIcon className="group-hover:text-white" />,
-      title: "Search for Services",
-      text: "Enter your postcode and the service you need, such as vaccinations, health checks, or consultations."
-    },
-    {
-      icon: <BookIcon className="group-hover:text-white" />,
-      title: "Compare Pharmacies",
-      text: "Browse nearby pharmacies, compare prices, check availability, and read reviews to make an informed decision."
-    },
-    {
-      icon: <ComputerIcon className="group-hover:text-white" />,
-      title: "Book Online",
-      text: "Select your preferred pharmacy and schedule your appointment through our secure online booking system."
-    },
-    {
-      icon: <VerifyIcon className="group-hover:text-white" />,
-      title: "Receive Confirmation",
-      text: "Your chosen pharmacy will receive a notification of your booking, and you'll get a confirmation email or SMS with all the details."
-    }
-  ]
+    const howItWorks = [
+      {
+        icon: <SearchIcon color={hoveredIndex === 0 ? "white" : "#189BA3"} />,
+        title: "Search for Services",
+        text: "Enter your postcode and the service you need, such as vaccinations, health checks, or consultations."
+      },
+      {
+        icon: <BookIcon color={hoveredIndex === 1 ? "white" : "#189BA3"} />,
+        title: "Compare Pharmacies",
+        text: "Browse nearby pharmacies, compare prices, check availability, and read reviews to make an informed decision."
+      },
+      {
+        icon: <ComputerIcon color={hoveredIndex === 2 ? "white" : "#189BA3"} />,
+        title: "Book Online",
+        text: "Select your preferred pharmacy and schedule your appointment through our secure online booking system."
+      },
+      {
+        icon: <VerifyIcon color={hoveredIndex === 3 ? "white" : "#189BA3"} />,
+        title: "Receive Confirmation",
+        text: "Your chosen pharmacy will receive a notification of your booking, and you'll get a confirmation email or SMS with all the details."
+      }
+    ]
   
   return (
     <section className='mt-80 mb-4'> 
@@ -54,7 +51,14 @@ const HowItWorks = () => {
           <h1 className='text-4xl font-bold text-center'>How it works</h1>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 my-8 gap-4'>
           {howItWorks.map((item, index) => (
-            <HowItWorksCard key={index} {...item} />
+            <div 
+              key={index}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+                
+            >
+              <HowItWorksCard {...item} />
+            </div>
           ))}
           </div>
         </div>
