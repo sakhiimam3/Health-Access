@@ -1,6 +1,6 @@
 import React from 'react';
-import Image from 'next/image';
-import HowItWorksImage from '../../public/images/howitworks.png';
+// import Image from 'next/image';
+// import HowItWorksImage from '../../public/images/howitworks.png';
 import LayoutWrapper from './layout/wrapper';
 import { BookIcon, CompassIcon, Computer, GitCompareIcon, SearchIcon } from 'lucide-react';
 import { ComputerIcon, VerifyIcon } from './icons/icons';

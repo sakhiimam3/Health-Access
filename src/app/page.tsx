@@ -16,8 +16,8 @@ export default function Home() {
     <PharmacySlider />
     <TrustedPartner />
     <Blogs />
-     <PartnerSection />
-     <FrequentlyAsked />
+     <PartnerSection bgColor="bg-[#189BA3]" />
+     <FrequentlyAsked btnColor="#189BA3" />
     <Footer />
     </>
    

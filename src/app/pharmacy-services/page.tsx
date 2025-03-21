@@ -104,13 +104,15 @@ const PharmacyServices = () => {
   ];
 
   return (
-    <PagesWrapper>
+    <PagesWrapper  bgColor="bg-[#189BA3]" btnColor="#189BA3">
       <div className="mt-56">
         <PagesBanner
           title="Pharmacy Services"
           image="/images/phr-banner.png"
-          height="h-40"
+          height="h-60"
           textColor="white"
+          fromColor="#189BA3"
+          toColor = "#189BA3"
         />
         <LayoutWrapper>
           <div className="my-20">

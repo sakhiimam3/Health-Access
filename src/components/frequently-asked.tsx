@@ -2,7 +2,8 @@ import React from "react";
 import LayoutWrapper from "./layout/wrapper";
 import ButtonTheme from "./shared/ButtonTheme";
 
-const FrequentlyAsked = () => {
+const FrequentlyAsked = ({btnColor}: {btnColor:string}) => {
+  const hexColor = btnColor.match(/#[0-9a-fA-F]{6}/)[0];
   const faqItems = [
     {
       question: "How do I book a service with Health Access?",
@@ -51,10 +52,10 @@ const FrequentlyAsked = () => {
       <LayoutWrapper>
         <div>
           <div className="max-w-4xl">
-            <h1 className="text-4xl font-bold text-gray-900 mb-5">
+            <h1 className="text-4xl font-bold  mb-5">
               Frequently Asked Questions
             </h1>
-            <p className="text-gray-600 mb-14">
+            <p className="mb-14 font-roboto">
               Have questions? We've got answers! Explore our FAQs to learn more
               about our services, booking process, and how we ensure seamless
               healthcare access.
@@ -63,21 +64,21 @@ const FrequentlyAsked = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {faqItems.map((item, index) => (
-              <div key={index} className="border-b border-gray-200 pb-6">
+              <div key={index} className="pb-6">
                 <h3 className="font-semibold  text-lg  mb-2">
                   {item.question}
                 </h3>
-                <p className="text-gray-600 text-sm">{item.answer}</p>
+                <p className="font-roboto text-sm">{item.answer}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-12 ">
-            <h3 className="text-xl font-medium text-[#189BA3] mb-4">
+          <div className="mt-12">
+            <h3 className="text-xl font-medium mb-4" style={{ color: hexColor }}>
               Still have questions?
             </h3>
 
-            <ButtonTheme bgColor="bg-[#189BA3]" paddingX="px-10" textColor="text-white">
+            <ButtonTheme bgColor={`bg-[${hexColor}]`} paddingX="px-10" textColor="text-white">
               Contact Us
             </ButtonTheme>
           </div>

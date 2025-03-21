@@ -2,9 +2,10 @@ import { Input } from "@/components/ui/input"
 import LayoutWrapper from "./layout/wrapper"
 import ButtonTheme from "./shared/ButtonTheme"
 
-export default function PartnerSection() {
-  return (
-    <section className="w-full bg-[#189BA3] px-4  md:py-12">
+export default function PartnerSection({bgColor}: {bgColor:string}) {
+
+  return (  
+    <section className={`w-full ${bgColor} px-4  md:py-12`}>
       <LayoutWrapper>
         <div className="grid md:grid-cols-2 ">
           {/* Left Column - Heading */}

@@ -11,11 +11,11 @@ interface HeaderBannerProps {
 
 const PagesBanner: React.FC<HeaderBannerProps> = ({
   image,
-  title = "Privacy Services",
-  textColor = "text-white",
-  fromColor = "#189BA3",
-  toColor = "#189BA3",
-  height = "h-32"
+  title ,
+  textColor,
+  fromColor,
+  toColor,
+  height 
 }) => {
   return (
     <div className={`relative w-full ${height} overflow-hidden`}>
@@ -30,12 +30,12 @@ const PagesBanner: React.FC<HeaderBannerProps> = ({
       <div
         className="absolute inset-0 z-10"
         style={{
-          background: `linear-gradient(to top, ${fromColor}80, ${toColor}40, transparent)`,
+          background: `linear-gradient(to top, ${fromColor}95, ${toColor}60, transparent)`,
         }}
       />
       {/* Centered Text */}
       <div className="absolute z-10 inset-0 flex items-center justify-center">
-        <h1 className={`text-xl md:text-2xl font-bold text-white ${textColor}`}>
+        <h1 className={`text-xl md:text-2xl lg:text-3xl font-bold text-white ${textColor}`}>
           {title}
         </h1>
       </div>
