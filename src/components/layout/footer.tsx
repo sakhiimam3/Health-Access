@@ -20,7 +20,7 @@ export default function Footer() {
                 />
               </Link>
             </div>
-            <p className="text-sm leading-relaxed pr-4">
+            <p className="text-sm leading-relaxed text-[#B8B8B8] pr-4">
               At Health Access, our mission is to make healthcare accessible,
               reliable, and hassle-free. We connect individuals with trusted NHS
               and private pharmacy services across the UK, ensuring you get the
@@ -39,7 +39,7 @@ export default function Footer() {
                   <li key={item}>
                     <Link
                       href={`/${item.toLowerCase().replace(" ", "-")}`}
-                      className="hover:text-white  transition-colors duration-200"
+                      className="hover:text-white  text-[#B8B8B8]  transition-colors duration-200"
                     >
                       {item}
                     </Link>

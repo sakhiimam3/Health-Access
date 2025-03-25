@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 // import HowItWorksImage from '../../public/images/howitworks.png';
 import LayoutWrapper from './layout/wrapper';
 import { BookIcon, CompassIcon, Computer, GitCompareIcon } from 'lucide-react';
-import { ComputerIcon, SearchIcon, VerifyIcon } from './icons/icons';
+import { ComputerIcon, SearchIcon, TextBoxIcon, VerifyIcon } from './icons/icons';
 import HowItWorksCard from './howitworksCard';
 
 
@@ -19,7 +19,7 @@ const HowItWorks = () => {
         text: "Enter your postcode and the service you need, such as vaccinations, health checks, or consultations."
       },
       {
-        icon: <BookIcon color={hoveredIndex === 1 ? "white" : "#189BA3"} />,
+        icon: <TextBoxIcon color={hoveredIndex === 1 ? "white" : "#189BA3"} />,
         title: "Compare Pharmacies",
         text: "Browse nearby pharmacies, compare prices, check availability, and read reviews to make an informed decision."
       },
@@ -103,7 +103,7 @@ const HowItWorks = () => {
           </div>
         </div>
       </div> */}
-       <div className='border-t-2 border-gray-200 mt-10'></div>
+       <div className='border-t-2 border-[#DCDCDC] mt-10'></div>
         </LayoutWrapper>
     </section>
  

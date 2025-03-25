@@ -18,20 +18,23 @@ import pharmacy5 from "../../public/images/pharmacy-2.png";
 
 const pharmacySlider = () => {
   const pharmacies = [
-    {
+    { 
+      id: "123",
       imageSrc: pharmacy1,
       title: "CarePlus Pharmacy",
       description: "45 High Street, Birmingham, B4 7SL",
       address: "Pharmacy Address",
       services: [],
     },
-    {
+    { 
+      id: "1234",
       imageSrc: pharmacy2,
       title: "Warburtons Pharmacy ",
       address: "78 Deansgate, Manchester, M3 2FW",
       services: [],
     },
     {
+      id: "1235",
       imageSrc: pharmacy3,
       title: "Warburtons Pharmacy",
       address: "78 Deansgate, Manchester, M3 2FW",
@@ -41,7 +44,8 @@ const pharmacySlider = () => {
         { id: "3", name: "NHS Services" },
       ],
     },
-    {
+    { 
+      id: "1236",
       imageSrc: pharmacy4,
       title: "CityCare Pharmacy",
       address: "101 Queen Street, Glasgow, G1 3DN",
@@ -52,7 +56,8 @@ const pharmacySlider = () => {
         { id: "3", name: "NHS Services" },
       ],
     },
-    {
+    { 
+      id: "1237",
       imageSrc: pharmacy5,
       title: "New Pharmacy",
       address: "123 New Street, London, E1 6AN",
@@ -87,6 +92,7 @@ const pharmacySlider = () => {
                     title={pharmacy.title}
                     address={pharmacy.address}
                     services={pharmacy.services || []}
+                    id={pharmacy.id}
                   />
                 </CarouselItem>
               ))}

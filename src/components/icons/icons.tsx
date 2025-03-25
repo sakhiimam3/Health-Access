@@ -38,7 +38,7 @@ const SearchIcon: React.FC<{
   height?: number;
   className?: string;
   color?:string
-}> = ({ width = 42, height = 44, className = "",color }) => {
+}> = ({ width = 32, height = 32, className = "",color }) => {
   return (
     <svg
       width={width}
@@ -83,7 +83,7 @@ const ComputerIcon: React.FC<{
   height?: number;
   className?: string;
   color?:string
-}> = ({ width = 40, height = 37, className = "" ,color}) => {
+}> = ({ width = 32, height = 32, className = "" ,color}) => {
   return (
     <svg
       width={width}
@@ -106,7 +106,7 @@ const VerifyIcon: React.FC<{
   height?: number;
   className?: string;
   color?:string
-}> = ({ width = 38, height = 44, className = "" ,color}) => {
+}> = ({ width = 32, height = 32, className = "" ,color}) => {
   return (
     <svg
       width={width}
@@ -258,8 +258,30 @@ const ConvinenceIcon: React.FC<{ width?: number; height?: number; className?: st
   );
 };
 
-// ... existing code ...
 
+
+const TextBoxIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+  color?: string;
+}> = ({ width = 32, height = 32, className = "", color = "#000000" }) => {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 256 256"
+      fill={color}
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M248,80v96a16,16,0,0,1-16,16H140a4,4,0,0,1-4-4V68a4,4,0,0,1,4-4h92A16,16,0,0,1,248,80ZM120,48V208a8,8,0,0,1-16,0V192H24A16,16,0,0,1,8,176V80A16,16,0,0,1,24,64h80V48a8,8,0,0,1,16,0ZM88,112a8,8,0,0,0-8-8H48a8,8,0,0,0,0,16h8v24a8,8,0,0,0,16,0V120h8A8,8,0,0,0,88,112Z"
+        fill={color}
+      />
+    </svg>
+  );
+};
 
 export {
   UserIcon,
@@ -272,5 +294,6 @@ export {
   TransparencyIcon,
   TrustIcon,
   CommunityIcon,
-  ConvinenceIcon
+  ConvinenceIcon,
+  TextBoxIcon
 };

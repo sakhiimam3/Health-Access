@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image, { StaticImageData } from "next/image";
 import ButtonTheme from "./shared/ButtonTheme";
-
+import { useRouter } from "next/navigation";
 interface PharmacyService {
   id: string;
   name: string;
@@ -19,18 +19,20 @@ interface PharmacyService {
 
 
 export const PharmacyCard = ({
+  id,
   title,
   address,
   services,
   image,
 }: {
+  id: string;
   title: string;
   address: string;
   services: PharmacyService[];
   image: StaticImageData | string;
 }) => {
   const colors = ["#63DBA3", "#79A6F2", "#AA23DB"];
-
+  const router = useRouter();
   return (
     <Card className="overflow-hidden hover:bg-gray-50 ">
       <CardHeader>
@@ -99,7 +101,7 @@ export const PharmacyCard = ({
         >
           Book Now
         </ButtonTheme>
-        <Button variant={"link"} className="underline hover:text-teal-600">
+        <Button variant={"link"} onClick={() => router.push(`/pharmacy/${id}`)} className="underline hover:text-teal-600">
           View Pharmacy
         </Button>
       </CardFooter>

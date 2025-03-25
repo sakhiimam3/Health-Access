@@ -59,7 +59,7 @@ const TrustedPartner = () => {
             <Image src={ukMap} alt="UK Map" width={400} height={400} />
           </div>
         </div>
-        <div className="border-t-2 border-gray-200 "></div>
+        <div className="border-t-2 border-[#DCDCDC] "></div>
       </LayoutWrapper>
     </section>
   );

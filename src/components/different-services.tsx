@@ -1,6 +1,8 @@
+"use client";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 interface Service {
   title: string;
@@ -20,6 +22,9 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
   viewAllLink,
   type,
 }) => {
+
+  const router = useRouter();
+
   return (
     <section className="py-8 ">
       <div className="flex justify-between items-center">
@@ -27,7 +32,10 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
 
         {true && (
           <div>
-            <Link href={viewAllLink || ""} className="underline text-[#52525B]  hover:text-teal-500">
+            <Link
+              href={viewAllLink || ""}
+              className="underline text-[#52525B]  hover:text-teal-500"
+            >
               View All
             </Link>
           </div>
@@ -35,11 +43,13 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
       </div>
       <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {services.map((service, index) => (
-          <div key={index} className="rounded-lg overflow-hidden min-h-[200px]">
-            <div className="relative rounded ">
-              {index === 0 && type === "vaccination" ? (
-                <div className="absolute overf inset-0 bg-gradient-to-t from-[#189BA3]/80 via-[#189BA3]/40 to-transparent z-10 rounded-[16px]" />
-              ) : null}
+          <div
+            key={index}
+            onClick={() => router.push(`/services/s7d9f2h4324234234234`)}
+            className="rounded-lg cursor-pointer overflow-hidden min-h-[200px] group"
+          >
+            <div className="relative rounded">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#189BA3]/80 via-[#189BA3]/40 to-transparent z-10 rounded-[16px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <Image
                 src={service.image}
                 alt="Medical consultation"

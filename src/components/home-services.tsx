@@ -109,7 +109,7 @@ const homeServices = () => {
           </ButtonTheme>
         </div>
 
-        <div className="border-t-2 border-gray-200 mt-10"></div>
+        <div className="border-t-2 border-[#DCDCDC] mt-10"></div>
       </LayoutWrapper>
     </section>
   );
