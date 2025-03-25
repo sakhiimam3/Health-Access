@@ -15,6 +15,8 @@ export default {
   			headingText: '#000000',
   			bodyText: '#4B4B4B',
   			white: '#FFFFFF',
+			textColor:"#1E222B",
+			paragraphColor:"#52525B",
   			accentDarkTeal: '#008080',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -65,6 +67,7 @@ export default {
   		fontFamily: {
   			ubuntu: ['var(--font-ubuntu)', 'sans-serif'],
   			roboto: ['var(--font-roboto-slab)', 'serif'],
+			plusJakartaSans: ['var(--font-plus-jakarta-sans)', 'sans-serif'],
   		}
   	}
   },

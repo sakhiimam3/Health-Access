@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto_Slab, Ubuntu } from "next/font/google";
+import { Roboto_Slab, Ubuntu,Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 const robotoSlab = Roboto_Slab({
@@ -10,6 +10,12 @@ const robotoSlab = Roboto_Slab({
 
 const ubuntu = Ubuntu({
   variable: "--font-ubuntu",
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta-sans",
   weight: ["300", "400", "500", "700"],
   subsets: ["latin"],
 });
@@ -26,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${robotoSlab.variable} ${ubuntu.variable}`}
+        className={`${robotoSlab.variable} ${ubuntu.variable} ${plusJakartaSans.variable}`}
       >
         {children}
       </body>
