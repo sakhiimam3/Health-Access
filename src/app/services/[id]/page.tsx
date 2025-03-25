@@ -1,3 +1,4 @@
+"use client"
 import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import LayoutWrapper from "@/components/layout/wrapper";
 import PagesBanner from "@/components/pagesBanner";
@@ -72,6 +73,7 @@ const ServicesDetails = () => {
               </div>
             ))}
           </div>
+            
          </div>
          <div className='border-t-2 border-[#DCDCDC] mt-10'></div>
 

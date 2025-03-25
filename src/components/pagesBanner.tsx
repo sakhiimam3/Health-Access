@@ -1,61 +1,58 @@
 import React from 'react';
-import Image from 'next/image';
-import Breadcrumb from './ui/breadcrumb';
+import Breadcrumb from './breadcrum';
 
-interface PagesBannerProps {
+interface HeaderBannerProps {
+  image: string;
   title?: string;
-  image?: string;
-  height?: string;
   textColor?: string;
   fromColor?: string;
   toColor?: string;
+  height?: string;
   isDetail?: boolean;
 }
 
-const PagesBanner = ({
-  title,
+const PagesBanner: React.FC<HeaderBannerProps> = ({
   image,
-  height = "h-96",
-  textColor = "black",
+  title,
+  textColor,
   fromColor,
   toColor,
-  isDetail
-}: PagesBannerProps) => {
+  height,
+  isDetail,
+}) => {
   return (
-    <div className={`relative ${height} w-full`}>
-      {!isDetail && image && (
-        <Image
-          src={image}
-          alt={title || "Banner"}
-          fill
-          className="object-cover"
-        />
-      )}
-      <div
-        className={`absolute inset-0 ${
-          isDetail ? 'bg-opacity-100' : 'bg-opacity-70'
-        }`}
-        style={{
-          background: isDetail 
-            ? fromColor 
-            : `linear-gradient(to right, ${fromColor || '#000000'}, ${toColor || '#000000'})`
-        }}
-      >
-        <div className="container mx-auto px-4 h-full flex flex-col justify-center">
-          {isDetail && (
-            <div className="mb-4">
-              <Breadcrumb
-                items={[
-                  { label: "Pharmacies", href: "/pharmacy" },
-                  { label: title || "", href: "#" },
-                ]}
-              />
-            </div>
-          )}
-          <h1 className={`text-4xl font-bold text-${textColor}`}>{title}</h1>
+    <>
+      {isDetail ? (
+        <div className={`relative w-full ${height} overflow-hidden`}>
+          <div className={`h-full w-full flex flex-col text-white items-center justify-center bg-[${fromColor}]`}>
+            <Breadcrumb  />
+            <h1 className={`text-white text-3xl mt-4 font-ubantu  font-bold ${textColor}`}>{title}</h1>
+          </div>
         </div>
-      </div>
-    </div>
+      ) : (
+        <div className={`relative w-full ${height} overflow-hidden`}>
+          {/* Background Image */}
+          <img 
+            src={image} 
+            alt="Banner background" 
+            className="w-full h-full object-cover"
+          />
+          {/* Overlay with dynamic color */}
+          <div
+            className="absolute inset-0 z-10"
+            style={{
+              background: `linear-gradient(to top, ${fromColor}95, ${toColor}60, transparent)`,
+            }}
+          />
+          {/* Centered Text */}
+          <div className="absolute z-10 inset-0 flex items-center justify-center">
+            <h1 className={`text-xl md:text-2xl lg:text-3xl font-bold text-white ${textColor}`}>
+              {title}
+            </h1>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
