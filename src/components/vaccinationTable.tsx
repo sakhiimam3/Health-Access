@@ -91,7 +91,7 @@ const VaccinationPriceList: React.FC = () => {
                 />
               </div>
               <div className='flex items-center'>
-                <Button variant="outline" className="border border-[#DCDCDC] h-11 px-4 rounded-[25px] flex items-center gap-2">
+                <Button  className="border-[1px] border-solid border-[#737373] h-11 px-4 rounded-[25px] flex items-center gap-2">
                   <FilterIcon />
                   <span>Filters</span>
                 </Button>

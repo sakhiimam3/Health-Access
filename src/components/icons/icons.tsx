@@ -329,6 +329,59 @@ const TextBoxIcon: React.FC<{
   );
 };
 
+const EmailIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 32, height = 32, className = "" }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"  width={width} height={height} className={className}>
+      <rect width="256" height="256" fill="none" />
+      <path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z" fill="#189BA3" />
+    </svg>
+  );
+};
+
+const SupportIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+  color?: string;
+}> = ({ width = 32, height = 32, className = "", color = "#189BA3" }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} fill={color} viewBox="0 0 256 256">
+      <path d="M232,128v80a40,40,0,0,1-40,40H136a8,8,0,0,1,0-16h56a24,24,0,0,0,24-24H192a24,24,0,0,1-24-24V144a24,24,0,0,1,24-24h23.65A88,88,0,0,0,66,65.54,87.29,87.29,0,0,0,40.36,120H64a24,24,0,0,1,24,24v40a24,24,0,0,1-24,24H48a24,24,0,0,1-24-24V128A104.11,104.11,0,0,1,201.89,54.66,103.41,103.41,0,0,1,232,128Z"></path>
+    </svg>
+  );
+};
+
+const LocationIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+  color?: string;
+}> = ({ width = 32, height = 32, className = "", color = "#189BA3" }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} fill={color} viewBox="0 0 256 256">
+      <path d="M200,224H150.54A266.56,266.56,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25a88,88,0,0,0-176,0c0,31.4,14.51,64.68,42,96.25A266.56,266.56,0,0,0,105.46,224H56a8,8,0,0,0,0,16H200a8,8,0,0,0,0-16ZM128,72a32,32,0,1,1-32,32A32,32,0,0,1,128,72Z"></path>
+    </svg>
+  );
+};
+
+const ClockIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+  color?: string;
+}> = ({ width = 32, height = 32, className = "", color = "#189BA3" }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} fill={color} viewBox="0 0 256 256">
+      <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm56,112H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48a8,8,0,0,1,0,16Z"></path>
+    </svg>
+  );
+};
+
+
 export {
   UserIcon,
   SearchIcon,
@@ -343,5 +396,9 @@ export {
   CommunityIcon,
   ConvinenceIcon,
   TextBoxIcon,
-  FilterIcon
+  FilterIcon,
+  EmailIcon,
+  SupportIcon,
+  LocationIcon,
+  ClockIcon
 };

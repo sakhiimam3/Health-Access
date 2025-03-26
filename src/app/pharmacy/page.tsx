@@ -16,6 +16,8 @@ import ButtonTheme from "@/components/shared/ButtonTheme";
 import Image from "next/image";
 import HomeServices from "@/components/home-services";
 import VaccinationPriceList from "@/components/vaccinationTable";
+import NHSServicesCard from "@/components/NHSServicesCard";
+import { ClockIcon, EmailIcon, LocationIcon, SupportIcon } from "@/components/icons/icons";
 
 const PharmacyDetails = () => {
   const searchParams = useSearchParams();
@@ -74,6 +76,28 @@ const PharmacyDetails = () => {
     },
   ];
   const pharmacy = pharmacies.find((pharmacy) => pharmacy.id === id);
+  const contactData = [
+    {
+      icon: EmailIcon,
+      title: 'Email',
+      content: 'contact@warburtonpharmacy.co.uk'
+    },
+    {
+      icon: SupportIcon,
+      title: 'Support',
+      content: '+44 1234 567890'
+    },
+    {
+      icon: LocationIcon,
+      title: 'Address',
+      content: '78 Deansgate, Manchester, M3 2FW, UK'
+    },
+    {
+      icon: ClockIcon,
+      title: 'Opening Hours',
+      content: 'Start new chat'
+    }
+  ];
 
   return (
     <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
@@ -88,51 +112,90 @@ const PharmacyDetails = () => {
           isDetail={true}
         />
         <LayoutWrapper>
-            <section>
-          <div className="grid lg:grid-cols-2 gap-6 my-16">
-            <h2 className="text-2xl md:text-3xl max-w-[800px] font-bold leading-tight">
-              Your Trusted Local Pharmacy for NHS and Private Services{" "}
-            </h2>
-            <div className="relative after:absolute after:w-4 after:h-0.5 after:-bottom-8 after:left-0 after:bg-[pink] before:absolute before:w-4 before:h-0.5 before:-top-8 before:left-0 before:bg-[#189BA3] mb-5">
-              <p className="text-[#52525B] text-md font-roboto ">
-                Warburtons Pharmacy is a trusted and community-focused independent
-                pharmacy located in <span className="text-[#189BA3] hover:underline cursor-pointer">Manchester, M3 2FW</span>. Renowned for its friendly
-                service and personalized care, Warburtons Pharmacy is dedicated to
-                offering exceptional healthcare solutions and building strong
-                relationships with every customer.
-              </p>
-              <ButtonTheme bgColor="bg-[#189BA3]" className="my-6 text-white py-4 px-16  text-xl font-ubantu rounded-[100px]" children="Book Now" />
+          <section>
+            <div className="grid lg:grid-cols-2 gap-6 my-16">
+              <h2 className="text-2xl md:text-3xl max-w-[800px] font-bold leading-tight">
+                Your Trusted Local Pharmacy for NHS and Private Services{" "}
+              </h2>
+              <div className="relative after:absolute after:w-4 after:h-0.5 after:-bottom-8 after:left-0 after:bg-[pink] before:absolute before:w-4 before:h-0.5 before:-top-8 before:left-0 before:bg-[#189BA3] mb-5">
+                <p className="text-[#52525B] text-md font-roboto ">
+                  Warburtons Pharmacy is a trusted and community-focused
+                  independent pharmacy located in{" "}
+                  <span className="text-[#189BA3] hover:underline cursor-pointer">
+                    Manchester, M3 2FW
+                  </span>
+                  . Renowned for its friendly service and personalized care,
+                  Warburtons Pharmacy is dedicated to offering exceptional
+                  healthcare solutions and building strong relationships with
+                  every customer.
+                </p>
+                <ButtonTheme
+                  bgColor="bg-[#189BA3]"
+                  className="my-6 text-white py-4 px-16  text-xl font-ubantu rounded-[100px]"
+                  children="Book Now"
+                />
+              </div>
             </div>
-          </div>
           </section>
           <section>
-           <div className="h-[600px] w-[92%] rounded-lg  relative">
-              <Image 
-                src={warbunsdeatil} 
-                alt={"pharmacy-detail"} 
+            <div className="h-[600px] w-[92%] rounded-lg  relative">
+              <Image
+                src={warbunsdeatil}
+                alt={"pharmacy-detail"}
                 fill
                 className="object-cover rounded-[10px]"
               />
               <div className="absolute top-[50px] right-[-100px] h-[250px] w-[240px] z-10">
-                <Image 
-                  src={consultant} 
-                  alt={"pharmacy-small-detail"} 
+                <Image
+                  src={consultant}
+                  alt={"pharmacy-small-detail"}
                   fill
                   className="object-cover rounded-lg"
                 />
               </div>
-           </div>
-           <div className='border-t-2 border-[#DCDCDC] mt-10'></div>
-           </section>
-            <section>
-                  <div className="text-3xl  text-center font-bold my-14">
-                     Our Services
+            </div>
+            <div className="border-t-1 border-[#DCDCDC] mt-10"></div>
+          </section>
+          <section>
+            <div className="text-3xl  text-center font-bold my-14">
+              Our Services
+            </div>
+
+            <HomeServices />
+          </section>
+          <section>
+            <VaccinationPriceList />
+          </section>
+        </LayoutWrapper>
+        <section className="mt-14">
+          <NHSServicesCard />
+        </section>
+        <LayoutWrapper>
+        <section >
+          <div className="my-14">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {contactData.map((item, index) => (
+                <div key={index} className="flex flex-col items-center text-center">
+                  <div className="mb-4 flex items-center gap-2 flex-col">
+                    <item.icon  className="text-[#189BA3]" />
+                    <div className="font-bold text-lg font-ubantu">{item.title}</div>
+
                   </div>
-                   
-                    <HomeServices />
-                  <VaccinationPriceList />
-                  
-            </section>
+                  <div className="text-[#52525B] font-roboto">{item.content}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        <div>
+        <div className="w-full">
+      <img 
+        src="/images/map.png" 
+        alt="City Map" 
+        className="w-full h-auto object-cover"
+      />
+    </div>
+        </div>
         </LayoutWrapper>
       </div>
     </PagesWrapper>

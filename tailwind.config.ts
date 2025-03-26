@@ -16,6 +16,7 @@ export default {
   			bodyText: '#4B4B4B',
   			white: '#FFFFFF',
 			textColor:"#1E222B",
+			bgbtn:"#189BA3",
 			paragraphColor:"#52525B",
   			accentDarkTeal: '#008080',
   			background: 'hsl(var(--background))',
