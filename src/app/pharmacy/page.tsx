@@ -2,7 +2,7 @@
 import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import LayoutWrapper from "@/components/layout/wrapper";
 import PagesBanner from "@/components/pagesBanner";
-import React from "react";
+import React, { Suspense } from "react";
 // import Image from "next/image";
 import pharmacy1 from "../../../public/images/pharmacy-1.png";
 import pharmacy2 from "../../../public/images/pharmacy-2.png";
@@ -21,6 +21,16 @@ import { ClockIcon, EmailIcon, LocationIcon, SupportIcon } from "@/components/ic
 import ContactUs from "@/components/contactus";
 
 const PharmacyDetails = () => {
+  return (
+    <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
+      <Suspense fallback={<div>Loading...</div>}>
+        <PharmacyContent />
+      </Suspense>
+    </PagesWrapper>
+  );
+};
+
+const PharmacyContent = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
@@ -101,83 +111,81 @@ const PharmacyDetails = () => {
   ];
 
   return (
-    <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
-      <div className="mt-56">
-        <PagesBanner
-          title={pharmacy?.title}
-          image="/images/pharmacy-detail.png"
-          height="h-[200px]"
-          textColor="white"
-          fromColor="#189BA3"
-          toColor="#189BA3"
-          isDetail={true}
-        />
-        <LayoutWrapper>
-          <section>
-            <div className="grid lg:grid-cols-2 gap-6 my-16">
-              <h2 className="text-2xl md:text-3xl max-w-[800px] font-bold leading-tight">
-                Your Trusted Local Pharmacy for NHS and Private Services{" "}
-              </h2>
-              <div className="relative after:absolute after:w-4 after:h-0.5 after:-bottom-8 after:left-0 after:bg-[pink] before:absolute before:w-4 before:h-0.5 before:-top-8 before:left-0 before:bg-[#189BA3] mb-5">
-                <p className="text-[#52525B] text-md font-roboto ">
-                  Warburtons Pharmacy is a trusted and community-focused
-                  independent pharmacy located in{" "}
-                  <span className="text-[#189BA3] hover:underline cursor-pointer">
-                    Manchester, M3 2FW
-                  </span>
-                  . Renowned for its friendly service and personalized care,
-                  Warburtons Pharmacy is dedicated to offering exceptional
-                  healthcare solutions and building strong relationships with
-                  every customer.
-                </p>
-                <ButtonTheme
-                  bgColor="bg-[#189BA3]"
-                  className="my-6 text-white py-4 px-16  text-xl font-ubantu rounded-[100px]"
-                  children="Book Now"
-                />
-              </div>
-            </div>
-          </section>
-          <section>
-            <div className="h-[600px] w-[92%] rounded-lg  relative">
-              <Image
-                src={warbunsdeatil}
-                alt={"pharmacy-detail"}
-                fill
-                className="object-cover rounded-[10px]"
+    <div className="mt-56">
+      <PagesBanner
+        title={pharmacy?.title}
+        image="/images/pharmacy-detail.png"
+        height="h-[200px]"
+        textColor="white"
+        fromColor="#189BA3"
+        toColor="#189BA3"
+        isDetail={true}
+      />
+      <LayoutWrapper>
+        <section>
+          <div className="grid lg:grid-cols-2 gap-6 my-16">
+            <h2 className="text-2xl md:text-3xl max-w-[800px] font-bold leading-tight">
+              Your Trusted Local Pharmacy for NHS and Private Services{" "}
+            </h2>
+            <div className="relative after:absolute after:w-4 after:h-0.5 after:-bottom-8 after:left-0 after:bg-[pink] before:absolute before:w-4 before:h-0.5 before:-top-8 before:left-0 before:bg-[#189BA3] mb-5">
+              <p className="text-[#52525B] text-md font-roboto ">
+                Warburtons Pharmacy is a trusted and community-focused
+                independent pharmacy located in{" "}
+                <span className="text-[#189BA3] hover:underline cursor-pointer">
+                  Manchester, M3 2FW
+                </span>
+                . Renowned for its friendly service and personalized care,
+                Warburtons Pharmacy is dedicated to offering exceptional
+                healthcare solutions and building strong relationships with
+                every customer.
+              </p>
+              <ButtonTheme
+                bgColor="bg-[#189BA3]"
+                className="my-6 text-white py-4 px-16  text-xl font-ubantu rounded-[100px]"
+                children="Book Now"
               />
-              <div className="absolute top-[50px] right-[-100px] h-[250px] w-[240px] z-10">
-                <Image
-                  src={consultant}
-                  alt={"pharmacy-small-detail"}
-                  fill
-                  className="object-cover rounded-lg"
-                />
-              </div>
             </div>
-            <div className="border-t-1 border-[#DCDCDC] mt-10"></div>
-          </section>
-          <section>
-            <div className="text-3xl  text-center font-bold my-14">
-              Our Services
+          </div>
+        </section>
+        <section>
+          <div className="h-[600px] w-[92%] rounded-lg  relative">
+            <Image
+              src={warbunsdeatil}
+              alt={"pharmacy-detail"}
+              fill
+              className="object-cover rounded-[10px]"
+            />
+            <div className="absolute top-[50px] right-[-100px] h-[250px] w-[240px] z-10">
+              <Image
+                src={consultant}
+                alt={"pharmacy-small-detail"}
+                fill
+                className="object-cover rounded-lg"
+              />
             </div>
+          </div>
+          <div className="border-t-1 border-[#DCDCDC] mt-10"></div>
+        </section>
+        <section>
+          <div className="text-3xl  text-center font-bold my-14">
+            Our Services
+          </div>
 
-            <HomeServices />
-          </section>
-          <section>
-            <VaccinationPriceList />
-          </section>
-        </LayoutWrapper>
-        <section className="mt-14">
-          <NHSServicesCard />
+          <HomeServices />
         </section>
-        <LayoutWrapper>
-        <section >
-          <ContactUs />
+        <section>
+          <VaccinationPriceList />
         </section>
-        </LayoutWrapper>
-      </div>
-    </PagesWrapper>
+      </LayoutWrapper>
+      <section className="mt-14">
+        <NHSServicesCard />
+      </section>
+      <LayoutWrapper>
+      <section >
+        <ContactUs />
+      </section>
+      </LayoutWrapper>
+    </div>
   );
 };
 
