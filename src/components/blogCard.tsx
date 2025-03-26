@@ -1,8 +1,10 @@
+"use client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import Image, { StaticImageData } from "next/image"
 
 import { FC } from 'react';
+import { useRouter } from "next/navigation";
 
 interface NHSCardProps {
   imageSrc: string | StaticImageData;
@@ -21,8 +23,9 @@ const NHSCard: FC<NHSCardProps> = ({
   date = "01 Jan 2025", 
   readTime = "5 min read",
 }) => {
+  const router = useRouter();
   return (
-    <Card className=" overflow-hidden border-none shadow-none">
+    <Card onClick={() => router.push(`/blogs?id=w3dasw33laaalasdf`)} className=" cursor-pointer overflow-hidden border-none shadow-none">
       <div className="relative h-[250px] rounded-t-[16px] w-full">
         <Image
           src={imageSrc}

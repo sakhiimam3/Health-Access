@@ -26,7 +26,7 @@ const PagesBanner: React.FC<HeaderBannerProps> = ({
         <div className={`relative w-full ${height} overflow-hidden`}>
           <div className={`h-full w-full flex flex-col text-white items-center justify-center bg-[${fromColor}]`}>
             <Breadcrumb  />
-            <h1 className={`text-white text-3xl mt-4 font-ubantu  font-bold ${textColor}`}>{title}</h1>
+            <h1 className={`text-white max-w-lg text-center text-3xl mt-4 font-ubantu  font-bold ${textColor}`}>{title}</h1>
           </div>
         </div>
       ) : (

@@ -18,6 +18,7 @@ import HomeServices from "@/components/home-services";
 import VaccinationPriceList from "@/components/vaccinationTable";
 import NHSServicesCard from "@/components/NHSServicesCard";
 import { ClockIcon, EmailIcon, LocationIcon, SupportIcon } from "@/components/icons/icons";
+import ContactUs from "@/components/contactus";
 
 const PharmacyDetails = () => {
   const searchParams = useSearchParams();
@@ -172,30 +173,8 @@ const PharmacyDetails = () => {
         </section>
         <LayoutWrapper>
         <section >
-          <div className="my-14">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {contactData.map((item, index) => (
-                <div key={index} className="flex flex-col items-center text-center">
-                  <div className="mb-4 flex items-center gap-2 flex-col">
-                    <item.icon  className="text-[#189BA3]" />
-                    <div className="font-bold text-lg font-ubantu">{item.title}</div>
-
-                  </div>
-                  <div className="text-[#52525B] font-roboto">{item.content}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ContactUs />
         </section>
-        <div>
-        <div className="w-full">
-      <img 
-        src="/images/map.png" 
-        alt="City Map" 
-        className="w-full h-auto object-cover"
-      />
-    </div>
-        </div>
         </LayoutWrapper>
       </div>
     </PagesWrapper>

@@ -382,6 +382,62 @@ const ClockIcon: React.FC<{
 };
 
 
+const FacebookIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+  color?: string;
+}> = ({ width = 24, height = 24, className = "", color = "#189BA3" }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      fill={color}
+      viewBox="0 0 256 256"
+      className={className}
+    >
+      <path d="M232,128a104.16,104.16,0,0,1-91.55,103.26,4,4,0,0,1-4.45-4V152h24a8,8,0,0,0,8-8.53,8.17,8.17,0,0,0-8.25-7.47H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,8-8.53A8.17,8.17,0,0,0,167.73,80H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0-8,8.53A8.17,8.17,0,0,0,96.27,152H120v75.28a4,4,0,0,1-4.44,4A104.15,104.15,0,0,1,24.07,124.09c2-54,45.74-97.9,99.78-100A104.12,104.12,0,0,1,232,128Z" />
+    </svg>
+  );
+};
+
+const InstagramIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 24, height = 24, className = "" }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} fill="#189BA3" viewBox="0 0 256 256">
+      <path d="M176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24ZM128,176a48,48,0,1,1,48-48A48.05,48.05,0,0,1,128,176Zm60-96a12,12,0,1,1,12-12A12,12,0,0,1,188,80Zm-28,48a32,32,0,1,1-32-32A32,32,0,0,1,160,128Z"></path>
+    </svg>
+  );
+};
+const XIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 24, height = 24, className = "" }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} fill="#189BA3" viewBox="0 0 256 256">
+      <path d="M215,219.85a8,8,0,0,1-7,4.15H160a8,8,0,0,1-6.75-3.71l-40.49-63.63L53.92,221.38a8,8,0,0,1-11.84-10.76l61.77-68L41.25,44.3A8,8,0,0,1,48,32H96a8,8,0,0,1,6.75,3.71l40.49,63.63,58.84-64.72a8,8,0,0,1,11.84,10.76l-61.77,67.95,62.6,98.38A8,8,0,0,1,215,219.85Z"></path>
+    </svg>
+  );
+};
+
+const LinkedInIcon: React.FC<{
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ width = 24, height = 24, className = "" }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} fill="#189BA3" viewBox="0 0 256 256">
+      <path d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24ZM96,176a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0ZM88,96a12,12,0,1,1,12-12A12,12,0,0,1,88,96Zm96,80a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140Z"></path>
+    </svg>
+  );
+};
+
+
 export {
   UserIcon,
   SearchIcon,
@@ -400,5 +456,9 @@ export {
   EmailIcon,
   SupportIcon,
   LocationIcon,
-  ClockIcon
+  ClockIcon,
+  FacebookIcon,
+  InstagramIcon,
+  XIcon,
+  LinkedInIcon
 };
