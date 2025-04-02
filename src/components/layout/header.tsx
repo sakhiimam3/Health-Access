@@ -95,8 +95,8 @@ const Header = () => {
                   <div className="text-gray-400 text-xs">Add dates</div>
                 </div>
                 <div className="text-black">
-                  <span className="font-semibold text-xs">Who</span>
-                  <div className="text-gray-400 text-xs">Add guests</div>
+                  <span className="font-semibold text-xs">No of people</span>
+                  <div className="text-gray-400 text-xs">Add No of people</div>
                 </div>
               </div>
               <Button

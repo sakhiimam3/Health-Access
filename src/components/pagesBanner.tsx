@@ -2,7 +2,7 @@ import React from 'react';
 import Breadcrumb from './breadcrum';
 
 interface HeaderBannerProps {
-  image: string;
+  image?: string;
   title?: string;
   textColor?: string;
   fromColor?: string;

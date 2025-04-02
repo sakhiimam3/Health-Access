@@ -25,8 +25,8 @@ const NHSCard: FC<NHSCardProps> = ({
 }) => {
   const router = useRouter();
   return (
-    <Card onClick={() => router.push(`/blogs?id=w3dasw33laaalasdf`)} className=" cursor-pointer overflow-hidden border-none shadow-none">
-      <div className="relative h-[250px] rounded-t-[16px] w-full">
+    <Card onClick={() => router.push(`/blogs/23423414234`)} className=" cursor-pointer overflow-hidden border-none shadow-none">
+      <div className="relative h-[300px] rounded-t-[16px] w-full">
         <Image
           src={imageSrc}
           alt="Medical consultation"

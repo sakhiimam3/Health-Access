@@ -25,6 +25,7 @@ const pharmacySlider = () => {
       description: "45 High Street, Birmingham, B4 7SL",
       address: "Pharmacy Address",
       services: [],
+      btnText: "View Pharmacy",
     },
     { 
       id: "1234",
@@ -32,6 +33,7 @@ const pharmacySlider = () => {
       title: "Warburtons Pharmacy ",
       address: "78 Deansgate, Manchester, M3 2FW",
       services: [],
+      btnText: "View Pharmacy",
     },
     {
       id: "1235",
@@ -42,7 +44,8 @@ const pharmacySlider = () => {
         { id: "1", name: "Travel Vaccine" },
         { id: "2", name: "Antimalarial Vaccine" },
         { id: "3", name: "NHS Services" },
-      ],
+          ],
+      btnText: "View Pharmacy",
     },
     { 
       id: "1236",
@@ -55,6 +58,7 @@ const pharmacySlider = () => {
         { id: "2", name: "Antimalarial Vaccine" },
         { id: "3", name: "NHS Services" },
       ],
+      btnText: "View Pharmacy",
     },
     { 
       id: "1237",
@@ -67,6 +71,7 @@ const pharmacySlider = () => {
         { id: "2", name: "Antimalarial Vaccine" },
         { id: "3", name: "NHS Services" },
       ],
+      btnText: "View Pharmacy",
     },
   ];
 
@@ -93,6 +98,8 @@ const pharmacySlider = () => {
                     address={pharmacy.address}
                     services={pharmacy.services || []}
                     id={pharmacy.id}
+                    isSearch={false}
+                    btnText={pharmacy.btnText}
                   />
                 </CarouselItem>
               ))}

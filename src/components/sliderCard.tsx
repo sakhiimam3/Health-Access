@@ -24,19 +24,23 @@ export const PharmacyCard = ({
   address,
   services,
   image,
+  isSearch,
+  btnText,
 }: {
   id: string;
   title: string;
   address: string;
   services: PharmacyService[];
   image: StaticImageData | string;
+  isSearch: boolean;
+  btnText: string;
 }) => {
   const colors = ["#63DBA3", "#79A6F2", "#AA23DB"];
   const router = useRouter();
   return (
-    <Card className="overflow-hidden hover:bg-gray-50 ">
+    <Card   className={`overflow-hidden ${isSearch ? "shadow-none" : "shadow-sm"}  hover:bg-gray-50 ${isSearch && "border-none"} `}>
       <CardHeader>
-        <div className="relative rounded-t-[16px] h-[250px] ">
+        <div className={`relative rounded-t-[16px] ${isSearch ? "h-[130px]" : "h-[250px]"} `}>
           <Image
             src={image}
             alt="Medical consultation"
@@ -46,9 +50,10 @@ export const PharmacyCard = ({
           />
         </div>{" "}
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2 min-h-[100px]">
-          <div className="flex flex-wrap gap-2 my-4">
+      <CardContent    >
+        <div className={`space-y-2 ${isSearch ? "min-h-[50px]" : "min-h-[100px]"} `} >
+          {!isSearch && (
+            <div className="flex flex-wrap gap-2 my-4">
             {services.length > 0 ? (
               services.map((service) => {
                 const randomColor =
@@ -73,9 +78,10 @@ export const PharmacyCard = ({
               <p></p>
             )}
           </div>
-          <h3 className="text-lg  font-semibold my-2">{title}</h3>
+          )}
+          <h3 className={`text-lg  font-semibold my-2 `}>{title}</h3>
 
-          <div className="flex items-center gap-2   text-[#52525B] font-roboto">
+          <div className={`flex ${isSearch ? "items-end" : "items-center"}  gap-2    text-[#52525B] font-roboto`}>
             <svg
               width="14"
               height="18"
@@ -88,21 +94,21 @@ export const PharmacyCard = ({
                 fill="#52525B"
               />
             </svg>
-            <p className="text-sm">{address}</p>
+            <p className={`text-[12px] ${isSearch ? "mt-3" : "mt-0"} truncate`}>{address}</p>
           </div>
         </div>
       </CardContent>
       <CardFooter className="p-2 pt-0 flex  gap-4">
         <ButtonTheme
           bgColor="bg-[#189BA3]"
-          paddingX="px-8"
+          paddingX={isSearch ? "px-3" : "px-8"}
           textColor="text-white"
-          className="px-4 hover:bg-teal-700"
+          className={`hover:bg-teal-700 ${isSearch ? "text-[12px]" : "text-sm"}`}
         >
           Book Now
         </ButtonTheme>
         <Button variant={"link"} onClick={() => router.push(`/pharmacy/?id=${id}`)} className="underline hover:text-teal-600">
-          View Pharmacy
+          {btnText}
         </Button>
       </CardFooter>
     </Card>

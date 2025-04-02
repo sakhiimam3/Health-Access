@@ -16,7 +16,7 @@ interface BreadcrumbProps {
 
 const Breadcrumb: React.FC<BreadcrumbProps> = () => {
   const pathname = usePathname(); 
-  const pathnames = pathname.split('/').filter(x => x);
+  const pathnames = pathname.split('/').filter(x => x && !/^\d+$/.test(x)); // Filter out parameter IDs
   const fullPathnames = ['Home', ...pathnames]; 
 
   return (

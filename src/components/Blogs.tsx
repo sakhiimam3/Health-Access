@@ -1,3 +1,4 @@
+"use client"
 import React from 'react'
 import LayoutWrapper from './layout/wrapper'
 import { CenterHeader } from './shared/centerHeader'
@@ -6,6 +7,7 @@ import blog1 from "../../public/images/blog-1.png"
 import blog2 from "../../public/images/blog-2.png"
 import blog3 from "../../public/images/blog-3.png"
 import ButtonTheme from './shared/ButtonTheme'
+import { useRouter } from 'next/navigation';
 const cardData = [
   {
     imageSrc: blog1,
@@ -34,12 +36,12 @@ const cardData = [
 ];
 
 const Blogs = () => {
+  const router = useRouter();
   return (
     <section className='py-16'>
       <LayoutWrapper>
         <div className='mb-10'>
         <CenterHeader title="Blogs" description="Explore expert tips, health insights, and updates on pharmacy services to stay informed and empowered." />
-
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cardData.map((card, index) => (
@@ -60,6 +62,7 @@ const Blogs = () => {
              textColor="text-white"
              paddingX='px-14'
              paddingY='py-3'
+             onClick={() => router.push('/blogs')}
              >
                 View All 
             </ButtonTheme>
