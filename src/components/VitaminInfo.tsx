@@ -77,7 +77,7 @@ const VitaminInfo: React.FC<VitaminInfoProps> = ({
           alt={title}
           fill
           objectFit="cover"
-          className="w-full h-full"
+          className={`w-full h-full ${isReverse ? "rounded-[10px]" : ""}`}
         />
       </div>
     </div>
