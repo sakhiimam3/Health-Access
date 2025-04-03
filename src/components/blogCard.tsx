@@ -13,6 +13,9 @@ interface NHSCardProps {
   author: string;
   date: string;
   readTime: string;
+  color?: string;
+  height?: string;
+  
 }
 
 const NHSCard: FC<NHSCardProps> = ({
@@ -22,25 +25,26 @@ const NHSCard: FC<NHSCardProps> = ({
   author = "Admin", 
   date = "01 Jan 2025", 
   readTime = "5 min read",
+  height = "300px",
 }) => {
   const router = useRouter();
   return (
     <Card onClick={() => router.push(`/blogs/23423414234`)} className=" cursor-pointer overflow-hidden border-none shadow-none">
-      <div className="relative h-[300px] rounded-t-[16px] w-full">
+      <div className={`relative ${height ? `h-[${height}]` : "h-[300px]"} rounded-[16px] w-full`}>
         <Image
           src={imageSrc}
           alt="Medical consultation"
           fill
-          className="object-cover rounded-t-[16px]"
+          className="object-cover rounded-[10px]"
           priority
         />
       </div>
       <CardContent className="p-6 px-0 ">
         <div className="space-y-4">
           <div>
-            <h6 className="text-sm font-medium  text-teal-600">NHS Services</h6>
-            <h2 className="text-lg font-bold mt-2 ">{title}</h2>
-            <p className="mt-2 font-roboto text-gray-600 text-sm leading-relaxed">
+            <h6 className="text-sm font-ubantu font-bold text-[#189BA3]">NHS Services</h6>
+            <h2 className={`text-lg font-bold mt-2   `}>{title}</h2>
+            <p className="mt-2 font-roboto  text-sm  textColor">
               {description}
             </p>
           </div>
