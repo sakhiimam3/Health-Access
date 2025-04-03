@@ -107,7 +107,7 @@ export const PharmacyCard = ({
         >
           Book Now
         </ButtonTheme>
-        <Button variant={"link"} onClick={() => router.push(`/pharmacy/?id=${id}`)} className="underline hover:text-teal-600">
+        <Button variant={"link"} onClick={() => router.push(`/pharmacy/${id}`)} className="underline hover:text-teal-600">
           {btnText}
         </Button>
       </CardFooter>

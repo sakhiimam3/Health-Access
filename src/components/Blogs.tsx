@@ -58,7 +58,7 @@ const Blogs = () => {
         </div>
         <div className='flex justify-center mt-8 items-center'>
             <ButtonTheme
-             bgColor="bg-[#52525B] hover:bg-[#52525B] px-12"
+             bgColor="bg-[#52525B] rounded-[24px] hover:bg-[#52525B] px-12"
              textColor="text-white"
              paddingX='px-14'
              paddingY='py-3'

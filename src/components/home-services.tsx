@@ -18,23 +18,27 @@ import ButtonTheme from "./shared/ButtonTheme";
 
 
 
-const homeServices = () => {
+const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
   const servicesData = [
     {
       title: "Travel Vaccines",
       image: Vs1,
+      link: link,
     },
     {
       title: "Weight Management",
       image: Vs2,
+      link: link,
     },
     {
       title: "Vitamin B12 Injections",
       image: Vs3,
+      link: link,
     },
     {
       title: "Yellow Fever Clinic",
       image: Vs4,
+      link: link,
     },
   ];
 
@@ -42,18 +46,22 @@ const homeServices = () => {
     {
       title: "Skin Boosters",
       image: Cs1,
+      link: link,
     },
     {
       title: "Dermal Fillers",
       image: Cs2,
+      link: link,
     },
     {
       title: "Lip Fillers",
       image: Cs3,
+      link: link,
     },
     {
       title: "Anti-Sweat Injections",
       image: Cs4,
+      link: link,
     },
   ];
 
@@ -61,18 +69,22 @@ const homeServices = () => {
     {
       title: "UTI Review",
       image: Ph1,
+      link: link,
     },
     {
       title: "Shingles Review",
       image: Ph2,
+      link: link,
     },
     {
       title: "Sore Throat Review",
       image: Ph3,
+      link: link,
     },
     {
       title: "Sinusitis",
       image: Ph4,
+      link: link,
     },
   ];
 
@@ -84,18 +96,24 @@ const homeServices = () => {
             title="Vaccination Services"
             services={servicesData}
             type="vaccination"
+            link={link}
+            isNested={isNested}
           />
         </div>
         <div>
           <DifferentServices
             title="Cosmetic Services"
             services={cosmeticServicesData}
+            link={link}
+            isNested={isNested}
           />
         </div>
         <div>
           <DifferentServices
             title="Pharmacy 1st Services"
             services={pharmacyServicesData}
+            link={link}
+            isNested={isNested}
           />
         </div>
         <div className="flex justify-center items-center">

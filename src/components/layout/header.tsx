@@ -117,7 +117,7 @@ const Header = () => {
             </span>
             </Link>
             
-             <ButtonTheme  bgColor="bg-[#189BA3]" textColor="text-white" >
+             <ButtonTheme className="rounded-[24px]" paddingY="py-4" paddingX="px-6"  bgColor="bg-[#189BA3]" textColor="text-white" >
                 Become a Partner
               </ButtonTheme> 
           </div>

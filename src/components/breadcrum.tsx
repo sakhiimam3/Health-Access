@@ -21,7 +21,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = () => {
 
   return (
     <ShadcnBreadcrumb>
-      <BreadcrumbList>
+      <BreadcrumbList >
         {fullPathnames.map((value, index) => {
           const href = `/${fullPathnames.slice(1, index + 1).join('/')}`; // Adjust href to skip 'Home'
           const displayValue = value === 'Home' ? 'Home' : value;

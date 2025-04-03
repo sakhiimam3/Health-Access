@@ -4,20 +4,20 @@ import LayoutWrapper from "@/components/layout/wrapper";
 import PagesBanner from "@/components/pagesBanner";
 import React, { Suspense } from "react";
 // import Image from "next/image";
-import pharmacy1 from "../../../public/images/pharmacy-1.png";
-import pharmacy2 from "../../../public/images/pharmacy-2.png";
-import pharmacy3 from "../../../public/images/pharmacy-3.png";
-import pharmacy4 from "../../../public/images/pharmacy-1.png";
-import pharmacy5 from "../../../public/images/pharmacy-2.png";
-import consultant from "../../../public/images/consultant.png";
-import warbunsdeatil from "../../../public/images/warbunsdeatil.png";
-import { useSearchParams } from "next/navigation";
+import pharmacy1 from "../../../../public/images/pharmacy-1.png";
+import pharmacy2 from "../../../../public/images/pharmacy-2.png";
+import pharmacy3 from "../../../../public/images/pharmacy-3.png";
+import pharmacy4 from "../../../../public/images/pharmacy-1.png";
+import pharmacy5 from "../../../../public/images/pharmacy-2.png";
+import consultant from "../../../../public/images/consultant.png";
+import warbunsdeatil from "../../../../public/images/warbunsdeatil.png";
+import { useParams } from "next/navigation";
 import ButtonTheme from "@/components/shared/ButtonTheme";
 import Image from "next/image";
 import HomeServices from "@/components/home-services";
 import VaccinationPriceList from "@/components/vaccinationTable";
 import NHSServicesCard from "@/components/NHSServicesCard";
-import { ClockIcon, EmailIcon, LocationIcon, SupportIcon } from "@/components/icons/icons";
+// import { ClockIcon, EmailIcon, LocationIcon, SupportIcon } from "@/components/icons/icons";
 import ContactUs from "@/components/contactus";
 
 const PharmacyDetails = () => {
@@ -31,8 +31,7 @@ const PharmacyDetails = () => {
 };
 
 const PharmacyContent = () => {
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const { id } = useParams();
 
   const pharmacies = [
     {
@@ -87,28 +86,9 @@ const PharmacyContent = () => {
     },
   ];
   const pharmacy = pharmacies.find((pharmacy) => pharmacy.id === id);
-  const contactData = [
-    {
-      icon: EmailIcon,
-      title: 'Email',
-      content: 'contact@warburtonpharmacy.co.uk'
-    },
-    {
-      icon: SupportIcon,
-      title: 'Support',
-      content: '+44 1234 567890'
-    },
-    {
-      icon: LocationIcon,
-      title: 'Address',
-      content: '78 Deansgate, Manchester, M3 2FW, UK'
-    },
-    {
-      icon: ClockIcon,
-      title: 'Opening Hours',
-      content: 'Start new chat'
-    }
-  ];
+  const pharmacyName = pharmacy?.title.replace(/\s+/g, "-");
+
+  console.log(pharmacyName);
 
   return (
     <div className="mt-56">
@@ -128,7 +108,7 @@ const PharmacyContent = () => {
               Your Trusted Local Pharmacy for NHS and Private Services{" "}
             </h2>
             <div className="relative after:absolute after:w-4 after:h-0.5 after:-bottom-8 after:left-0 after:bg-[pink] before:absolute before:w-4 before:h-0.5 before:-top-8 before:left-0 before:bg-[#189BA3] mb-5">
-              <p className="text-[#52525B] text-md font-roboto ">
+              <p className="paragraphColor text-md font-roboto ">
                 Warburtons Pharmacy is a trusted and community-focused
                 independent pharmacy located in{" "}
                 <span className="text-[#189BA3] hover:underline cursor-pointer">
@@ -141,8 +121,9 @@ const PharmacyContent = () => {
               </p>
               <ButtonTheme
                 bgColor="bg-[#189BA3]"
-                className="my-6 text-white py-4 px-16  text-xl font-ubantu rounded-[100px]"
+                className="my-6 text-white py-3  text-lg rounded-[24px]"
                 children="Book Now"
+                paddingX="px-12"
               />
             </div>
           </div>
@@ -171,7 +152,10 @@ const PharmacyContent = () => {
             Our Services
           </div>
 
-          <HomeServices />
+          <HomeServices
+            isNested={true}
+            link={`/pharmacy/${id}/${pharmacyName}`}
+          />
         </section>
         <section>
           <VaccinationPriceList />
@@ -181,9 +165,9 @@ const PharmacyContent = () => {
         <NHSServicesCard />
       </section>
       <LayoutWrapper>
-      <section >
-        <ContactUs />
-      </section>
+        <section>
+          <ContactUs />
+        </section>
       </LayoutWrapper>
     </div>
   );

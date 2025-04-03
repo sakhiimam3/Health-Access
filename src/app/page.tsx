@@ -12,7 +12,7 @@ export default function Home() {
     <>
     <Header />
     <HowItWorks />
-    <HomeServices />
+    <HomeServices isNested={false} link="/services" />
     <PharmacySlider />
     <TrustedPartner />
     <Blogs />

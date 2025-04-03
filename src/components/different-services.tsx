@@ -14,6 +14,8 @@ interface VaccinationServicesProps {
   services: Service[];
   viewAllLink?: string;
   type?: string;
+  link?: string;
+  isNested?: boolean;
 }
 
 const VaccinationServices: React.FC<VaccinationServicesProps> = ({
@@ -21,6 +23,8 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
   services,
   viewAllLink,
   type,
+  link,
+  isNested,
 }) => {
 
   const router = useRouter();
@@ -45,7 +49,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
         {services.map((service, index) => (
           <div
             key={index}
-            onClick={() => router.push(`/services/s7d9f2h4324234234234`)}
+            onClick={() => router.push(`${isNested ? `${link}` :  `${link}/1233123123`}`)}
             className="rounded-lg cursor-pointer overflow-hidden min-h-[200px] group"
           >
             <div className="relative rounded">
