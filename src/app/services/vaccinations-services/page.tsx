@@ -6,12 +6,25 @@ import PagesBanner from "@/components/pagesBanner";
 import VaccineSection from "@/components/vaccineSection";
 import TravelVaccines from "@/components/travelVaccines";
 import { useSearchParams } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 import VitaminInfo from "@/components/VitaminInfo";
 import PharmacySlider from "@/components/pharmacySlider";
 import ButtonTheme from "@/components/shared/ButtonTheme";
 import DifferentServices from "@/components/different-services";
+
 const VaccinationServices = () => {
+  return (
+    <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
+      <div className="mt-56">
+        <Suspense fallback={<div>Loading...</div>}>
+          <Content />
+        </Suspense>
+      </div>
+    </PagesWrapper>
+  );
+};
+
+const Content = () => {
   const searchParams = useSearchParams();
   const serviceName = searchParams.get("serviceName")?.replace(/-/g, " ");
 
@@ -134,118 +147,106 @@ const VaccinationServices = () => {
   ];
 
   return (
-    <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
-      <div className="mt-56">
-        <PagesBanner
-          title={serviceName}
-          height="h-[200px]"
-          textColor="white"
-          fromColor="#189BA3"
-          toColor="#189BA3"
-          isDetail={true}
+    <LayoutWrapper>
+      <PagesBanner
+        title={serviceName}
+        height="h-[200px]"
+        textColor="white"
+        fromColor="#189BA3"
+        toColor="#189BA3"
+        isDetail={true}
+      />
+      <VaccineSection
+        title="Why Travel Vaccines Are Important"
+        description="Traveling exposes you to different environments, climates, and health risks. Many countries have infectious diseases that are uncommon in your home country. Travel vaccines protect you against these diseases and ensure you have a safe and healthy journey. Some vaccines are even required for entry into certain countries."
+        imageSrc={serviceName === "Travel Vaccines" ? "/images/travel-vaccine.png" : "/images/mensHealth.png"}
+        buttonText="Book Now"
+      />
+      <TravelVaccines
+        title={serviceName === "Travel Vaccines" ? "Common Travel Vaccines" : "Common Causes of Hair Loss in Men"}
+        vaccines={vaccines}
+        mensHealthVaccines={mensHealthVaccines}
+      />
+      <section className="py-6">
+        <VitaminInfo
+          title="When to Get Vaccinated?"
+          description="It's recommended to get vaccinated 4-6 weeks before travel, as some vaccines require multiple doses for full protection. Check with a travel health specialist to plan your vaccinations based on your itinerary."
+          imageSrc="/images/checkup.png"
+          isReverse={false}
         />
-        <LayoutWrapper>
-          <VaccineSection
-            title="Why Travel Vaccines Are Important"
-            description="Traveling exposes you to different environments, climates, and health risks. Many countries have infectious diseases that are uncommon in your home country. Travel vaccines protect you against these diseases and ensure you have a safe and healthy journey. Some vaccines are even required for entry into certain countries."
-            imageSrc={
-              serviceName === "Travel Vaccines"
-                ? "/images/travel-vaccine.png"
-                : "/images/mensHealth.png"
-            }
-            buttonText="Book Now"
-          />
+      </section>
+      {serviceName !== "Travel Vaccines" && (
+        <section>
           <TravelVaccines
-            title={
-              serviceName === "Travel Vaccines"
-                ? "Common Travel Vaccines"
-                : "Common Causes of Hair Loss in Men"
-            }
-            vaccines={vaccines}
-            mensHealthVaccines={mensHealthVaccines}
+            title={"Treatment & Prevention of Male Pattern Baldness"}
+            mensHealthVaccines={treatmentPrevention}
           />
-          <section className="py-6">
-            <VitaminInfo
-              title="When to Get Vaccinated?"
-              description="It's recommended to get vaccinated 4-6 weeks before travel, as some vaccines require multiple doses for full protection. Check with a travel health specialist to plan your vaccinations based on your itinerary."
-              imageSrc="/images/checkup.png"
-              isReverse={false}
-            />
-          </section>
-          {serviceName !== "Travel Vaccines" && (
-            <section>
-              <TravelVaccines
-                title={"Treatment & Prevention of Male Pattern Baldness"}
-                mensHealthVaccines={treatmentPrevention}
-              />
-            </section>
-          )}
-          <div className="py-6">
-            <PharmacySlider />
-          </div>
-          {serviceName === "Travel Vaccines" && (
-            <Blogs />
-          )}
-        </LayoutWrapper>
-        <section
-          className={`w-full flex items-center  h-[300px]  bg-cover bg-center bg-no-repeat`}
-          style={{ backgroundImage: serviceName === "Travel Vaccines" ? "url('/images/partner-bg-1.png')" : "url('/images/bg-2.png')" }}
-        >
-          <LayoutWrapper>
-            <div className="grid md:grid-cols-2 w-[1320px]">
-              <div>
-                {serviceName === "Travel Vaccines" ? (
-                  <h1 className="text-3xl leading-relaxed font-bold text-white md:text-4xl lg:text-5xl">
-                    Book Your Travel <br /> Vaccines Today
-                  </h1>
-                ) : (
-                  <h1 className="text-3xl leading-relaxed font-bold text-white md:text-4xl lg:text-5xl">
-                    Book a Consultation for <br /> Hair Loss Treatment
-                  </h1>
-                )}
-              </div>
-              <div className="flex flex-col gap-6">
-                {serviceName === "Travel Vaccines" ? (
-                  <p className="text-white mx-w-[30px] text-xl font-roboto">
-                    Stay protected wherever you go! Find a nearby pharmacy and{" "}
-                    <br /> book your travel vaccines now.
-                  </p>
-                ) : (
-                  <p className="text-white mx-w-[30px] text-xl font-roboto">
-                    Don&apos;t wait until it&apos;s too late – take action
-                    today! Find a Pharmacy Near You to explore personalized hair
-                    loss solutions.
-                  </p>
-                )}
-
-                <ButtonTheme
-                  bgColor="bg-[#189BA3]"
-                  className="my-6 w-[200px] text-white py-3 text-lg rounded-[24px]"
-                  children="Book Now"
-                  paddingX="px-12"
-                />
-              </div>
-            </div>
-          </LayoutWrapper>
         </section>
+      )}
+      <div className="py-6">
+        <PharmacySlider />
+      </div>
+      {serviceName === "Travel Vaccines" && (
+        <Blogs />
+      )}
+      <section
+        className={`w-full flex items-center  h-[300px]  bg-cover bg-center bg-no-repeat`}
+        style={{ backgroundImage: serviceName === "Travel Vaccines" ? "url('/images/partner-bg-1.png')" : "url('/images/bg-2.png')" }}
+      >
         <LayoutWrapper>
-          {serviceName === "Travel Vaccines" ? (
-            <div className="py-12">
-              <DifferentServices
-                title="Related Services"
-                services={servicesData}
-                type="vaccination"
-                link="/services"
+          <div className="grid md:grid-cols-2 w-[1320px]">
+            <div>
+              {serviceName === "Travel Vaccines" ? (
+                <h1 className="text-3xl leading-relaxed font-bold text-white md:text-4xl lg:text-5xl">
+                  Book Your Travel <br /> Vaccines Today
+                </h1>
+              ) : (
+                <h1 className="text-3xl leading-relaxed font-bold text-white md:text-4xl lg:text-5xl">
+                  Book a Consultation for <br /> Hair Loss Treatment
+                </h1>
+              )}
+            </div>
+            <div className="flex flex-col gap-6">
+              {serviceName === "Travel Vaccines" ? (
+                <p className="text-white mx-w-[30px] text-xl font-roboto">
+                  Stay protected wherever you go! Find a nearby pharmacy and{" "}
+                  <br /> book your travel vaccines now.
+                </p>
+              ) : (
+                <p className="text-white mx-w-[30px] text-xl font-roboto">
+                  Don&apos;t wait until it&apos;s too late – take action
+                  today! Find a Pharmacy Near You to explore personalized hair
+                  loss solutions.
+                </p>
+              )}
+
+              <ButtonTheme
+                bgColor="bg-[#189BA3]"
+                className="my-6 w-[200px] text-white py-3 text-lg rounded-[24px]"
+                children="Book Now"
+                paddingX="px-12"
+              />
+            </div>
+          </div>
+        </LayoutWrapper>
+      </section>
+      <LayoutWrapper>
+        {serviceName === "Travel Vaccines" ? (
+          <div className="py-12">
+            <DifferentServices
+              title="Related Services"
+              services={servicesData}
+              type="vaccination"
+              link="/services"
               isNested={false}
               viewAllLink={false}
             />
           </div>
-          ):
+        ) : (
           <Blogs />
-        }
-        </LayoutWrapper>
-      </div>
-    </PagesWrapper>
+        )}
+      </LayoutWrapper>
+    </LayoutWrapper>
   );
 };
 
