@@ -88,7 +88,6 @@ const PharmacyContent = () => {
   const pharmacy = pharmacies.find((pharmacy) => pharmacy.id === id);
   const pharmacyName = pharmacy?.title.replace(/\s+/g, "-");
 
-  console.log(pharmacyName);
 
   return (
     <div className="mt-56">

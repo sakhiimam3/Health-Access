@@ -35,13 +35,13 @@ const Aboutus = () => {
                   </p>
                 </div>
 
-                <div className="relative mt-6 rounded-lg">
+                <div className="relative mt-6 rounded-[10px]">
                   <Image
                     src="/images/about-us.png"
                     alt="Healthcare interaction"
                     width={900}
                     height={500}
-                    className="rounded-lg shadow-md w-full"
+                    className="rounded-[10px] shadow-md w-full"
                   />
                   <div className="absolute top-1/2 left-[30%] w-[40%] h-0  transform -translate-y-1/2" />
                 </div>

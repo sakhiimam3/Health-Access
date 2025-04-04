@@ -27,10 +27,11 @@ export default function PartnerSection({bgColor}: {bgColor:string}) {
               <Input
                 type="email"
                 placeholder="Enter your email"
-                className="h-12 flex-1 rounded-[25px] border-[#52525B] text-white outline-none bg-transparent text-base placeholder:text-white"
+                className="h-12 flex-1 rounded-[24px] border-[#52525B] text-white outline-none bg-transparent text-base placeholder:text-white"
               />
               <ButtonTheme bgColor="bg-[#333333]"
               textColor="text-white"
+              className="rounded-[24px]"
               >
                 Become a Partner
               </ButtonTheme>

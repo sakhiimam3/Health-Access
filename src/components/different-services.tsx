@@ -12,7 +12,7 @@ interface Service {
 interface VaccinationServicesProps {
   title: string;
   services: Service[];
-  viewAllLink?: string;
+  viewAllLink?: boolean;
   type?: string;
   link?: string;
   isNested?: boolean;
@@ -34,10 +34,10 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold mb-8 text-[#52525B]">{title}</h2>
 
-        {true && (
+        {viewAllLink && (
           <div>
             <Link
-              href={viewAllLink || ""}
+              href={"#"}
               className="underline text-[#52525B]  hover:text-teal-500"
             >
               View All
@@ -49,7 +49,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
         {services.map((service, index) => (
           <div
             key={index}
-            onClick={() => router.push(`${isNested ? `${link}` :  `${link}/1233123123`}`)}
+            onClick={() => router.push(`${isNested ? `${link}` :  `${link}?=id1233123123`}`)}
             className="rounded-lg cursor-pointer overflow-hidden min-h-[200px] group"
           >
             <div className="relative rounded">
