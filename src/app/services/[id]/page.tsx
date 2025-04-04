@@ -9,7 +9,9 @@ import Vs2 from "../../../../public/images/vs-2.png";
 import Vs3 from "../../../../public/images/vs-3.png";
 import Vs4 from "../../../../public/images/vs-4.png"   ;
 import Vs5 from "../../../../public/images/service-detail.png"   ;
+import { useRouter } from "next/navigation";
 const ServicesDetails = () => {
+  const router=useRouter()
     const servicesData = [
         {
           title: "Travel Vaccines",
@@ -54,6 +56,7 @@ const ServicesDetails = () => {
                 className={`rounded-lg overflow-hidden min-h-[350px] group ${
                   index === servicesData.length - 1 ? 'md:col-span-2 lg:col-span-2' : ''
                 }`}
+                 onClick={()=>router.push(`/${service.title}`)}
               >
                 <div className="relative rounded h-[350px] w-full">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#189BA3]/80 via-[#189BA3]/40 to-transparent z-10 rounded-[16px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
