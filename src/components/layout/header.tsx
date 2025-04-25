@@ -9,6 +9,7 @@ import {  Search, Calendar } from "lucide-react";
 import LayoutWrapper from "./wrapper";
 import { NavItems } from "@/mockdata";
 import ButtonTheme from "../shared/ButtonTheme";
+import { useRouter } from "next/navigation";
 
 
 const Header = () => {
@@ -16,7 +17,7 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const scrollPositionRef = useRef(0);
-
+  const router = useRouter();
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -117,7 +118,7 @@ const Header = () => {
             </span>
             </Link>
             
-             <ButtonTheme className="rounded-[24px]" paddingY="py-4" paddingX="px-6"  bgColor="bg-[#189BA3]" textColor="text-white" >
+             <ButtonTheme onClick={() => router.push('/become-partner')} className="rounded-[24px]" paddingY="py-4" paddingX="px-6"  bgColor="bg-[#189BA3]" textColor="text-white" >
                 Become a Partner
               </ButtonTheme> 
           </div>
