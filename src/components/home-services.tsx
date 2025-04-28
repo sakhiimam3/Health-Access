@@ -98,6 +98,7 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
             type="vaccination"
             link={link}
             isNested={isNested}
+            viewAllLink={true}
           />
         </div>
         <div>
@@ -105,7 +106,9 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
             title="Cosmetic Services"
             services={cosmeticServicesData}
             link={link}
+            type="cosmetic"
             isNested={isNested}
+            viewAllLink={true}
           />
         </div>
         <div>
@@ -113,7 +116,9 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
             title="Pharmacy 1st Services"
             services={pharmacyServicesData}
             link={link}
+            type="pharmacy 1st services"
             isNested={isNested}
+            viewAllLink={true}
           />
         </div>
         <div className="flex justify-center items-center">

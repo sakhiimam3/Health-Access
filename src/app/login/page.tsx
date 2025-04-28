@@ -1,6 +1,4 @@
 "use client";
-
-import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,9 +21,13 @@ import {
 } from "@/components/ui/form";
 
 import { DatePicker } from "@/components/ui/DatePicker";
+import { useCreateUser } from "@/lib/hooks";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const {mutate,isPending,error}=useCreateUser()
 
   // Login form
   const loginForm = useForm<LoginFormValues>({
@@ -54,6 +56,8 @@ export default function AuthPage() {
 
   // Form submission handlers
   const onLoginSubmit = (data: LoginFormValues) => {
+    // toast.success("login successfully");
+
     console.log("%c Login form submission:", "color: #00A0AA; font-weight: bold; font-size: 14px;");
     console.table(data);
     // Handle login logic here
@@ -63,6 +67,27 @@ export default function AuthPage() {
     console.log("%c Registration form submission:", "color: #00A0AA; font-weight: bold; font-size: 14px;");
     console.table(data);
     console.log("Date of Birth:", data.dateOfBirth);
+    // mutate(
+    //   {
+    //     firstName: data.firstName,
+    //     lastName: data.lastName,
+    //     email: data.email,
+    //     dateOfBirth: data.dateOfBirth,
+    //     postcode: data.postcode,
+    //     address: data.address,
+    //     city: data.city,
+    //     country: data.country,
+    //     password: data.password,
+    //   },
+    //   {
+    //     onSuccess: () => {
+    //       toast.success("User created successfully");
+    //     },
+    //     onError: (error) => {
+    //       toast.error("Error creating user: " + error.message);
+    //     },
+    //   }
+    // );
     // Handle registration logic here
   };
 

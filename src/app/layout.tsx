@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import { Roboto_Slab, Ubuntu,Plus_Jakarta_Sans } from "next/font/google";
+import { Roboto_Slab, Ubuntu, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import Provider from "@/components/layout/provider";
+import { ToastContainer } from "react-toastify";
+import { UserContextProvider } from "@/context/userStore";
 
 const robotoSlab = Roboto_Slab({
   variable: "--font-roboto-slab",
@@ -31,11 +34,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${robotoSlab.variable} ${ubuntu.variable} ${plusJakartaSans.variable}`}
-      >
-        {children}
-      </body>
+      <UserContextProvider>
+        <Provider>
+          <body
+            className={`${robotoSlab.variable} ${ubuntu.variable} ${plusJakartaSans.variable}`}
+          >
+            {children}
+            <ToastContainer 
+              autoClose={2000}
+              
+            />
+          </body>
+        </Provider>
+      </UserContextProvider>
     </html>
   );
 }

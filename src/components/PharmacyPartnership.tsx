@@ -1,9 +1,24 @@
+"use client"
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import ButtonTheme from './shared/ButtonTheme';
 import Image from 'next/image';
 import Wrapper from './layout/wrapper';
 
 const PharmacyPartnership: React.FC = () => {
+  const router = useRouter();
+
+  const handleSignUpClick = () => {
+    // Scroll smoothly to the sign-up section
+    const signUpSection = document.getElementById('sign-up-section');
+    if (signUpSection) {
+      signUpSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // If the section is not found, navigate to the sign-up page
+      router.push('/partner-signup');
+    }
+  };
+
   return (
     <div  className='bg-[#189BA3]'>
    <Wrapper>
@@ -27,9 +42,9 @@ const PharmacyPartnership: React.FC = () => {
             paddingX="px-6"
             paddingY="py-3"
             className="rounded-[24px]"
-
+            onClick={handleSignUpClick}
           >
-            Sign Up As Partner
+            Sign up as Partner
           </ButtonTheme>
         </div>
         

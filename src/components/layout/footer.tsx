@@ -1,8 +1,37 @@
 import Link from "next/link";
 import LayoutWrapper from "./wrapper";
 import Image from "next/image";
+import { NavItems } from "@/mockdata";
 
 export default function Footer() {
+  const servicesData = [
+    {
+      title: "Travel Vaccines",
+      id:"12312313wd3413"
+    },
+    {
+      title: "Weight Management",
+      id:"12312313wd3443"
+
+    },
+    {
+      title: "Vitamin B12 Injections",
+      id:"12312313wg3443"
+
+    },
+    {
+      title: "Yellow Fever Clinic",
+      id:"12312313wd3493"
+
+    },
+    {
+        title: "Anti-Sweat Injections",
+    
+        id:"12312313wd3493"
+
+      },
+      
+  ];
   return (
     <footer className="bg-[#363636] text-[#BCBCBC] py-12">
       <LayoutWrapper>
@@ -34,14 +63,14 @@ export default function Footer() {
               Quick Links
             </h3>
             <ul className="space-y-5 ">
-              {["Home", "NHS Services", "Vaccines", "About Us", "Contact"].map(
+              {NavItems.map(
                 (item) => (
-                  <li key={item}>
+                  <li key={item.label}>
                     <Link
-                      href={`/${item.toLowerCase().replace(" ", "-")}`}
-                      className="hover:text-white  text-[#B8B8B8]  transition-colors duration-200"
+                      href={item.href}
+                      className="hover:text-white capitalize text-[#B8B8B8]  transition-colors duration-200"
                     >
-                      {item}
+                      {item.label}
                     </Link>
                   </li>
                 )
@@ -53,22 +82,13 @@ export default function Footer() {
           <div className="md:col-span-3">
             <h3 className="text-white font-semibold text-lg mb-4">Services</h3>
             <ul className="space-y-5">
-              {[
-                "Pharmacy First Services",
-                "Vaccination Services",
-                "Health & Wellness",
-                "Diagnostic & Screening",
-                "Specialty Medicine",
-              ].map((item) => (
-                <li key={item}>
+              {servicesData.map((item) => (
+                <li key={item.id}>
                   <Link
-                    href={`/${item
-                      .toLowerCase()
-                      .replace(/ & /g, "-")
-                      .replace(/ /g, "-")}`}
+                    href={`/services/?type=${item.title}`}
                     className="hover:text-white font-roboto-slab transition-colors duration-200"
                   >
-                    {item}
+                    {item.title}
                   </Link>
                 </li>
               ))}
@@ -162,13 +182,31 @@ export default function Footer() {
             <p className="text-sm text-white">
               © 2024 Health Access. All rights reserved.
             </p>
-            <div className="flex gap-6 mt-4 md:mt-0 text-sm">
+            <div className="flex gap-3">
+            <div className="flex gap-2 mt-4 md:mt-0 text-sm">
               <Link
                 href="/privacy-policy"
-                className="hover:text-white text-[#B8B8B8] transition-colors duration-200 !important"
+                className="hover:text-white underline text-[#B8B8B8] transition-colors duration-200 !important"
               >
                 Privacy Policy
               </Link>
+            </div>
+            <div className="flex gap-6 mt-4 md:mt-0 text-sm">
+              <Link
+                href="/privacy-policy"
+                className="hover:text-white underline text-[#B8B8B8] transition-colors duration-200 !important"
+              >
+                Terms of Services
+              </Link>
+            </div>
+            <div className="flex gap-6 mt-4 md:mt-0 text-sm">
+              <Link
+                href="/privacy-policy"
+                className="hover:text-white underline text-[#B8B8B8] transition-colors duration-200 !important"
+              >
+                Cookies Settings
+              </Link>
+            </div>
             </div>
           </div>
         </div>

@@ -37,7 +37,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
         {viewAllLink && (
           <div>
             <Link
-              href={"#"}
+              href={`/services/?type=${type}`}
               className="underline text-[#52525B]  hover:text-teal-500"
             >
               View All
@@ -49,7 +49,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
         {services.map((service, index) => (
           <div
             key={index}
-            onClick={() => router.push(`${isNested ? `${link}` :  `${link}?=id1233123123`}`)}
+            onClick={() => router.push(`${isNested ? `${link}` :  `${link}/vaccinations-services?serviceName=${service.title}`}`)}
             className="rounded-lg cursor-pointer overflow-hidden min-h-[200px] group"
           >
             <div className="relative rounded">

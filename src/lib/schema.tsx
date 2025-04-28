@@ -4,6 +4,7 @@ import { z } from "zod";
 export const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  notificationToken: z.string().optional(),
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
@@ -41,17 +42,42 @@ export const registerSchema = z.object({
 });
 
 export const pharmacySignUpSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  businessName: z.string().min(2, "Business name must be at least 2 characters"),
-  websiteUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
-  businessPhone: z.string().min(10, "Please enter a valid phone number"),
-  businessType: z.string().min(1, "Please select a business type"),
-  location: z.string().min(1, "Please select a location"),
-  postalCode: z.string().min(1, "Please enter a valid postal code"),
+  email: z.string().email(),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  businessName: z.string().min(1, "Business name is required"),
+  website: z.string().url("Invalid URL"),
+  businessType: z.string().min(1, "Business type is required"),
+  schedulingPlatform: z.string().min(1, "Scheduling platform is required"),
+  location: z.object({
+    name: z.string().min(1, "Location name is required"),
+    latitude: z.number().min(-90).max(90, "Latitude must be between -90 and 90"),
+    longitude: z.number().min(-180).max(180, "Longitude must be between -180 and 180"),
+  }),
+  phoneNumber: z.string().min(1, "Pharmacy phone is required"),
+  termsAccepted: z.boolean().refine(val => val === true, {
+    message: "You must accept the terms and conditions",
+  }),
+  postalCode: z.string().optional(),
+  notificationToken: z.string().optional(), // Assuming this can be optional
 });
 
-export type PharmacySignUpFormValues = z.infer<typeof pharmacySignUpSchema>;
+export const resetPasswordSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string().min(8, 'Please confirm your password'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+});
+
+  
+export type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
+export type PharmacySignUpFormValues = z.infer<typeof pharmacySignUpSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+export type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;

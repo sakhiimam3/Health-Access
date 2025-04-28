@@ -1,3 +1,4 @@
+"use client"
 import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import PagesBanner from "@/components/pagesBanner";
 import {
@@ -7,6 +8,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useRouter } from "next/navigation";
+
 import React from "react";
 import Vs1 from "../../../public/images/vs-1.png";
 import Vs2 from "../../../public/images/vs-2.png";
@@ -25,12 +28,12 @@ import Other2 from "../../../public/images/other-2.png";
 import Other3 from "../../../public/images/other-3.png";
 import Other4 from "../../../public/images/other-4.png";
 
-
 import Image from "next/image";
 import LayoutWrapper from "@/components/layout/wrapper";
 import Link from "next/link";
 
 const PharmacyServices = () => {
+  const router = useRouter();
   const servicesData = [
     {
       title: "Travel Vaccines",
@@ -138,6 +141,7 @@ const PharmacyServices = () => {
                   {servicesData.map((service, index) => (
                     <CarouselItem
                       key={index}
+                      onClick={() => router.push(`/services/vaccinations-services?serviceName=${service.title}`)}
                       className="pl-2 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
                     >
                       <div
@@ -191,7 +195,7 @@ const PharmacyServices = () => {
                 </div>
               )}
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4" onClick={() => router.push(`/services/vaccinations-services?serviceName=Erectile Dysfunction`)}>
               <div className="w-[50%]">
                 <div className="h-[200px] relative overflow-hidden">
                   <Image
@@ -207,7 +211,7 @@ const PharmacyServices = () => {
                   Erectile Dysfunction
                 </h3>
               </div>
-              <div className="w-[50%]">
+              <div className="w-[50%]" onClick={() => router.push(`/services/vaccinations-services?serviceName=Hair loss`)}>
                 <div className="h-[200px] relative">
                   <Image
                     src={Women2}
@@ -248,6 +252,7 @@ const PharmacyServices = () => {
                   {pharmacyServicesData.map((pharmacy, index) => (
                     <CarouselItem
                       key={index}
+                      onClick={() => router.push(`/services/vaccinations-services?serviceName=${pharmacy.title}`)}
                       className="pl-2 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
                     >
                       <div

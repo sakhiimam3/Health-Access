@@ -147,7 +147,7 @@ const Content = () => {
   ];
 
   return (
-    <LayoutWrapper>
+    <>
       <PagesBanner
         title={serviceName}
         height="h-[200px]"
@@ -156,14 +156,23 @@ const Content = () => {
         toColor="#189BA3"
         isDetail={true}
       />
-      <VaccineSection
-        title="Why Travel Vaccines Are Important"
-        description="Traveling exposes you to different environments, climates, and health risks. Many countries have infectious diseases that are uncommon in your home country. Travel vaccines protect you against these diseases and ensure you have a safe and healthy journey. Some vaccines are even required for entry into certain countries."
-        imageSrc={serviceName === "Travel Vaccines" ? "/images/travel-vaccine.png" : "/images/mensHealth.png"}
+      <LayoutWrapper>
+        <VaccineSection
+          title="Why Travel Vaccines Are Important"
+          description="Traveling exposes you to different environments, climates, and health risks. Many countries have infectious diseases that are uncommon in your home country. Travel vaccines protect you against these diseases and ensure you have a safe and healthy journey. Some vaccines are even required for entry into certain countries."
+        imageSrc={
+          serviceName === "Travel Vaccines"
+            ? "/images/travel-vaccine.png"
+            : "/images/mensHealth.png"
+        }
         buttonText="Book Now"
       />
       <TravelVaccines
-        title={serviceName === "Travel Vaccines" ? "Common Travel Vaccines" : "Common Causes of Hair Loss in Men"}
+        title={
+          serviceName === "Travel Vaccines"
+            ? "Common Travel Vaccines"
+            : "Common Causes of Hair Loss in Men"
+        }
         vaccines={vaccines}
         mensHealthVaccines={mensHealthVaccines}
       />
@@ -186,12 +195,15 @@ const Content = () => {
       <div className="py-6">
         <PharmacySlider />
       </div>
-      {serviceName === "Travel Vaccines" && (
-        <Blogs />
-      )}
+      {serviceName === "Travel Vaccines" && <Blogs />}
       <section
         className={`w-full flex items-center  h-[300px]  bg-cover bg-center bg-no-repeat`}
-        style={{ backgroundImage: serviceName === "Travel Vaccines" ? "url('/images/partner-bg-1.png')" : "url('/images/bg-2.png')" }}
+        style={{
+          backgroundImage:
+            serviceName === "Travel Vaccines"
+              ? "url('/images/partner-bg-1.png')"
+              : "url('/images/bg-2.png')",
+        }}
       >
         <LayoutWrapper>
           <div className="grid md:grid-cols-2 w-[1320px]">
@@ -214,9 +226,9 @@ const Content = () => {
                 </p>
               ) : (
                 <p className="text-white mx-w-[30px] text-xl font-roboto">
-                  Don&apos;t wait until it&apos;s too late – take action
-                  today! Find a Pharmacy Near You to explore personalized hair
-                  loss solutions.
+                  Don&apos;t wait until it&apos;s too late – take action today!
+                  Find a Pharmacy Near You to explore personalized hair loss
+                  solutions.
                 </p>
               )}
 
@@ -247,6 +259,7 @@ const Content = () => {
         )}
       </LayoutWrapper>
     </LayoutWrapper>
+    </>
   );
 };
 

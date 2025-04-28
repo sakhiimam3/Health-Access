@@ -1,5 +1,5 @@
-import React from 'react';
-import Breadcrumb from './breadcrum';
+import React from "react";
+import Breadcrumb from "./breadcrum";
 
 interface HeaderBannerProps {
   image?: string;
@@ -24,17 +24,23 @@ const PagesBanner: React.FC<HeaderBannerProps> = ({
     <>
       {isDetail ? (
         <div className={`relative w-full ${height} overflow-hidden`}>
-          <div className={`h-full w-full flex flex-col text-white items-center justify-center bg-[${fromColor}]`}>
-            <Breadcrumb  />
-            <h1 className={`text-white max-w-lg text-center text-3xl mt-4 font-ubantu  font-bold ${textColor}`}>{title}</h1>
+          <div
+            className={`h-full w-full flex flex-col text-white items-center justify-center bg-[${fromColor}]`}
+          >
+            <Breadcrumb />
+            <h1
+              className={`text-white capitalize max-w-lg text-center text-3xl mt-4 font-ubantu  font-bold ${textColor}`}
+            >
+              {title}
+            </h1>
           </div>
         </div>
       ) : (
         <div className={`relative w-full ${height} overflow-hidden`}>
           {/* Background Image */}
-          <img 
-            src={image} 
-            alt="Banner background" 
+          <img
+            src={image}
+            alt="Banner background"
             className="w-full h-full object-cover"
           />
           {/* Overlay with dynamic color */}
@@ -46,7 +52,9 @@ const PagesBanner: React.FC<HeaderBannerProps> = ({
           />
           {/* Centered Text */}
           <div className="absolute z-10 inset-0 flex items-center justify-center">
-            <h1 className={`text-xl md:text-2xl lg:text-3xl font-bold text-white ${textColor}`}>
+            <h1
+              className={`text-xl capitalize md:text-2xl lg:text-3xl font-bold text-white ${textColor}`}
+            >
               {title}
             </h1>
           </div>

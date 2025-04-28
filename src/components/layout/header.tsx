@@ -5,16 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {  Search, Calendar } from "lucide-react";
+import { Search, Calendar } from "lucide-react";
 import LayoutWrapper from "./wrapper";
 import { NavItems } from "@/mockdata";
 import ButtonTheme from "../shared/ButtonTheme";
-import { useRouter } from "next/navigation";
-
+import { usePathname, useRouter } from "next/navigation";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const pathName = usePathname();
+
   const dropdownRef = useRef(null);
   const scrollPositionRef = useRef(0);
   const router = useRouter();
@@ -29,11 +30,11 @@ const Header = () => {
   useEffect(() => {
     if (isDropdownOpen) {
       scrollPositionRef.current = window.scrollY;
-      document.body.style.position = 'fixed';
+      document.body.style.position = "fixed";
       document.body.style.top = `-${scrollPositionRef.current}px`;
     } else {
-      document.body.style.position = '';
-      document.body.style.top = '';
+      document.body.style.position = "";
+      document.body.style.top = "";
       window.scrollTo(0, scrollPositionRef.current);
     }
   }, [isDropdownOpen]);
@@ -68,7 +69,7 @@ const Header = () => {
             <div
               className={`hidden md:flex items-center space-x-12 transition-opacity duration-300 }`}
             >
-              {NavItems.map((item,index) => (
+              {NavItems.map((item, index) => (
                 <Link
                   key={index}
                   href={item.href}
@@ -102,7 +103,7 @@ const Header = () => {
               </div>
               <Button
                 size="icon"
-                className="bg-teal-500 hover:bg-teal-600 rounded-full h-8 w-8 ml-2"
+                className="bg-[#189BA3] hover:bg-teal-600 rounded-full h-8 w-8 ml-2"
               >
                 <span>
                   <Search className="h-5 w-5 text-white" />
@@ -113,14 +114,21 @@ const Header = () => {
 
           <div className="flex items-center space-x-4">
             <Link href="/login">
-            <span className="hidden underline text-sm font-ubuntu font-[400] md:inline">
-             Sign In
-            </span>
+              <span className="hidden underline text-sm font-ubuntu font-[400] md:inline">
+                Sign In
+              </span>
             </Link>
-            
-             <ButtonTheme onClick={() => router.push('/become-partner')} className="rounded-[24px]" paddingY="py-4" paddingX="px-6"  bgColor="bg-[#189BA3]" textColor="text-white" >
-                Become a Partner
-              </ButtonTheme> 
+
+            <ButtonTheme
+              onClick={() => router.push("/partner/become-partner")}
+              className="rounded-[24px]"
+              paddingY="py-4"
+              paddingX="px-6"
+              bgColor="bg-[#189BA3]"
+              textColor="text-white"
+            >
+              Become a Partner
+            </ButtonTheme>
           </div>
         </nav>
         <div
@@ -169,7 +177,10 @@ const Header = () => {
                     />
                   </svg>
                   <div className="relative">
-                    <select defaultValue="service1" className="border-0 focus:ring-0 p-2 h-full flex items-center transition-none">
+                    <select
+                      defaultValue="service1"
+                      className="border-0 focus:ring-0 p-2 h-full flex items-center transition-none"
+                    >
                       <option value="service1">Service 1</option>
                       <option value="service2">Service 2</option>
                       <option value="service3">Service 3</option>
@@ -206,7 +217,10 @@ const Header = () => {
                       </clipPath>
                     </defs>
                   </svg>
-                  <select defaultValue="1" className="border-0 focus:ring-0 p-2 h-full flex items-center">
+                  <select
+                    defaultValue="1"
+                    className="border-0 focus:ring-0 p-2 h-full flex items-center"
+                  >
                     {[1, 2, 3, 4, 5].map((num) => (
                       <option key={num} value={num.toString()}>
                         {num}
@@ -230,7 +244,8 @@ const Header = () => {
 
               <Button
                 size="icon"
-                className="bg-teal-500 hover:bg-teal-600 rounded-full h-10 w-10 ml-2"
+                onClick={() => router.push("/search")}
+                className="bg-[#189BA3] hover:bg-teal-600 rounded-full h-10 w-10 ml-2"
               >
                 <span>
                   <Search className="h-6 w-6 text-white" />
