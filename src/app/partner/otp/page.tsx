@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
@@ -131,5 +131,11 @@ const OTPPage = () => {
     </div>
   );
 };
-
-export default OTPPage;
+const OTPWrapper = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OTPPage />
+    </Suspense>
+  );
+};
+export default OTPWrapper;

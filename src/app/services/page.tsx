@@ -1,8 +1,9 @@
 "use client"
+import React, { Suspense } from "react";
+
 import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import LayoutWrapper from "@/components/layout/wrapper";
 import PagesBanner from "@/components/pagesBanner";
-import React from "react";
 import Image from "next/image";
 import Vs1 from "../../../public/images/vs-1.png";
 import Vs2 from "../../../public/images/vs-2.png";
@@ -100,4 +101,13 @@ const ServicesDetails = () => {
   );
 };
 
-export default ServicesDetails;
+const Page = () => {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-white">Loading...</div>}>
+      <ServicesDetails />
+    </Suspense>
+  );
+};
+
+
+export default Page;

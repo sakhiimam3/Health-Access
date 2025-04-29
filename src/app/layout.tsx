@@ -1,9 +1,11 @@
+import React from "react"
 import type { Metadata } from "next";
-import { Roboto_Slab, Ubuntu, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { Roboto_Slab, Ubuntu, Plus_Jakarta_Sans } from "next/font/google";
+
 import Provider from "@/components/layout/provider";
-import { ToastContainer } from "react-toastify";
 import { UserContextProvider } from "@/context/userStore";
+import { ToastContainer } from "react-toastify";
 
 const robotoSlab = Roboto_Slab({
   variable: "--font-roboto-slab",
