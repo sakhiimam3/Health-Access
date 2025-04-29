@@ -40,7 +40,7 @@ export default function RootLayout({
       >
         <UserContextProvider>
           <Provider>
-            {/* {children} */}
+            {children}
             <ToastContainer autoClose={2000} />
 
           </Provider>
