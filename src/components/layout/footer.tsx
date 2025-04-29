@@ -64,8 +64,8 @@ export default function Footer() {
             </h3>
             <ul className="space-y-5 ">
               {NavItems.map(
-                (item) => (
-                  <li key={item.label}>
+                (item,index) => (
+                  <li key={index}>
                     <Link
                       href={item.href}
                       className="hover:text-white capitalize text-[#B8B8B8]  transition-colors duration-200"

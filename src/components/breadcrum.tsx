@@ -15,9 +15,12 @@ interface BreadcrumbProps {
 }
 
 const Breadcrumb: React.FC<BreadcrumbProps> = () => {
-  const pathname = usePathname(); 
-  const pathnames = pathname.split('/').filter(x => x && !/^\d+$/.test(x)); // Filter out parameter IDs
-  const fullPathnames = ['Home', ...pathnames.filter(value => !/^\d+$/.test(value))]; // Filter out numeric IDs
+  const pathname = usePathname();
+  const isId = (segment: string) =>
+    /^\d+$/.test(segment) || /^[0-9a-fA-F]{24}$/.test(segment) || /^[0-9a-fA-F\-]{36}$/.test(segment);
+  
+  const pathnames = pathname.split('/').filter(x => x && !isId(x));
+  const fullPathnames = ['Home', ...pathnames];
 
   return (
     <ShadcnBreadcrumb>

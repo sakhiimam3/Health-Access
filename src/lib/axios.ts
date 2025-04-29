@@ -6,9 +6,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-const userData = localStorage.getItem('health_access_user'); 
-const user = userData ? JSON.parse(userData) : null;
-console.log('Parsed user:', user);
+
 
 api.interceptors.request.use((config) => {
   const userData = localStorage.getItem('health_access_user'); 

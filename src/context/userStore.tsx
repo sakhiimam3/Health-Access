@@ -51,7 +51,6 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user]);
 
-  if(!user)return null;
 
 
   return (

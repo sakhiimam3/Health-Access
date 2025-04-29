@@ -4,6 +4,8 @@ import "./globals.css";
 import Provider from "@/components/layout/provider";
 import { ToastContainer } from "react-toastify";
 import { UserContextProvider } from "@/context/userStore";
+// import { Suspense } from "react";
+// import Loading from "./loading";
 
 const robotoSlab = Roboto_Slab({
   variable: "--font-roboto-slab",
@@ -34,20 +36,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-       <body
-            className={`${robotoSlab.variable} ${ubuntu.variable} ${plusJakartaSans.variable}`}
-          >
-      <UserContextProvider>
-        <Provider>
-         
+      <body
+        className={`${robotoSlab.variable} ${ubuntu.variable} ${plusJakartaSans.variable}`}
+      >
+        <UserContextProvider>
+          <Provider>
+            {/* <Suspense fallback={<Loading />}>{children}</Suspense> */}
             {children}
-            <ToastContainer 
-              autoClose={2000}
-              
-            />
-         
-        </Provider>
-      </UserContextProvider>
+            <ToastContainer autoClose={2000} />
+
+          </Provider>
+        </UserContextProvider>
       </body>
     </html>
   );

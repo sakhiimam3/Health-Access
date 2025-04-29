@@ -16,69 +16,13 @@ import pharmacy3 from "../../public/images/pharmacy-3.png";
 import pharmacy4 from "../../public/images/pharmacy-1.png";
 import pharmacy5 from "../../public/images/pharmacy-2.png";
 import { useGetPartners } from "@/lib/hooks";
+import { partners } from "@/mockdata";
 
 const pharmacySlider = () => {
 
-const {data, isLoading, error, refetch} = useGetPartners();
-console.log(data);
-  const pharmacies = [
-    { 
-      id: "123",
-      imageSrc: pharmacy1,
-      title: "CarePlus Pharmacy",
-      description: "45 High Street, Birmingham, B4 7SL",
-      address: "Pharmacy Address",
-      services: [],
-      btnText: "View Pharmacy",
-    },
-    { 
-      id: "1234",
-      imageSrc: pharmacy2,
-      title: "Warburtons Pharmacy ",
-      address: "78 Deansgate, Manchester, M3 2FW",
-      services: [],
-      btnText: "View Pharmacy",
-    },
-    {
-      id: "1235",
-      imageSrc: pharmacy3,
-      title: "Warburtons Pharmacy",
-      address: "78 Deansgate, Manchester, M3 2FW",
-      services: [
-        { id: "1", name: "Travel Vaccine" },
-        { id: "2", name: "Antimalarial Vaccine" },
-        { id: "3", name: "NHS Services" },
-          ],
-      btnText: "View Pharmacy",
-    },
-    { 
-      id: "1236",
-      imageSrc: pharmacy4,
-      title: "CityCare Pharmacy",
-      address: "101 Queen Street, Glasgow, G1 3DN",
-      phone: "12345 678910",
-      services: [
-        { id: "1", name: "Travel Vaccine" },
-        { id: "2", name: "Antimalarial Vaccine" },
-        { id: "3", name: "NHS Services" },
-      ],
-      btnText: "View Pharmacy",
-    },
-    { 
-      id: "1237",
-      imageSrc: pharmacy5,
-      title: "New Pharmacy",
-      address: "123 New Street, London, E1 6AN",
-      phone: "11122 334455",
-      services: [
-        { id: "1", name: "Travel Vaccine" },
-        { id: "2", name: "Antimalarial Vaccine" },
-        { id: "3", name: "NHS Services" },
-      ],
-      btnText: "View Pharmacy",
-    },
-  ];
-
+// const {data, isLoading, error, refetch} = useGetPartners();
+// console.log(data,"bababababa");
+  
   return (
     <section className="mb-12">
       <LayoutWrapper>
@@ -91,19 +35,20 @@ console.log(data);
         <div className="relative">
           <Carousel className="w-full">
             <CarouselContent className="gap-2 " >
-              {pharmacies.map((pharmacy, index) => (
+              {partners.map((pharmacy:any, index:any) => (
                 <CarouselItem
                   key={index}
                   className="pl-2 md:basis-1/2 lg:basis-1/3"
                 >
                   <PharmacyCard
-                    image={pharmacy.imageSrc}
-                    title={pharmacy.title}
-                    address={pharmacy.address}
+                    image={pharmacy.imageSrc || pharmacy1}
+                    title={pharmacy.businessName}
+                    address={pharmacy.location?.name}
                     services={pharmacy.services || []}
                     id={pharmacy.id}
                     isSearch={false}
-                    btnText={pharmacy.btnText}
+                    key={pharmacy.id}
+                    btnText={"View Pharmacy"}
                   />
                 </CarouselItem>
               ))}
