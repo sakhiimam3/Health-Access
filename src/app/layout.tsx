@@ -34,19 +34,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <UserContextProvider>
-        <Provider>
-          <body
+       <body
             className={`${robotoSlab.variable} ${ubuntu.variable} ${plusJakartaSans.variable}`}
           >
+      <UserContextProvider>
+        <Provider>
+         
             {children}
             <ToastContainer 
               autoClose={2000}
               
             />
-          </body>
+         
         </Provider>
       </UserContextProvider>
+      </body>
     </html>
   );
 }

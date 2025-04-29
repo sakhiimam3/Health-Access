@@ -15,8 +15,12 @@ import pharmacy2 from "../../public/images/pharmacy-2.png";
 import pharmacy3 from "../../public/images/pharmacy-3.png";
 import pharmacy4 from "../../public/images/pharmacy-1.png";
 import pharmacy5 from "../../public/images/pharmacy-2.png";
+import { useGetPartners } from "@/lib/hooks";
 
 const pharmacySlider = () => {
+
+const {data, isLoading, error, refetch} = useGetPartners();
+console.log(data);
   const pharmacies = [
     { 
       id: "123",

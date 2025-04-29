@@ -19,9 +19,11 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
+import { useUserContext } from "@/context/userStore";
 export default function AuthPage() {
   const { mutate: loginPartner, isPending, error } = useLoginPartner();
   const router = useRouter();
+  const {setUserData}=useUserContext();
   // Login form
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -39,8 +41,14 @@ export default function AuthPage() {
       notificationToken: "",
     };
     loginPartner(dataToSend, {
-      onSuccess: () => {
-        toast.success("Login successfully");
+      onSuccess: (data) => {
+        console.log(data?.data);
+        setUserData(data?.data);
+        toast.success("Login successfully",{
+          onClose(){
+            router.push("/");
+          }
+        });
       },
       onError: (error: unknown) => {
         if (error instanceof AxiosError) {

@@ -62,22 +62,19 @@ export const pharmacySignUpSchema = z.object({
   notificationToken: z.string().optional(), // Assuming this can be optional
 });
 
-export const resetPasswordSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string().min(8, 'Please confirm your password'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
 
+
+
+export const otpSchema = z.object({
+  otp: z.string().length(6, { message: "OTP must be 6 digits" }),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+});
 
 export const forgotPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
 });
 
-  
-export type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
+export type OTPForm = z.infer<typeof otpSchema>;
 export type PharmacySignUpFormValues = z.infer<typeof pharmacySignUpSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;

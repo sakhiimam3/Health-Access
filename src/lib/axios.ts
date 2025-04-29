@@ -6,11 +6,16 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+const userData = localStorage.getItem('health_access_user'); 
+const user = userData ? JSON.parse(userData) : null;
+console.log('Parsed user:', user);
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token'); 
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
+  const userData = localStorage.getItem('health_access_user'); 
+  const user = userData ? JSON.parse(userData) : null;
+  console.log('Parsed user:', user);
+  if (user) {
+    config.headers['Authorization'] = `Bearer ${user.token}`;
   }
   return config;
 }, (error) => {

@@ -3,20 +3,15 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 export interface User {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  businessName: string;
-  website: string;
-  phone: string;
-  businessType: string;
-  location: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  };
-  termsAccepted: boolean;
+  email?: string;
+  firstName?: string;
+  id?: string;
+  isActive?: boolean;
+  isApproved?: boolean;
+  isVerified?: boolean;
+  lastName?: string;
+  role?: string;
+  token?: string;
 }
 
 
@@ -55,6 +50,9 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
     }
   }, [user]);
+
+  if(!user)return null;
+
 
   return (
     <UserContext.Provider value={{ user, setUserData, logout }}>

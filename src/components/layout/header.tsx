@@ -10,11 +10,14 @@ import LayoutWrapper from "./wrapper";
 import { NavItems } from "@/mockdata";
 import ButtonTheme from "../shared/ButtonTheme";
 import { usePathname, useRouter } from "next/navigation";
+import { useUserContext } from "@/context/userStore";
+import HeaderMenu from "../headerMenu";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathName = usePathname();
+  const {user}=useUserContext();
 
   const dropdownRef = useRef(null);
   const scrollPositionRef = useRef(0);
@@ -111,10 +114,13 @@ const Header = () => {
               </Button>
             </div>
           )}
-
-          <div className="flex items-center space-x-4">
-            <Link href="/login">
-              <span className="hidden underline text-sm font-ubuntu font-[400] md:inline">
+          {user ? (
+            <HeaderMenu
+             />
+          ) : (
+            <div className="flex items-center space-x-4">
+              <Link href="/login">
+                <span className="hidden underline text-sm font-ubuntu font-[400] md:inline">
                 Sign In
               </span>
             </Link>
@@ -130,6 +136,7 @@ const Header = () => {
               Become a Partner
             </ButtonTheme>
           </div>
+          )}
         </nav>
         <div
           className={`w-full bg-white transition-all z-50 duration-300 ${

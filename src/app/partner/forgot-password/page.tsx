@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ForgotPasswordForm,
   forgotPasswordSchema,
-  ResetPasswordForm,
 } from "@/lib/schema";
 import { useRequestResetPartner } from "@/lib/hooks";
 import ButtonTheme from "@/components/shared/ButtonTheme";
@@ -27,7 +26,7 @@ const ForgotPassword = () => {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = (data: ResetPasswordForm) => {
+  const onSubmit = (data: ForgotPasswordForm) => {
     const dataToSend = {
       email: data.email,
     };
@@ -35,7 +34,7 @@ const ForgotPassword = () => {
       onSuccess: () => {
         toast.success("Email sent successfully", {
           onClose() {
-            router.push("/partner/otp");
+            router.push(`/partner/otp?email=${data.email}`);
           },
         });
       },
