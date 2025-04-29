@@ -4,8 +4,6 @@ import "./globals.css";
 import Provider from "@/components/layout/provider";
 import { ToastContainer } from "react-toastify";
 import { UserContextProvider } from "@/context/userStore";
-// import { Suspense } from "react";
-// import Loading from "./loading";
 
 const robotoSlab = Roboto_Slab({
   variable: "--font-roboto-slab",
@@ -18,6 +16,7 @@ const ubuntu = Ubuntu({
   weight: ["300", "400", "500", "700"],
   subsets: ["latin"],
 });
+// console.log("cehck")
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -41,8 +40,7 @@ export default function RootLayout({
       >
         <UserContextProvider>
           <Provider>
-            {/* <Suspense fallback={<Loading />}>{children}</Suspense> */}
-            {children}
+            {/* {children} */}
             <ToastContainer autoClose={2000} />
 
           </Provider>
