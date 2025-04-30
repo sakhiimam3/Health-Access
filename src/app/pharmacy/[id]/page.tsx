@@ -15,6 +15,7 @@ import NHSServicesCard from "@/components/NHSServicesCard";
 // import { ClockIcon, EmailIcon, LocationIcon, SupportIcon } from "@/components/icons/icons";
 import ContactUs from "@/components/contactus";
 import { partners } from "@/mockdata";
+import { useGetPartners } from "@/lib/hooks";
 
 const PharmacyDetails = () => {
   return (
@@ -28,8 +29,10 @@ const PharmacyDetails = () => {
 
 const PharmacyContent = () => {
   const { id } = useParams();
+  const { data, isLoading, error, refetch } = useGetPartners();
+  console.log(data, "data1111");
 
-  const pharmacy = partners.find((pharmacy: any) => pharmacy.id === id);
+  const pharmacy = data?.data?.find((pharmacy: any) => pharmacy?.id === id);
   const pharmacyName = pharmacy?.businessName.replace(/\s+/g, "-");
 
   return (
@@ -72,11 +75,14 @@ const PharmacyContent = () => {
         </section>
         <section>
           <div className="h-[600px] w-[92%] rounded-lg  relative">
-            <Image
-              src={warbunsdeatil}
+            <img
+              src={pharmacy?.image}
               alt={"pharmacy-detail"}
-              fill
-              className="object-cover rounded-[10px]"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
             />
             <div className="absolute top-[50px] right-[-100px] h-[250px] w-[240px] z-10">
               <Image

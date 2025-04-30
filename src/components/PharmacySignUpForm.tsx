@@ -132,14 +132,18 @@ const PharmacySignUpForm = () => {
   };
 
   const businessTypeOptions = [
-    { value: "retail", label: "Retail" },
-    { value: "healthcare", label: "Healthcare" },
-    { value: "education", label: "Education" },
-    { value: "finance", label: "Finance" },
-    { value: "technology", label: "Technology" },
-    { value: "hospitality", label: "Hospitality" },
+    { value: "pharmacy", label: "Pharmacy" },
+    { value: "hospital", label: "Hospital" },
+    { value: "clinic", label: "Clinic" },
+    { value: "laboratory", label: "Laboratory" },
+    { value: "imaging_center", label: "Imaging Center" },
+    { value: "nursing_home", label: "Nursing Home" },
+    { value: "dental_practice", label: "Dental Practice" },
+    { value: "optometry", label: "Optometry" },
+    { value: "physical_therapy", label: "Physical Therapy" },
+    { value: "mental_health", label: "Mental Health" },
     { value: "other", label: "Other" },
-  ];
+  ]
 
   return (
     <div className="min-h-screen bg-[#189BA3] py-16" id="sign-up-section">

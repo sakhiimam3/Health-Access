@@ -15,6 +15,7 @@ import Ph2 from "../../public/images/ph-2.png";
 import Ph3 from "../../public/images/ph-3.png";
 import Ph4 from "../../public/images/ph-4.png";
 import ButtonTheme from "./shared/ButtonTheme";
+import Link from "next/link";
 
 
 
@@ -88,13 +89,21 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
     },
   ];
 
+  function shuffleArray(arr: any) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
   return (
     <section className="mb-12">
       <LayoutWrapper>
         <div>
           <DifferentServices
             title="Vaccination Services"
-            services={servicesData}
+            services={shuffleArray(servicesData)}
             type="vaccination"
             link={link}
             isNested={isNested}
@@ -104,7 +113,7 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
         <div>
           <DifferentServices
             title="Cosmetic Services"
-            services={cosmeticServicesData}
+            services={shuffleArray(cosmeticServicesData)}
             link={link}
             type="cosmetic"
             isNested={isNested}
@@ -114,7 +123,7 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
         <div>
           <DifferentServices
             title="Pharmacy 1st Services"
-            services={pharmacyServicesData}
+            services={shuffleArray(pharmacyServicesData)}
             link={link}
             type="pharmacy 1st services"
             isNested={isNested}
@@ -122,6 +131,7 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
           />
         </div>
         <div className="flex justify-center items-center">
+          <Link href={link}>
           <ButtonTheme
             bgColor="bg-[#52525B] hover:bg-[#52525B] px-12"
             textColor="text-white"
@@ -130,6 +140,7 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
           >
             View All Services
           </ButtonTheme>
+          </Link>
         </div>
 
         <div className="border-t-2 border-[#DCDCDC] mt-10"></div>

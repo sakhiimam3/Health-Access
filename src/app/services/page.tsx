@@ -11,6 +11,8 @@ import Vs3 from "../../../public/images/vs-3.png";
 import Vs4 from "../../../public/images/vs-4.png"   ;
 import Vs5 from "../../../public/images/service-detail.png"   ;
 import {  useRouter, useSearchParams } from "next/navigation";
+
+
 const ServicesDetails = () => {
   const router=useRouter()
   const searchParams = useSearchParams();
@@ -55,7 +57,7 @@ const ServicesDetails = () => {
     <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
       <div className="mt-56">
         <PagesBanner
-          title={type}
+        title={type || "Services"}
           image="/images/how-it-works.png"
           height="h-85"
           textColor="white"
