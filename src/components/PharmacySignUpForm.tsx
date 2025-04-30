@@ -113,7 +113,7 @@ const PharmacySignUpForm = () => {
 
     createPartner(dataTosend, {
       onSuccess: () => {
-        toast.success("Partner created successfully", {
+        toast.success("Your application has been submitted successfully", {
           onClose: () => {
             router.push("/partner/partner-login");
           },

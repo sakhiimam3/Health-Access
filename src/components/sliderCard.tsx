@@ -12,6 +12,7 @@ import Image, { StaticImageData } from "next/image";
 import ButtonTheme from "./shared/ButtonTheme";
 import { useRouter } from "next/navigation";
 import { Loader2 } from 'lucide-react';
+import pharmacy1 from "../../public/images/pharmacy-1.png";
 
 interface PharmacyService {
   id: string;
@@ -19,37 +20,9 @@ interface PharmacyService {
 }
 
 import { X } from 'lucide-react'; // Optional: For a nicer close icon
+import Modal from "./modal";
 
-const Modal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-6 text-center">
-        {/* Close Icon */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-          aria-label="Close modal"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Modal Content */}
-        <h2 className="text-2xl font-semibold text-gray-800">Coming Soon</h2>
-        <p className="text-gray-500 mt-2">This feature is under development.</p>
-
-        {/* Optional Button */}
-        <button
-          onClick={onClose}
-          className="mt-6 px-6 py-2 bg-[#189BA3] text-white font-medium rounded-lg hover:bg-teal-700 transition"
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  );
-};
 
 
 
@@ -73,14 +46,14 @@ export const PharmacyCard = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const colors = ["#63DBA3", "#79A6F2", "#AA23DB"];
   const router = useRouter();
-
+  const imageSrc = typeof image === 'string' ? image : pharmacy1.src;
   return (
     <>
       <Card   className={`overflow-hidden ${isSearch ? "shadow-none" : "shadow-sm"}  hover:bg-gray-50 ${isSearch && "border-none"} `}>
         <CardHeader>
           <div className={`relative rounded-t-[16px] ${isSearch ? "h-[130px]" : "h-[250px]"} `}>
             <img
-              src={image}
+              src={imageSrc}
               alt="Medical consultation"
               width={100}
               height={100}
@@ -163,63 +136,63 @@ export const PharmacyCard = ({
   );
 };
 
-const pharmacySlider = () => {
-  const { data, isLoading, error, refetch } = useGetPartners();
+// const pharmacySlider = () => {
+//   const { data, isLoading, error, refetch } = useGetPartners();
 
-  // Show loader while data is loading
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <p>
-          <Loader2 className="w-10 h-10 animate-spin" />
-        </p>
-      </div>
-    );
-  }
+//   // Show loader while data is loading
+//   if (isLoading) {
+//     return (
+//       <div className="flex justify-center items-center h-64">
+//         <p>
+//           <Loader2 className="w-10 h-10 animate-spin" />
+//         </p>
+//       </div>
+//     );
+//   }
 
-  // Ensure data is valid before rendering
-  if (!data || !data.data || data.data.length === 0) {
-    return null; // Return null if no data is available
-  }
+//   // Ensure data is valid before rendering
+//   if (!data || !data.data || data.data.length === 0) {
+//     return null; // Return null if no data is available
+//   }
 
-  return (
-    <section className="mb-12">
-      <LayoutWrapper>
-        <div className="mb-10">
-          <CenterHeader
-            title="Trusted Pharmacies, Ready to Serve You"
-            description="Explore the top-rated pharmacies on Health Access, handpicked for their exceptional service and customer satisfaction. Find the perfect match for your healthcare needs."
-          />
-        </div>
-        <div className="relative">
-          <Carousel className="w-full">
-            <CarouselContent className="gap-2">
-              {data.data.map((pharmacy: any, index: any) => (
-                <CarouselItem
-                  key={index}
-                  className="pl-2 md:basis-1/2 lg:basis-1/3"
-                >
-                  <PharmacyCard
-                    image={pharmacy.image || pharmacy1}
-                    title={pharmacy.businessName}
-                    address={pharmacy.location?.name}
-                    services={pharmacy.services || []}
-                    id={pharmacy.id}
-                    isSearch={false}
-                    key={pharmacy.id}
-                    btnText={"View Pharmacy"}
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <div className="absolute bottom-[-30px] right-12 flex gap-1">
-              <CarouselPrevious className="group bg-white shadow-lg rounded-full p-2 transition-colors duration-300 hover:bg-gray-200 active:bg-gray-300" />
-              <CarouselNext className="group bg-white shadow-lg rounded-full p-2 transition-colors duration-300 hover:bg-gray-200 active:bg-gray-300" />
-            </div>
-          </Carousel>
-        </div>
-        <div className="border-t-2 border-gray-200 mt-24"></div>
-      </LayoutWrapper>
-    </section>
-  );
-};
+//   return (
+//     <section className="mb-12">
+//       <LayoutWrapper>
+//         <div className="mb-10">
+//           <CenterHeader
+//             title="Trusted Pharmacies, Ready to Serve You"
+//             description="Explore the top-rated pharmacies on Health Access, handpicked for their exceptional service and customer satisfaction. Find the perfect match for your healthcare needs."
+//           />
+//         </div>
+//         <div className="relative">
+//           <Carousel className="w-full">
+//             <CarouselContent className="gap-2">
+//               {data.data.map((pharmacy: any, index: any) => (
+//                 <CarouselItem
+//                   key={index}
+//                   className="pl-2 md:basis-1/2 lg:basis-1/3"
+//                 >
+//                   <PharmacyCard
+//                     image={pharmacy.image || pharmacy1}
+//                     title={pharmacy.businessName}
+//                     address={pharmacy.location?.name}
+//                     services={pharmacy.services || []}
+//                     id={pharmacy.id}
+//                     isSearch={false}
+//                     key={pharmacy.id}
+//                     btnText={"View Pharmacy"}
+//                   />
+//                 </CarouselItem>
+//               ))}
+//             </CarouselContent>
+//             <div className="absolute bottom-[-30px] right-12 flex gap-1">
+//               <CarouselPrevious className="group bg-white shadow-lg rounded-full p-2 transition-colors duration-300 hover:bg-gray-200 active:bg-gray-300" />
+//               <CarouselNext className="group bg-white shadow-lg rounded-full p-2 transition-colors duration-300 hover:bg-gray-200 active:bg-gray-300" />
+//             </div>
+//           </Carousel>
+//         </div>
+//         <div className="border-t-2 border-gray-200 mt-24"></div>
+//       </LayoutWrapper>
+//     </section>
+//   );
+// };

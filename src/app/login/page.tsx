@@ -137,7 +137,7 @@ export default function AuthPage() {
               <Button
                 variant={isLogin ? "default" : "ghost"}
                 className={cn(
-                  "flex-1 rounded-full text-sm font-medium textColor font-ubuntu",
+                  "flex-1 rounded-full hover:bg-[#00B0B0] text-sm font-medium textColor font-ubuntu",
                   isLogin
                     ? "bg-[#00A0AA] text-white"
                     : "bg-transparent text-[#00A0AA]"
@@ -149,7 +149,7 @@ export default function AuthPage() {
               <Button
                 variant={!isLogin ? "default" : "ghost"}
                 className={cn(
-                  "flex-1 rounded-full text-sm font-medium font-ubantu",
+                  "flex-1 rounded-full hover:bg-[#00B0B0] text-sm font-medium font-ubantu",
                   !isLogin
                     ? "bg-[#00A0AA] text-white"
                     : "bg-transparent text-[#00A0AA]"
@@ -221,6 +221,7 @@ export default function AuthPage() {
                   <div className="text-right">
                     <Button
                       variant="link"
+                      type="button"
                       className="text-[#737373] p-0 text-sm underline font-roboto"
                     >
                       Forgot Password?
@@ -229,7 +230,7 @@ export default function AuthPage() {
 
                   <Button
                     type="submit"
-                    className="w-full rounded-full bg-[#00A0AA] text-white py-2 h-11 mt-6"
+                    className="w-full hover:bg-[#00B0B0] rounded-full bg-[#00A0AA] text-white py-2 h-11 mt-6"
                   >
                     Login
                   </Button>
@@ -264,7 +265,7 @@ export default function AuthPage() {
                               className="rounded-full placeholder:text-[#B8B8B8] h-11 border-[#737373]"
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -285,7 +286,7 @@ export default function AuthPage() {
                               className="rounded-full placeholder:text-[#B8B8B8] h-11 border-[#737373]"
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-red-500" />
                         </FormItem>
                       )}
                     />
@@ -565,7 +566,7 @@ export default function AuthPage() {
 
                   <Button
                     type="submit"
-                    className="w-full rounded-full bg-[#00A0AA] text-white py-2 h-11 mt-6"
+                    className="w-full  hover:bg-[#00B0B0] rounded-full bg-[#00A0AA] text-white py-2 h-11 mt-6"
                     onClick={() => {
                       console.log("Register button clicked");
                       console.log("Current email value:", registerForm.getValues("email"));
