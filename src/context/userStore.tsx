@@ -32,7 +32,7 @@ const getUserFromStorage = (): User | null => {
   const storedUser = localStorage.getItem(STORAGE_KEY);
   return storedUser ? JSON.parse(storedUser) : INITIAL_VALUE;
 };
-
+// console.log("babab")
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => getUserFromStorage());
 
