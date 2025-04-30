@@ -2,7 +2,7 @@
 import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import LayoutWrapper from "@/components/layout/wrapper";
 import PagesBanner from "@/components/pagesBanner";
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 
 import consultant from "../../../../public/images/consultant.png";
 import warbunsdeatil from "../../../../public/images/warbunsdeatil.png";
@@ -16,6 +16,8 @@ import NHSServicesCard from "@/components/NHSServicesCard";
 import ContactUs from "@/components/contactus";
 import { partners } from "@/mockdata";
 import { useGetPartners } from "@/lib/hooks";
+import Modal from "@/components/modal";
+import pharmacy1 from "../../../../public/images/pharmacy-1.png";
 
 const PharmacyDetails = () => {
   return (
@@ -29,11 +31,13 @@ const PharmacyDetails = () => {
 
 const PharmacyContent = () => {
   const { id } = useParams();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { data, isLoading, error, refetch } = useGetPartners();
   console.log(data, "data1111");
 
   const pharmacy = data?.data?.find((pharmacy: any) => pharmacy?.id === id);
   const pharmacyName = pharmacy?.businessName.replace(/\s+/g, "-");
+  const imageSrc = typeof pharmacy?.image === 'string' ? pharmacy?.image : pharmacy1.src;
 
   return (
     <div className="mt-56">
@@ -69,6 +73,7 @@ const PharmacyContent = () => {
                 className="my-6 text-white py-3  text-lg rounded-[24px]"
                 children="Book Now"
                 paddingX="px-12"
+                onClick={() => setIsModalOpen(true)}
               />
             </div>
           </div>
@@ -76,7 +81,7 @@ const PharmacyContent = () => {
         <section>
           <div className="h-[600px] w-[92%] rounded-lg  relative">
             <img
-              src={pharmacy?.image}
+              src={imageSrc}
               alt={"pharmacy-detail"}
               style={{
                 width: "100%",
@@ -100,10 +105,7 @@ const PharmacyContent = () => {
             Our Services
           </div>
 
-          <HomeServices
-            isNested={true}
-            link={`/pharmacy/${id}/${pharmacyName}`}
-          />
+          <HomeServices isNested={true} link={`/services`} />
         </section>
         <section>
           <VaccinationPriceList />
@@ -117,6 +119,7 @@ const PharmacyContent = () => {
           <ContactUs />
         </section>
       </LayoutWrapper>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };

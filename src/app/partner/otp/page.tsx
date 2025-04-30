@@ -111,13 +111,13 @@ const OTPPage = () => {
               </InputOTPGroup>
             </InputOTP>
 
-            {errors.otp && (
-              <p className="mt-1 text-sm text-red-600 text-center">
+          
+          </div>
+          {errors.otp && (
+              <p className=" text-sm text-red-600 text-center">
                 {errors.otp.message}
               </p>
             )}
-          </div>
-
           <ButtonTheme
             bgColor="#00A0AA"
             textColor="text-white"

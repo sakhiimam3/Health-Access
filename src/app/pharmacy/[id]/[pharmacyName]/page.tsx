@@ -49,6 +49,7 @@ const PharmacyNestedPage = () => {
                   className="my-6 text-white py-3  text-lg rounded-[24px]"
                   children="Book Now"
                   paddingX="px-12"
+                 
                 />
               </div>
             </div>

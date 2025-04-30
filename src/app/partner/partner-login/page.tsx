@@ -42,7 +42,6 @@ export default function AuthPage() {
     };
     loginPartner(dataToSend, {
       onSuccess: (data) => {
-        console.log(data?.data);
         setUserData(data?.data);
         toast.success("Login successfully",{
           onClose(){
@@ -156,7 +155,7 @@ export default function AuthPage() {
                 <Button
                   type="submit"
                   disabled={isPending}
-                  className="w-full rounded-full bg-[#00A0AA] text-white py-2 h-11 mt-6"
+                  className="w-full rounded-full  hover:bg-[#00B0B0] bg-[#00A0AA] text-white py-2 mt-6"
                 >
                  {isPending ? "Processing..." : "Login"}
                 </Button>
