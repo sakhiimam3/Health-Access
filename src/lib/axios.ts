@@ -1,11 +1,14 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL, 
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://node.hostingladz.com:3837/', 
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+console.log("Axios Base URL:", process.env.NEXT_PUBLIC_API_BASE_URL);
+
 
 
 api.interceptors.request.use((config) => {
