@@ -16,8 +16,31 @@ import { useGetPartners } from "@/lib/hooks";
 // import { partners } from "@/mockdata";
 import { Loader2 } from "lucide-react";
 
+interface Partner {
+  id: string;
+  businessName: string;
+  location?: {
+    name: string;
+  };
+  services?: string[];
+}
+
+interface PartnerResponse {
+  data: Partner[];
+}
+
 const pharmacySlider = () => {
-  const { data, isLoading, error, refetch } = useGetPartners();
+  const { data, isLoading, error, refetch } = useGetPartners() as {
+    data: PartnerResponse | null;
+    isLoading: boolean;
+    error: any;
+    refetch: () => void;
+  };
+
+  // If no data exists, show nothing
+  if (!data) {
+    return null;
+  }
 
   // Show loader while data is loading
   if (isLoading) {
@@ -30,7 +53,8 @@ const pharmacySlider = () => {
     );
   }
 
-  if (!data || !data.data || data.data.length === 0) {
+  // If data exists but is empty, show nothing
+  if (!data.data || data.data.length === 0) {
     return null;
   }
 
@@ -52,12 +76,11 @@ const pharmacySlider = () => {
                   className="pl-2 md:basis-1/2 lg:basis-1/3"
                 >
                   <PharmacyCard
-                    image={ pharmacy1}
+                    image={pharmacy1}
                     title={pharmacy.businessName}
                     address={pharmacy.location?.name}
                     services={pharmacy.services || []}
                     id={pharmacy.id}
-
                     isSearch={false}
                     key={pharmacy.id}
                     btnText={"View Pharmacy"}

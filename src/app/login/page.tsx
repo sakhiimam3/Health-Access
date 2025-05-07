@@ -24,11 +24,12 @@ import { DatePicker } from "@/components/ui/DatePicker";
 import { useCreateUser } from "@/lib/hooks";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const {mutate,isPending,error}=useCreateUser()
-
+  const router=useRouter()
   // Login form
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -114,7 +115,8 @@ export default function AuthPage() {
                 alt="Health Access"
                 width={250}
                 height={40}
-                className="object-contain"
+                onClick={()=>router.push("/")}
+                className="object-contain cursor-pointer"
               />
             </div>
           </div>

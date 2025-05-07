@@ -11,10 +11,11 @@ import VitaminInfo from "@/components/VitaminInfo";
 import PharmacySlider from "@/components/pharmacySlider";
 import ButtonTheme from "@/components/shared/ButtonTheme";
 import DifferentServices from "@/components/different-services";
+import FrequentlyAsked from "@/components/frequently-asked";
 
 const VaccinationServices = () => {
   return (
-    <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
+    <PagesWrapper bgColor="bg-[#189BA3]" isSearchPage={true} type={true} btnColor="#189BA3">
       <div className="mt-56">
         <Suspense fallback={<div>Loading...</div>}>
           <Content />
@@ -160,42 +161,44 @@ const Content = () => {
         <VaccineSection
           title="Why Travel Vaccines Are Important"
           description="Traveling exposes you to different environments, climates, and health risks. Many countries have infectious diseases that are uncommon in your home country. Travel vaccines protect you against these diseases and ensure you have a safe and healthy journey. Some vaccines are even required for entry into certain countries."
-        imageSrc={
-          serviceName === "Travel Vaccines"
-            ? "/images/travel-vaccine.png"
-            : "/images/mensHealth.png"
-        }
-        buttonText="Book Now"
-      />
-      <TravelVaccines
-        title={
-          serviceName === "Travel Vaccines"
-            ? "Common Travel Vaccines"
-            : "Common Causes of Hair Loss in Men"
-        }
-        vaccines={vaccines}
-        mensHealthVaccines={mensHealthVaccines}
-      />
-      <section className="py-6">
-        <VitaminInfo
-          title="When to Get Vaccinated?"
-          description="It's recommended to get vaccinated 4-6 weeks before travel, as some vaccines require multiple doses for full protection. Check with a travel health specialist to plan your vaccinations based on your itinerary."
-          imageSrc="/images/checkup.png"
-          isReverse={false}
+          imageSrc={
+            serviceName === "Travel Vaccines"
+              ? "/images/travel-vaccine.png"
+              : "/images/mensHealth.png"
+          }
+          buttonText="Book Now"
         />
-      </section>
-      {serviceName !== "Travel Vaccines" && (
-        <section>
-          <TravelVaccines
-            title={"Treatment & Prevention of Male Pattern Baldness"}
-            mensHealthVaccines={treatmentPrevention}
+        <TravelVaccines
+          title={
+            serviceName === "Travel Vaccines"
+              ? "Common Travel Vaccines"
+              : "Common Causes of Hair Loss in Men"
+          }
+          vaccines={vaccines}
+          mensHealthVaccines={mensHealthVaccines}
+        />
+        <section className="py-6">
+          <VitaminInfo
+            title="When to Get Vaccinated?"
+            description="It's recommended to get vaccinated 4-6 weeks before travel, as some vaccines require multiple doses for full protection. Check with a travel health specialist to plan your vaccinations based on your itinerary."
+            imageSrc="/images/checkup.png"
+            isReverse={false}
           />
         </section>
-      )}
-      <div className="py-6">
-        <PharmacySlider />
-      </div>
-      {serviceName === "Travel Vaccines" && <Blogs />}
+        {serviceName !== "Travel Vaccines" && (
+          <section>
+            <TravelVaccines
+              title={"Treatment & Prevention of Male Pattern Baldness"}
+              mensHealthVaccines={treatmentPrevention}
+            />
+          </section>
+        )}
+        <div className="py-6">
+          <PharmacySlider />
+        </div>
+      </LayoutWrapper>
+
+       <FrequentlyAsked btnColor="#189BA3" />
       <section
         className={`w-full flex items-center  h-[300px]  bg-cover bg-center bg-no-repeat`}
         style={{
@@ -242,23 +245,6 @@ const Content = () => {
           </div>
         </LayoutWrapper>
       </section>
-      <LayoutWrapper>
-        {serviceName === "Travel Vaccines" ? (
-          <div className="py-12">
-            <DifferentServices
-              title="Related Services"
-              services={servicesData}
-              type="vaccination"
-              link="/services"
-              isNested={false}
-              viewAllLink={false}
-            />
-          </div>
-        ) : (
-          <Blogs />
-        )}
-      </LayoutWrapper>
-    </LayoutWrapper>
     </>
   );
 };

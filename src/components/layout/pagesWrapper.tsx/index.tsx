@@ -11,9 +11,9 @@ PagesWrapper = ({ children ,bgColor,btnColor,type,isSearchPage,isPartner}: { chi
     <div>
       <Header />
       {children}
-      {type && <Blogs />}
-      {isPartner && <PartnerSection bgColor={bgColor} />}
       {!isSearchPage && <FrequentlyAsked  btnColor={btnColor} />}
+      {isPartner && <PartnerSection bgColor={bgColor} />}
+      {type && <Blogs />}
       <Footer />
     </div>
   );

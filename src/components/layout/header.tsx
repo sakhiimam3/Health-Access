@@ -119,22 +119,23 @@ const Header = () => {
              />
           ) : (
             <div className="flex items-center space-x-4">
-              <Link href="/login">
-                <span className="hidden underline text-sm font-ubuntu font-[400] md:inline">
-                Sign In
-              </span>
-            </Link>
+          
 
             <ButtonTheme
               onClick={() => router.push("/partner/become-partner")}
               className="rounded-[24px]"
               paddingY="py-4"
               paddingX="px-6"
-              bgColor="bg-[#189BA3]"
+              bgColor="bg-[#1E222B]"
               textColor="text-white"
             >
               Become a Partner
             </ButtonTheme>
+            <Link href="/login">
+                <span className="hidden underline text-sm font-ubuntu font-[400] md:inline">
+                Sign In
+              </span>
+            </Link>
           </div>
           )}
         </nav>

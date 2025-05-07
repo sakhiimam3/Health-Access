@@ -8,7 +8,7 @@ import { ComputerIcon, SearchIcon, TextBoxIcon, VerifyIcon } from './icons/icons
 import HowItWorksCard from './howitworksCard';
 
 
-const HowItWorks = () => {
+const HowItWorks = ({isNested}:{isNested?:boolean}) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
 
@@ -36,17 +36,20 @@ const HowItWorks = () => {
     ]
   
   return (
-    <section className='mt-80 mb-4'> 
+    <section className={`${isNested ? 'mt-20' : 'mt-80'} mb-4`}> 
         <LayoutWrapper>
        
       {/* Main Title */}
+      {!isNested && (
       <div className="text-center mb-16">
+      
         <h1 className="text-5xl font-bold">
           <span className="text-teal-500">Connecting</span>
           <span className="text-gray-700"> You To</span>
         </h1>
         <h2 className="text-4xl text-gray-700 font-bold mt-2">Health Services</h2>
       </div>
+      )}
         <div>
           <h1 className='text-4xl font-bold text-center'>How it works</h1>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 my-8 gap-4'>
