@@ -24,9 +24,9 @@ export const useCreatePartner = () => {
   return { mutate, isPending, error };
 };
 
-export const useLoginPartner = () => {
+export const useLogin = () => {
   const { mutate, isPending, error } = useApiMutation<User, LoginFormValues>(
-    "/v1/api/auth/partner/login",
+    "/v1/api/auth/login",
     "POST"
   );
   return { mutate, isPending, error };

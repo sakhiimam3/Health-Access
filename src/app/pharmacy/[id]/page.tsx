@@ -37,18 +37,19 @@ const PharmacyContent = () => {
 
   const pharmacy = data?.data?.find((pharmacy: any) => pharmacy?.id === id);
   const pharmacyName = pharmacy?.businessName.replace(/\s+/g, "-");
-  const imageSrc = typeof pharmacy?.image === 'string' ? pharmacy?.image : pharmacy1.src;
+  const imageSrc =
+    typeof pharmacy?.image === "string" ? pharmacy?.image : pharmacy1.src;
 
   return (
     <div className="mt-56">
       <PagesBanner
         title={pharmacyName}
-        image="/images/pharmacy-detail.png"
-        height="h-[200px]"
+        image="/images/pharmacyDetail.png"
+        height="h-[300px]"
         textColor="white"
         fromColor="#189BA3"
         toColor="#189BA3"
-        isDetail={true}
+        isDetail={false}
       />
       <LayoutWrapper>
         <section>

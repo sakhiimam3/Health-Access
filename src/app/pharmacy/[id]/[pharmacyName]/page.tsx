@@ -22,6 +22,7 @@ const PharmacyNestedPage = () => {
           fromColor="#189BA3"
           toColor="#189BA3"
           isDetail={true}
+          
         />
         <LayoutWrapper>
           <section>

@@ -60,7 +60,7 @@ const page = () => {
         bgColor="bg-[#189BA3]"
         btnColor="#189BA3"
       >
-        <PharmacyPartnership  />
+        <PharmacyPartnership />
 
         {/* Why Partner with Health Access Section */}
         <div className="py-16 ">
@@ -142,9 +142,7 @@ const page = () => {
           </Wrapper>
         </div>
         <PharmacySignUpForm />
-
       </PagesWrapper>
-
     </div>
   );
 };

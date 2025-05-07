@@ -149,9 +149,10 @@ const BlogsPage = () => {
         <PagesBanner
           fromColor="#189BA3"
           toColor="#189BA3"
+          image="/images/blogBg.png"
           textColor="text-white"
-          height="h-[200px]"
-          isDetail={true}
+          height="h-[350px]"
+          isDetail={false}
           title="Blogs"
         />
 
