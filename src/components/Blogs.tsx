@@ -38,7 +38,7 @@ const cardData = [
 const Blogs = () => {
   const router = useRouter();
   return (
-    <section className='py-6'>
+    <section className='py-16'>
       <LayoutWrapper>
         <div className='mb-10'>
         <CenterHeader title="Blogs" description="Explore expert tips, health insights, and updates on pharmacy services to stay informed and empowered." />

@@ -31,7 +31,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = () => {
           return (
             <React.Fragment key={index}>
               <BreadcrumbItem>
-                <BreadcrumbLink className="text-white capitalize" href={href}>{displayValue.replace(/\s+/g, "-")}</BreadcrumbLink>
+                <BreadcrumbLink className="text-white text-xl capitalize" href={href}>{displayValue.replace(/\s+/g, "-")}</BreadcrumbLink>
               </BreadcrumbItem>
               {index < fullPathnames.length - 1 && (
                 <BreadcrumbSeparator>

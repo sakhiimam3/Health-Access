@@ -18,6 +18,7 @@ export default {
 			textColor:"#1E222B",
 			bgbtn:"#189BA3",
 			bgDev:"#189BA3",
+			btnbgThird:"#189BA3",
 			borderColor:"#DCDCDC",
 			paragraphColor:"#52525B",
   			accentDarkTeal: '#008080',

@@ -21,14 +21,19 @@ import {
 } from "@/components/ui/form";
 
 import { DatePicker } from "@/components/ui/DatePicker";
-import { useCreateUser } from "@/lib/hooks";
+import { useCreateUser, useLogin } from "@/lib/hooks";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
+import { useUserContext } from "@/context/userStore";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const {mutate,isPending,error}=useCreateUser()
-
+  const { mutate: loginMutate, isPending: loginPending, error: loginError } = useLogin();
+  const {setUserData}=useUserContext()
+  const router=useRouter()
   // Login form
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -57,6 +62,30 @@ export default function AuthPage() {
   // Form submission handlers
   const onLoginSubmit = (data: LoginFormValues) => {
     // toast.success("login successfully");
+    const dataToSend = {
+      email: data.email,
+      password: data.password,
+      notificationToken: "",
+    };
+    loginMutate(dataToSend, {
+      onSuccess: (data) => {
+        setUserData(data?.data);
+        toast.success("Login successfully",{
+          onClose(){
+            router.push("/");
+          }
+        });
+      },
+      onError: (error: unknown) => {
+        if (error instanceof AxiosError) {
+          const errorMessage =
+            error.response?.data?.message || "Error creating partner";
+          toast.error(errorMessage);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
+      },
+    });
 
     console.log("%c Login form submission:", "color: #00A0AA; font-weight: bold; font-size: 14px;");
     console.table(data);
@@ -114,7 +143,8 @@ export default function AuthPage() {
                 alt="Health Access"
                 width={250}
                 height={40}
-                className="object-contain"
+                onClick={()=>router.push("/")}
+                className="object-contain cursor-pointer"
               />
             </div>
           </div>
@@ -230,9 +260,10 @@ export default function AuthPage() {
 
                   <Button
                     type="submit"
+                    disabled={loginPending}
                     className="w-full hover:bg-[#00B0B0] rounded-full bg-[#00A0AA] text-white py-2 h-11 mt-6"
                   >
-                    Login
+                    {loginPending ? "Logging in..." : "Login"}
                   </Button>
                 </form>
               </Form>

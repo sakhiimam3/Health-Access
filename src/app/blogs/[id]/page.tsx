@@ -22,7 +22,7 @@ const BlogDetails = () => {
         <PagesBanner
           title={"Everything You Need to Know About the Flu Vaccine"}
           image="/images/pharmacy-detail.png"
-          height="h-[200px]"
+          height="h-[240px]"
           textColor="white"
           fromColor="#189BA3"
           toColor="#189BA3"

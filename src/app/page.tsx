@@ -15,9 +15,9 @@ export default function Home() {
     <HomeServices isNested={false} link="/services" />
     <PharmacySlider />
     <TrustedPartner />
-    <Blogs />
+    <FrequentlyAsked btnColor="#189BA3" />
      <PartnerSection bgColor="bg-[#189BA3]" />
-     <FrequentlyAsked btnColor="#189BA3" />
+     <Blogs />
     <Footer />
     </>
    

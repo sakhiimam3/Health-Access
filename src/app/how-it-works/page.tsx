@@ -10,35 +10,9 @@ import {
   SearchIcon,
   VerifyIcon,
 } from "@/components/icons/icons";
+import HowItWorks from "@/components/howitworks";
 
-const HowItWorks = () => {
-  const howItWorks = [
-    {
-      icon: <SearchIcon className="group-hover:text-white" />,
-      title: "Search for Services",
-      text: "Enter your postcode and the service you need, such as vaccinations, health checks, or consultations.",
-    },
-    {
-      icon: <BookIcon className="group-hover:text-white" />,
-      title: "Compare Pharmacies",
-      text: "Browse nearby pharmacies, compare prices, check availability, and read reviews to make an informed decision.",
-    },
-    {
-      icon: <ComputerIcon className="group-hover:text-white" />,
-      title: "Book Online",
-      text: "Select your preferred pharmacy and schedule your appointment through our secure online booking system.",
-    },
-    {
-      icon: <VerifyIcon className="group-hover:text-white" />,
-      title: "Receive Confirmation",
-      text: "Your chosen pharmacy will receive a notification of your booking, and you'll get a confirmation email or SMS with all the details.",
-    },
-    {
-      icon: <VerifyIcon className="group-hover:text-white" />,
-      title: "Visit Your Pharmacy",
-      text: "Attend your appointment at the scheduled time and location. Get expert care without the hassle.",
-    },
-  ];
+const HowItWorksPage = () => {
   return (
     <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
       <div className="mt-56">
@@ -51,7 +25,7 @@ const HowItWorks = () => {
           toColor="#189BA3"
         />
         <LayoutWrapper>
-          <div className="grid grid-cols-1 mt-20 lg:grid-cols-2 gap-2 items-start">
+          {/* <div className="grid grid-cols-1 mt-20 lg:grid-cols-2 gap-2 items-start">
             <div className="w-full flex  items-start h-[100%] ">
               <Image
                 src={HowItWorksImage}
@@ -79,11 +53,12 @@ const HowItWorks = () => {
                 ))}
               </div>
             </div>
-          </div>
+          </div> */}
+          <HowItWorks isNested={true} />
         </LayoutWrapper>
       </div>
     </PagesWrapper>
   );
 };
 
-export default HowItWorks;
+export default HowItWorksPage;

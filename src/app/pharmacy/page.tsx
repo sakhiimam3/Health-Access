@@ -83,7 +83,7 @@ const SearchPage = () => {
         },
   ];
   return (
-    <PagesWrapper isSearchPage={true} bgColor="bg-[#189BA3]" btnColor="#189BA3">
+    <PagesWrapper isSearchPage={true}  bgColor="bg-[#189BA3]" btnColor="#189BA3">
       <LayoutWrapper>
         <section className="mt-60 mb-10">
           <div className="w-full flex gap-10">

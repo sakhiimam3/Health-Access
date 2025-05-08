@@ -115,7 +115,7 @@ const PharmacySignUpForm = () => {
       onSuccess: () => {
         toast.success("Your application has been submitted successfully", {
           onClose: () => {
-            router.push("/partner/partner-login");
+            router.push("/login");
           },
         });
         reset();
@@ -453,7 +453,7 @@ const PharmacySignUpForm = () => {
                 <div className="text-center text-sm text-gray-500 mt-4">
                   Already have an account?{" "}
                   <Link
-                    href="/partner/partner-login"
+                    href="/login"
                     className="text-[#189BA3] hover:underline"
                   >
                     Login
