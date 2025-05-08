@@ -138,7 +138,7 @@ const page = () => {
                 </div>
               ))}
             </div>
-            {/* Sign Up Form Section */}
+          
           </Wrapper>
         </div>
         <PharmacySignUpForm />
