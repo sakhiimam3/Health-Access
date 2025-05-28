@@ -1,28 +1,29 @@
-"use client";
+"use client"
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import React, { CSSProperties } from "react";
-import { useForm, Controller } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import Image from "next/image";
-import Link from "next/link";
-import { pharmacySignUpSchema, PharmacySignUpFormValues } from "@/lib/schema";
-import Wrapper from "./layout/wrapper";
-import ButtonTheme from "./shared/ButtonTheme";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import { useCreatePartner } from "@/lib/hooks";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
-import { AxiosError } from 'axios';
+import { zodResolver } from "@hookform/resolvers/zod"
+import { type CSSProperties, useRef, useEffect, useState } from "react"
+import { useForm, Controller } from "react-hook-form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
+import { Input } from "./ui/input"
+import Image from "next/image"
+import Link from "next/link"
+import { pharmacySignUpSchema, type PharmacySignUpFormValues } from "@/lib/schema"
+import Wrapper from "./layout/wrapper"
+import ButtonTheme from "./shared/ButtonTheme"
+import PhoneInput from "react-phone-input-2"
+import "react-phone-input-2/lib/style.css"
+import { useCreatePartner } from "@/lib/hooks"
+import { toast } from "react-toastify"
+import { useRouter } from "next/navigation"
+import { AxiosError } from "axios"
+
+// Declare global google types
+declare global {
+  interface Window {
+    google: any
+    initMap: () => void
+  }
+}
 
 const selectStyles = {
   input: {
@@ -38,27 +39,15 @@ const selectStyles = {
     WebkitAppearance: "none",
     MozAppearance: "none",
     backgroundImage:
-      'url(\'data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e\')',
+      'url(\'data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e\')',
     backgroundRepeat: "no-repeat",
     backgroundPosition: "right 1rem center",
     backgroundSize: "1rem",
     paddingRight: "2.5rem",
   } as CSSProperties,
-};
+}
 
-// Location options
-const locationOptions = [
-  { value: "london", label: "London" },
-  { value: "manchester", label: "Manchester" },
-  { value: "birmingham", label: "Birmingham" },
-  { value: "leeds", label: "Leeds" },
-  { value: "glasgow", label: "Glasgow" },
-  { value: "edinburgh", label: "Edinburgh" },
-  { value: "liverpool", label: "Liverpool" },
-  { value: "bristol", label: "Bristol" },
-];
-
-// Postal code options
+// Postal code options (kept as fallback)
 const postalCodeOptions = [
   { value: "sw1", label: "SW1" },
   { value: "w1", label: "W1" },
@@ -68,12 +57,15 @@ const postalCodeOptions = [
   { value: "n1", label: "N1" },
   { value: "ec1", label: "EC1" },
   { value: "wc1", label: "WC1" },
-];
+]
 
 const PharmacySignUpForm = () => {
-  const { mutate: createPartner, isPending, error } = useCreatePartner();
-  const router = useRouter();
+  const { mutate: createPartner, isPending, error } = useCreatePartner()
+  const router = useRouter()
 
+  // Google Maps states
+  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
+  const locationInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<PharmacySignUpFormValues>({
     resolver: zodResolver(pharmacySignUpSchema),
@@ -88,20 +80,89 @@ const PharmacySignUpForm = () => {
       notificationToken: "",
       termsAccepted: true,
       schedulingPlatform: "calendly",
-      postalCode:"",
+      postalCode: "",
       location: {
         name: "",
         latitude: 0,
         longitude: 0,
       },
     },
+  })
 
-  });
-  const { reset } = form;
+  const { reset, setValue, clearErrors } = form
 
+  // Load Google Maps Script
+  useEffect(() => {
+    if (window.google?.maps?.places?.Autocomplete) {
+      setIsGoogleLoaded(true)
+      return
+    }
+
+    const script = document.createElement("script")
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`
+    script.async = true
+    script.defer = true
+    script.onload = () => setIsGoogleLoaded(true)
+    document.head.appendChild(script)
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script)
+      }
+    }
+  }, [])
+
+  // Setup Google Places Autocomplete
+  useEffect(() => {
+    if (!isGoogleLoaded || !locationInputRef.current) return
+
+    const autocomplete = new window.google.maps.places.Autocomplete(locationInputRef.current, {
+      types: ["address"],
+      componentRestrictions: { country: "gb" }, // Restrict to UK
+      fields: ["formatted_address", "geometry", "address_components"],
+    })
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace()
+
+      if (place.geometry && place.geometry.location) {
+        const lat = place.geometry.location.lat()
+        const lng = place.geometry.location.lng()
+        const address = place.formatted_address || ""
+
+        // Extract postal code from address components
+        let postalCode = ""
+        if (place.address_components) {
+          const postalCodeComponent = place.address_components.find((component: any) =>
+            component.types.includes("postal_code"),
+          )
+          if (postalCodeComponent) {
+            postalCode = postalCodeComponent.long_name
+          }
+        }
+
+        // Update form values
+        setValue("location.name", address)
+        setValue("location.latitude", lat)
+        setValue("location.longitude", lng)
+
+        // Auto-fill postal code if found
+        if (postalCode) {
+          setValue("postalCode", postalCode)
+          clearErrors("postalCode")
+        }
+
+        clearErrors(["location.name"])
+      }
+    })
+
+    return () => {
+      window.google.maps.event.clearInstanceListeners(autocomplete)
+    }
+  }, [isGoogleLoaded, setValue, clearErrors])
 
   const onSubmit = (data: PharmacySignUpFormValues) => {
-    const { location, postalCode, ...rest } = data;
+    const { location, postalCode, ...rest } = data
     const dataTosend = {
       ...rest,
       location: {
@@ -109,27 +170,27 @@ const PharmacySignUpForm = () => {
         latitude: data.location.latitude,
         longitude: data.location.longitude,
       },
-    };
+    }
 
     createPartner(dataTosend, {
       onSuccess: () => {
         toast.success("Your application has been submitted successfully", {
           onClose: () => {
-            router.push("/login");
+            router.push("/login")
           },
-        });
-        reset();
+        })
+        reset()
       },
       onError: (error: unknown) => {
         if (error instanceof AxiosError) {
-          const errorMessage = error.response?.data?.message || "Error creating partner";
-          toast.error("Error creating partner: " + errorMessage);
+          const errorMessage = error.response?.data?.message || "Error creating partner"
+          toast.error("Error creating partner: " + errorMessage)
         } else {
-          toast.error("An unexpected error occurred.");
+          toast.error("An unexpected error occurred.")
         }
       },
-    });
-  };
+    })
+  }
 
   const businessTypeOptions = [
     { value: "pharmacy", label: "Pharmacy" },
@@ -152,12 +213,9 @@ const PharmacySignUpForm = () => {
         <div className="w-full flex  justify-between flex-col md:flex-row overflow-hidden">
           <div style={{ borderRadius: "24px" }}>
             <div className="text-white mt-8 mb-10">
-              <h1 className="text-3xl md:text-4xl font-ubantu font-bold mb-6">
-                Pharmacy Sign-Up Form
-              </h1>
+              <h1 className="text-3xl md:text-4xl font-ubantu font-bold mb-6">Pharmacy Sign-Up Form</h1>
               <p className="text-white/90 text-lg">
-                Fill in your details to become a verified Health Access partner
-                pharmacy.
+                Fill in your details to become a verified Health Access partner pharmacy.
               </p>
             </div>
             <div className="flex w-full">
@@ -172,15 +230,9 @@ const PharmacySignUpForm = () => {
           </div>
 
           {/* Right Side - Form */}
-          <div
-            className="p-8 md:p-10 md:w-1/2 bg-white"
-            style={{ borderRadius: "24px" }}
-          >
+          <div className="p-8 md:p-10 md:w-1/2 bg-white" style={{ borderRadius: "24px" }}>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* First Name and Last Name */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
@@ -188,9 +240,7 @@ const PharmacySignUpForm = () => {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium ml-1 font-roboto">
-                          First Name
-                        </FormLabel>
+                        <FormLabel className="font-medium ml-1 font-roboto">First Name</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="First name"
@@ -208,9 +258,7 @@ const PharmacySignUpForm = () => {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium ml-1 font-roboto">
-                          Last Name
-                        </FormLabel>
+                        <FormLabel className="font-medium ml-1 font-roboto">Last Name</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Last name"
@@ -231,9 +279,7 @@ const PharmacySignUpForm = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-medium ml-1 font-roboto">
-                        Email*
-                      </FormLabel>
+                      <FormLabel className="font-medium ml-1 font-roboto">Email*</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Email"
@@ -254,9 +300,7 @@ const PharmacySignUpForm = () => {
                     name="businessName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium ml-1 font-roboto">
-                          Business Name
-                        </FormLabel>
+                        <FormLabel className="font-medium ml-1 font-roboto">Business Name</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="HealthCare Pharmacy"
@@ -274,9 +318,7 @@ const PharmacySignUpForm = () => {
                     name="website"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium ml-1 font-roboto">
-                          Website URL
-                        </FormLabel>
+                        <FormLabel className="font-medium ml-1 font-roboto">Website URL</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="www.example.com"
@@ -297,9 +339,7 @@ const PharmacySignUpForm = () => {
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-medium font-roboto ml-1">
-                        Business Phone Number
-                      </FormLabel>
+                      <FormLabel className="font-medium font-roboto ml-1">Business Phone Number</FormLabel>
                       <FormControl>
                         <div className="phone-input-container">
                           <Controller
@@ -338,15 +378,13 @@ const PharmacySignUpForm = () => {
                   )}
                 />
 
-                {/* Business Type - Replaced with regular input */}
+                {/* Business Type */}
                 <FormField
                   control={form.control}
                   name="businessType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-medium ml-1 font-roboto">
-                        Business Type
-                      </FormLabel>
+                      <FormLabel className="font-medium ml-1 font-roboto">Business Type</FormLabel>
                       <FormControl>
                         <select
                           className="flex h-12 w-full rounded-[24px] border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -368,37 +406,28 @@ const PharmacySignUpForm = () => {
                   )}
                 />
 
-                {/* Location and Postal Code */}
+                {/* Location (Google Autocomplete) and Postal Code */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="location.name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium ml-1 font-roboto">
-                          Location
-                        </FormLabel>
+                        <FormLabel className="font-medium ml-1 font-roboto">Location</FormLabel>
                         <FormControl>
-                          <select
-                            className="flex h-12 w-full rounded-[24px] border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          <input
+                            ref={locationInputRef}
+                            placeholder="Start typing your address..."
+                            className="flex h-12 w-full rounded-[24px] border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            autoComplete="off"
                             value={field.value}
-                            onChange={field.onChange}
-                            style={selectStyles.select}
-                          >
-                            <option
-                              value=""
-                              disabled
-                              className="text-gray-400"
-                              style={{ color: "#9CA3AF" }}
-                            >
-                              Select location
-                            </option>
-                            {locationOptions.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
+                            onChange={(e) => {
+                              field.onChange(e.target.value)
+                              if (e.target.value.trim()) {
+                                clearErrors("location.name")
+                              }
+                            }}
+                          />
                         </FormControl>
                         <FormMessage className="text-red-500 text-[12px]" />
                       </FormItem>
@@ -409,30 +438,14 @@ const PharmacySignUpForm = () => {
                     name="postalCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium ml-1 font-roboto">
-                          Postal Code
-                        </FormLabel>
+                        <FormLabel className="font-medium ml-1 font-roboto">Postal Code</FormLabel>
                         <FormControl>
-                          <select
-                            className="flex h-12 w-full rounded-[24px] border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            value={field.value}
-                            onChange={field.onChange}
-                            style={selectStyles.select}
-                          >
-                            <option
-                              value=""
-                              disabled
-                              className="text-gray-400"
-                              style={{ color: "#9CA3AF" }}
-                            >
-                              Select postal code
-                            </option>
-                            {postalCodeOptions.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
+                          <Input
+                            placeholder="Auto-filled from location"
+                            className="px-4 py-3 placeholder:text-gray-400"
+                            style={selectStyles.input}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage className="text-red-500 text-[12px]" />
                       </FormItem>
@@ -452,10 +465,7 @@ const PharmacySignUpForm = () => {
                 {/* Login Link */}
                 <div className="text-center text-sm text-gray-500 mt-4">
                   Already have an account?{" "}
-                  <Link
-                    href="/login"
-                    className="text-[#189BA3] hover:underline"
-                  >
+                  <Link href="/login" className="text-[#189BA3] hover:underline">
                     Login
                   </Link>
                 </div>
@@ -464,8 +474,39 @@ const PharmacySignUpForm = () => {
           </div>
         </div>
       </Wrapper>
-    </div>
-  );
-};
 
-export default PharmacySignUpForm;
+      {/* Google Places Autocomplete Styles */}
+      <style jsx global>{`
+        .pac-container {
+          margin-top: 4px !important;
+          border-radius: 12px !important;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+          border: 1px solid #d1d5db !important;
+          z-index: 9999 !important;
+          background-color: white !important;
+        }
+        .pac-item {
+          padding: 8px 12px !important;
+          cursor: pointer !important;
+          font-size: 14px !important;
+          border-bottom: 1px solid #f3f4f6 !important;
+        }
+        .pac-item:last-child {
+          border-bottom: none !important;
+        }
+        .pac-item:hover {
+          background-color: #f9fafb !important;
+        }
+        .pac-item-selected {
+          background-color: #f0f9ff !important;
+        }
+        .pac-matched {
+          font-weight: 600 !important;
+          color: #189BA3 !important;
+        }
+      `}</style>
+    </div>
+  )
+}
+
+export default PharmacySignUpForm

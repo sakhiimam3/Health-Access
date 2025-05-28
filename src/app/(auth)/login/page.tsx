@@ -252,6 +252,7 @@ export default function AuthPage() {
                     <Button
                       variant="link"
                       type="button"
+                      onClick={()=>router.push("/forgot-password")}
                       className="text-[#737373] p-0 text-sm underline font-roboto"
                     >
                       Forgot Password?

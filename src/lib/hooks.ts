@@ -58,7 +58,37 @@ export const useVerifyOTP = () => {
   return { mutate, isPending, error };
 };
 
+export const useUpload = () => {
+  const { mutate, isPending, error } = useApiMutation<{ url: string }, FormData>(
+    "/v1/api/media/upload",
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+
 export const useGetPartners = () => {
   const { data, isLoading, error, refetch } = useApiQuery("/v1/api/partners");
   return { data, isLoading, error, refetch };
 };
+
+export const getServicesParams = {
+  limit: 100,
+  page: 1,
+  isActive: true,
+  includeChildren: true,
+  sortBy: "name",
+  sortOrder: "asc"
+}
+
+export type GetServicesParams = typeof getServicesParams
+
+export const useGetServices = (params?: Partial<GetServicesParams>) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/services",
+    // params: {
+    //   ...getServicesParams,
+    //   ...params
+    // }
+  })
+  return { data, isLoading, error, refetch }
+}
