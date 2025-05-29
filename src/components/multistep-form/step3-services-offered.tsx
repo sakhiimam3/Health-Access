@@ -3,8 +3,8 @@
 import type { UseFormReturn } from "react-hook-form"
 import type { FormData } from "./multi-step-form"
 import { useState } from "react"
-import { ChevronRight, Check, X } from "lucide-react"
-import { useGetServices } from "@/lib/hooks"
+import { ChevronRight, Check, X, Loader2 } from "lucide-react"
+import { useGetServices, useGetSeriveTypes } from "@/lib/hooks"
 
 interface Step3Props {
   form: UseFormReturn<FormData>
@@ -13,203 +13,119 @@ interface Step3Props {
 interface Service {
   id: string
   name: string
-  category: string
+  typeId?: string
   parentId?: string
   level: number
-  children?: Service[]
 }
 
-// Pharmacy Services (Multiple Categories)
-const pharmacyServicesData: Service[] = [
-  {
-    id: "vaccination",
-    name: "Vaccination Services",
-    category: "pharmacy",
-    level: 0,
-    children: [
-      { id: "covid-vaccine", name: "COVID-19 Vaccine", category: "pharmacy", parentId: "vaccination", level: 1 },
-      { id: "flu-vaccine", name: "Flu Vaccine", category: "pharmacy", parentId: "vaccination", level: 1 },
-      { id: "travel-vaccine", name: "Travel Vaccines", category: "pharmacy", parentId: "vaccination", level: 1 },
-      { id: "hpv-vaccine", name: "HPV Vaccine", category: "pharmacy", parentId: "vaccination", level: 1 },
-    ],
-  },
-  {
-    id: "mens-health",
-    name: "Men's Health",
-    category: "pharmacy",
-    level: 0,
-    children: [
-      {
-        id: "erectile-dysfunction",
-        name: "Erectile Dysfunction",
-        category: "pharmacy",
-        parentId: "mens-health",
-        level: 1,
-      },
-      { id: "hair-loss", name: "Hair Loss Treatment", category: "pharmacy", parentId: "mens-health", level: 1 },
-      { id: "testosterone", name: "Testosterone Therapy", category: "pharmacy", parentId: "mens-health", level: 1 },
-    ],
-  },
-  {
-    id: "womens-health",
-    name: "Women's Health",
-    category: "pharmacy",
-    level: 0,
-    children: [
-      { id: "contraception", name: "Contraception", category: "pharmacy", parentId: "womens-health", level: 1 },
-      { id: "uti-treatment", name: "UTI Treatment", category: "pharmacy", parentId: "womens-health", level: 1 },
-      { id: "menopause", name: "Menopause Support", category: "pharmacy", parentId: "womens-health", level: 1 },
-    ],
-  },
-  {
-    id: "pharmacy-first",
-    name: "Pharmacy 1st Services",
-    category: "pharmacy",
-    level: 0,
-  },
-  {
-    id: "blood-pressure",
-    name: "Blood Pressure Monitoring",
-    category: "pharmacy",
-    level: 0,
-  },
-  {
-    id: "diabetes-care",
-    name: "Diabetes Care",
-    category: "pharmacy",
-    level: 0,
-  },
-  {
-    id: "wellness",
-    name: "Wellness Services",
-    category: "pharmacy",
-    level: 0,
-    children: [
-      { id: "weight-management", name: "Weight Management", category: "pharmacy", parentId: "wellness", level: 1 },
-      { id: "nutrition-advice", name: "Nutrition Advice", category: "pharmacy", parentId: "wellness", level: 1 },
-      { id: "health-screening", name: "Health Screening", category: "pharmacy", parentId: "wellness", level: 1 },
-    ],
-  },
-  {
-    id: "consultation",
-    name: "Consultation Services",
-    category: "pharmacy",
-    level: 0,
-  },
-  {
-    id: "delivery",
-    name: "Delivery Services",
-    category: "pharmacy",
-    level: 0,
-  },
-  {
-    id: "emergency",
-    name: "Emergency Services",
-    category: "pharmacy",
-    level: 0,
-  },
-]
-
-// Aesthetic Services (Separate Section)
-const aestheticServicesData: Service[] = [
-  {
-    id: "skin-boosters",
-    name: "Skin Boosters",
-    category: "aesthetic",
-    level: 0,
-    children: [
-      { id: "profhilo", name: "Profhilo", category: "aesthetic", parentId: "skin-boosters", level: 1 },
-      { id: "seventy-hyal", name: "Seventy Hyal", category: "aesthetic", parentId: "skin-boosters", level: 1 },
-      { id: "jalupro", name: "Jalupro", category: "aesthetic", parentId: "skin-boosters", level: 1 },
-    ],
-  },
-  {
-    id: "dermal-fillers",
-    name: "Dermal Fillers",
-    category: "aesthetic",
-    level: 0,
-    children: [
-      { id: "lip-fillers", name: "Lip Fillers", category: "aesthetic", parentId: "dermal-fillers", level: 1 },
-      { id: "cheek-fillers", name: "Cheek Fillers", category: "aesthetic", parentId: "dermal-fillers", level: 1 },
-      { id: "nose-fillers", name: "Nose Fillers", category: "aesthetic", parentId: "dermal-fillers", level: 1 },
-    ],
-  },
-  {
-    id: "polynucleotides",
-    name: "Polynucleotides",
-    category: "aesthetic",
-    level: 0,
-  },
-  {
-    id: "anti-sweat",
-    name: "Anti-Sweat Injections",
-    category: "aesthetic",
-    level: 0,
-  },
-  {
-    id: "anti-wrinkle",
-    name: "Anti-wrinkle Injections",
-    category: "aesthetic",
-    level: 0,
-  },
-]
-
 export default function Step3ServicesOffered({ form }: Step3Props) {
-  const [selectedPharmacyService, setSelectedPharmacyService] = useState<string | null>(null)
-  const [selectedAestheticService, setSelectedAestheticService] = useState<string | null>(null)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-   const {data:serviesData,isLoading}=useGetServices()
-   console.log(serviesData,"serviesData")
+  // State for tracking selections in each column
+  const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null)
+  const [selectedParentId, setSelectedParentId] = useState<string | null>(null)
+  const [selectedSubParentId, setSelectedSubParentId] = useState<string | null>(null)
 
   const {
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     trigger,
   } = form
 
   const selectedServices = watch("selectedServices") || []
 
+  // Fetch service types
+  const { data: serviceTypesData, isLoading: typesLoading } = useGetSeriveTypes()
+
+  // Fetch main services based on selected type
+  const { data: mainServicesData, isLoading: mainServicesLoading } = useGetServices({
+    typeId: selectedTypeId || undefined,
+  })
+
+  // Fetch child services based on selected parent
+  const { data: childServicesData, isLoading: childServicesLoading } = useGetServices({
+    parentId: selectedParentId || undefined,
+  })
+
+  // Fetch sub-child services based on selected sub-parent
+  const { data: subChildServicesData, isLoading: subChildServicesLoading } = useGetServices({
+    parentId: selectedSubParentId || undefined,
+  })
+
   const toggleService = (service: Service) => {
-    const isSelected = selectedServices.some((s) => s.id === service.id)
+    const isSelected = selectedServices.some((s) => s === service.id)
 
     if (isSelected) {
-      // Remove service and all its children
-      const updatedServices = selectedServices.filter((s) => s.id !== service.id && !s.id.startsWith(service.id + "-"))
+      const updatedServices = selectedServices.filter((s) => s !== service.id)
       setValue("selectedServices", updatedServices)
     } else {
-      // Add service
-      const newService = {
-        id: service.id,
-        name: service.name,
-        category: service.category,
-        parentId: service.parentId,
-        level: service.level,
-      }
-      setValue("selectedServices", [...selectedServices, newService])
+      setValue("selectedServices", [...selectedServices, service.id])
     }
 
-    // Trigger validation after change
     trigger("selectedServices")
   }
 
-  
-
   const removeService = (serviceId: string) => {
-    const updatedServices = selectedServices.filter((s) => s.id !== serviceId)
+    const updatedServices = selectedServices.filter((s) => s !== serviceId)
     setValue("selectedServices", updatedServices)
     trigger("selectedServices")
   }
 
   const isServiceSelected = (serviceId: string) => {
-    return selectedServices.some((s) => s.id === serviceId)
+    return selectedServices.some((s) => s === serviceId)
   }
 
-  const getChildServices = (parentId: string, category: "pharmacy" | "aesthetic") => {
-    const data = category === "pharmacy" ? pharmacyServicesData : aestheticServicesData
-    const parent = data.find((s) => s.id === parentId)
-    return parent?.children || []
+  // Handle service type selection
+  const handleServiceTypeClick = (typeId: string) => {
+    setSelectedTypeId(typeId)
+    setSelectedParentId(null)
+    setSelectedSubParentId(null)
   }
+
+  // Handle main service selection
+  const handleMainServiceClick = (service: any) => {
+    setSelectedParentId(service.id)
+    setSelectedSubParentId(null)
+
+    toggleService({
+      id: service.id,
+      name: service.name,
+      typeId: selectedTypeId || undefined,
+      level: 0,
+    })
+  }
+
+  // Handle child service selection
+  const handleChildServiceClick = (service: any) => {
+    setSelectedSubParentId(service.id)
+
+    toggleService({
+      id: service.id,
+      name: service.name,
+      parentId: selectedParentId || undefined,
+      level: 1,
+    })
+  }
+
+  // Handle sub-child service selection
+  const handleSubChildServiceClick = (service: any) => {
+    toggleService({
+      id: service.id,
+      name: service.name,
+      parentId: selectedSubParentId || undefined,
+      level: 2,
+    })
+  }
+
+  // Loading skeleton component
+  const LoadingSkeleton = ({ count = 3 }: { count?: number }) => (
+    <div className="space-y-2">
+      {Array.from({ length: count }).map((_, index) => (
+        <div key={index} className="animate-pulse">
+          <div className="h-12 bg-gray-200 rounded-lg"></div>
+        </div>
+      ))}
+    </div>
+  )
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -222,21 +138,22 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
       {/* Multi-Select Display */}
       <div className="mb-8">
         <label className="text-sm font-medium text-gray-900 mb-2 block">Selected Services</label>
-        <div className="min-h-[60px] p-4 border border-gray-300 rounded-lg bg-white focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500">
+        <div className="min-h-[60px] p-4 border border-[#E7E7E7] rounded-[20px] bg-white shadow-sm focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500">
           {selectedServices.length === 0 ? (
             <span className="text-gray-500">No services selected...</span>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {selectedServices.map((service) => (
+              {selectedServices.map((serviceId) => (
                 <div
-                  key={service.id}
-                  className="inline-flex items-center gap-2 px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm"
+                  key={serviceId}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 text-teal-800 rounded-[20px] text-sm border border-teal-200"
                 >
-                  <span>{service.name}</span>
+                  <span>{serviceId}</span>
                   <button
                     type="button"
-                    onClick={() => removeService(service.id)}
-                    className="hover:bg-teal-200 rounded-full p-0.5"
+                    onClick={() => removeService(serviceId)}
+                    className="hover:bg-teal-100 rounded-full p-0.5 transition-colors"
+                    disabled={isSubmitting}
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -249,119 +166,148 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
       </div>
 
       {/* Service Selection Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Column 1: Service Categories */}
-        <div className="space-y-8">
-          {/* Pharmacy Services Section */}
-          <div>
-            <h3 className="text-lg font-semibold text-teal-600 mb-4">Pharmacy Services</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {pharmacyServicesData.map((service) => (
-                <button
-                  key={service.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedPharmacyService(service.id)
-                    setSelectedAestheticService(null)
-                    toggleService(service)
-                  }}
-                  className={`p-3 text-left rounded-lg border transition-all text-sm ${
-                    selectedPharmacyService === service.id
-                      ? "border-teal-500 bg-teal-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  } ${isServiceSelected(service.id) ? "ring-2 ring-teal-500" : ""}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900 text-xs leading-tight">{service.name}</span>
-                    <div className="flex items-center space-x-1">
-                      {isServiceSelected(service.id) && <Check className="w-3 h-3 text-teal-500" />}
-                      {service.children && <ChevronRight className="w-3 h-3 text-gray-400" />}
-                    </div>
-                  </div>
-                </button>
-              ))}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Column 1: Service Types & Main Services */}
+        <div className="space-y-6">
+          {typesLoading ? (
+            <div className="flex items-center justify-center p-8">
+              <Loader2 className="w-6 h-6 animate-spin text-teal-500" />
+              <span className="ml-2 text-gray-600">Loading service types...</span>
             </div>
-          </div>
+          ) : (
+            serviceTypesData?.data?.map((type: any) => (
+              <div key={type.id} className="space-y-3">
+                {/* Service Type Header */}
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg capitalize font-semibold text-teal-600">{type.name}</h3>
+                  {selectedTypeId !== type.id && (
+                    <button
+                      type="button"
+                      onClick={() => handleServiceTypeClick(type.id)}
+                      className="text-sm text-teal-600 hover:text-teal-700 flex items-center"
+                      disabled={isSubmitting}
+                    >
+                      View Services
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </button>
+                  )}
+                </div>
 
-          {/* Aesthetic Services Section */}
-          <div>
-            <h3 className="text-lg font-semibold text-teal-600 mb-4">Aesthetic Services</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {aestheticServicesData.map((service) => (
-                <button
-                  key={service.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedAestheticService(service.id)
-                    setSelectedPharmacyService(null)
-                    toggleService(service)
-                  }}
-                  className={`p-3 text-left rounded-lg border transition-all text-sm ${
-                    selectedAestheticService === service.id
-                      ? "border-teal-500 bg-teal-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  } ${isServiceSelected(service.id) ? "ring-2 ring-teal-500" : ""}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900 text-xs leading-tight">{service.name}</span>
-                    <div className="flex items-center space-x-1">
-                      {isServiceSelected(service.id) && <Check className="w-3 h-3 text-teal-500" />}
-                      {service.children && <ChevronRight className="w-3 h-3 text-gray-400" />}
-                    </div>
+                {/* Main Services for this type */}
+                {selectedTypeId === type.id && (
+                  <div className="space-y-2">
+                    {mainServicesLoading ? (
+                      <LoadingSkeleton count={4} />
+                    ) : mainServicesData?.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500 border border-[#E7E7E7] rounded-[20px] shadow-sm">
+                        No services available for {type.name}
+                      </div>
+                    ) : (
+                      mainServicesData?.map((service: any) => (
+                        <button
+                          key={service.id}
+                          type="button"
+                          onClick={() => handleMainServiceClick(service)}
+                          disabled={isSubmitting}
+                          className={`w-full h-12 p-3 text-left rounded-[20px] border border-[#E7E7E7] shadow-sm transition-all ${
+                            selectedParentId === service.id ? "border-teal-500 bg-teal-50" : "hover:border-gray-300"
+                          } ${isServiceSelected(service.id) ? "ring-2 ring-teal-500" : ""} ${
+                            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-gray-900 text-sm">{service.name}</span>
+                            <div className="flex items-center space-x-1">
+                              {isServiceSelected(service.id) && <Check className="w-4 h-4 text-teal-500" />}
+                              <ChevronRight className="w-4 h-4 text-gray-400" />
+                            </div>
+                          </div>
+                        </button>
+                      ))
+                    )}
                   </div>
-                </button>
-              ))}
-            </div>
-          </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
 
-        {/* Column 2: Sub-Services */}
-        {(selectedPharmacyService || selectedAestheticService) && (
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Sub-Services</h3>
-            <div className="space-y-2">
-              {selectedPharmacyService &&
-                getChildServices(selectedPharmacyService, "pharmacy").map((service) => (
-                  <button
-                    key={service.id}
-                    type="button"
-                    onClick={() => toggleService(service)}
-                    className={`w-full p-3 text-left rounded-lg border transition-all ${
-                      isServiceSelected(service.id)
-                        ? "border-teal-500 bg-teal-50 ring-2 ring-teal-500"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-900 text-sm">{service.name}</span>
-                      {isServiceSelected(service.id) && <Check className="w-4 h-4 text-teal-500" />}
-                    </div>
-                  </button>
-                ))}
-              {selectedAestheticService &&
-                getChildServices(selectedAestheticService, "aesthetic").map((service) => (
-                  <button
-                    key={service.id}
-                    type="button"
-                    onClick={() => toggleService(service)}
-                    className={`w-full p-3 text-left rounded-lg border transition-all ${
-                      isServiceSelected(service.id)
-                        ? "border-teal-500 bg-teal-50 ring-2 ring-teal-500"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-900 text-sm">{service.name}</span>
-                      {isServiceSelected(service.id) && <Check className="w-4 h-4 text-teal-500" />}
-                    </div>
-                  </button>
-                ))}
-            </div>
-          </div>
-        )}
+        {/* Column 2: Child Services */}
+        <div>
+          {selectedParentId && (
+            <>
+              <h3 className="text-lg font-semibold capitalize text-teal-600 mb-4">Sub-Services</h3>
+              <div className="space-y-2">
+                {childServicesLoading ? (
+                  <LoadingSkeleton count={3} />
+                ) : childServicesData?.data?.length === 0 ? (
+                  <div className="p-4 text-center text-gray-500 border border-[#E7E7E7] rounded-[20px] shadow-sm">
+                    No sub-services available
+                  </div>
+                ) : (
+                  childServicesData?.map((service: any) => (
+                    <button
+                      key={service.id}
+                      type="button"
+                      onClick={() => handleChildServiceClick(service)}
+                      disabled={isSubmitting}
+                      className={`w-full h-12 p-3 text-left rounded-[20px] border border-[#E7E7E7] shadow-sm transition-all ${
+                        selectedSubParentId === service.id ? "border-teal-500 bg-teal-50" : "hover:border-gray-300"
+                      } ${isServiceSelected(service.id) ? "ring-2 ring-teal-500" : ""} ${
+                        isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-gray-900 text-sm">{service.name}</span>
+                        <div className="flex items-center space-x-1">
+                          {isServiceSelected(service.id) && <Check className="w-4 h-4 text-teal-500" />}
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </>
+          )}
+        </div>
 
-        {/* Column 3: Placeholder for future expansion */}
-        <div className="hidden lg:block">{/* This column can be used for additional sub-categories if needed */}</div>
+        {/* Column 3: Sub-Child Services */}
+        <div>
+          {selectedSubParentId && (
+            <>
+              <h3 className="text-lg font-semibold capitalize text-teal-600 mb-4">Sub Sub Services</h3>
+              <div className="space-y-2">
+                {subChildServicesLoading ? (
+                  <LoadingSkeleton count={2} />
+                ) : subChildServicesData?.data?.length === 0 ? (
+                  <div className="p-4 text-center text-gray-500 border border-[#E7E7E7] rounded-[20px] shadow-sm">
+                    No additional options available
+                  </div>
+                ) : (
+                  subChildServicesData?.map((service: any) => (
+                    <button
+                      key={service.id}
+                      type="button"
+                      onClick={() => handleSubChildServiceClick(service)}
+                      disabled={isSubmitting}
+                      className={`w-full h-12 p-3 text-left rounded-[20px] border border-[#E7E7E7] shadow-sm transition-all ${
+                        isServiceSelected(service.id)
+                          ? "border-teal-500 bg-teal-50 ring-2 ring-teal-500"
+                          : "hover:border-gray-300"
+                      } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-gray-900 text-sm">{service.name}</span>
+                        {isServiceSelected(service.id) && <Check className="w-4 h-4 text-teal-500" />}
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )

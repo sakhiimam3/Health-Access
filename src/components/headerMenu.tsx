@@ -9,17 +9,12 @@ import { toast } from "react-toastify";
 const CustomDropdownMenu = () => {
   const { user, logout } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
-
   const handleLogout = () => {
-    if(user?.role === "partner"){
+    
       logout()
-      toast.success("Logout successfully",{
-        onClose(){
-          if(user?.role === "partner")
-          window.location.href = "/partner/partner-login";
-        }
-      });
-    }
+      toast.success("Logout successfully");
+      window.location.href = "/login";
+    
   };
 
   return (

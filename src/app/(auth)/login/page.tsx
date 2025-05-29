@@ -69,10 +69,15 @@ export default function AuthPage() {
     };
     loginMutate(dataToSend, {
       onSuccess: (data) => {
-        setUserData(data?.data);
-        toast.success("Login successfully",{
-          onClose(){
-            router.push("/");
+        console.log(data?.data)
+        setUserData(data);
+        toast.success("Login successfully", {
+          onClose: () => {
+            if (!data?.data?.onboardingCompleted && data?.data?.user.role === "partner") {
+              router.push("/partner/onboarding");
+            } else {
+              router.push("/");
+            }
           }
         });
       },

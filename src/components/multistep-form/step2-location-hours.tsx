@@ -33,7 +33,7 @@ export default function Step2LocationHours({ form }: Step2Props) {
   const [marker, setMarker] = useState<google.maps.Marker | null>(null)
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
   const [isDaysDropdownOpen, setIsDaysDropdownOpen] = useState(false)
-
+   
   const mapRef = useRef<HTMLDivElement>(null)
   const daysDropdownRef = useRef<HTMLDivElement>(null)
   const addressInputRef = useRef<HTMLInputElement>(null)
@@ -46,7 +46,7 @@ export default function Step2LocationHours({ form }: Step2Props) {
     clearErrors,
   } = form
 
-  const workingDays = watch("workingDays") || []
+  const timings = watch("timings") || []
 
   // Load Google Maps
   useEffect(() => {
@@ -203,15 +203,39 @@ export default function Step2LocationHours({ form }: Step2Props) {
   }
 
   const toggleDay = (day: string) => {
-    const updatedDays = workingDays.includes(day) ? workingDays.filter((d) => d !== day) : [...workingDays, day]
-    setValue("workingDays", updatedDays, { shouldValidate: true })
-    clearErrors("workingDays")
+    const dayLabel = DAYS_OF_WEEK.find(d => d.id === day)?.label || day
+    const existingTiming = timings.find(t => t.dayOfWeek === dayLabel)
+    
+    if (existingTiming) {
+      // Remove the day if it exists
+      const updatedTimings = timings.filter(t => t.dayOfWeek !== dayLabel)
+      setValue("timings", updatedTimings, { shouldValidate: true })
+    } else {
+      // Add new day with default times
+      const newTiming = {
+        dayOfWeek: dayLabel,
+        openTime: "09:00",
+        closeTime: "18:00",
+        isClosed: false
+      }
+      setValue("timings", [...timings, newTiming], { shouldValidate: true })
+    }
+    clearErrors("timings")
+  }
+
+  const updateTiming = (dayOfWeek: string, field: "openTime" | "closeTime", value: string) => {
+    const updatedTimings = timings.map(timing => 
+      timing.dayOfWeek === dayOfWeek 
+        ? { ...timing, [field]: value }
+        : timing
+    )
+    setValue("timings", updatedTimings, { shouldValidate: true })
   }
 
   const getSelectedDaysLabel = () => {
-    if (workingDays.length === 0) return "Select working days"
-    if (workingDays.length === 7) return "All days"
-    return workingDays.map((day) => DAYS_OF_WEEK.find((d) => d.id === day)?.label).join(", ")
+    if (timings.length === 0) return "Select working days"
+    if (timings.length === 7) return "All days"
+    return timings.map(t => t.dayOfWeek).join(", ")
   }
 
   // Close dropdown when clicking outside
@@ -242,74 +266,73 @@ export default function Step2LocationHours({ form }: Step2Props) {
               type="button"
               onClick={() => setIsDaysDropdownOpen(!isDaysDropdownOpen)}
               className={`w-full h-12 px-4 text-left text-base rounded-full border ${
-                errors.workingDays ? "border-red-500" : "border-[#E7E7E7]"
+                errors.timings ? "border-red-500" : "border-[#E7E7E7]"
               } shadow-sm focus:border-teal-500 focus:ring-teal-500 flex items-center justify-between bg-white hover:border-gray-400 transition-colors`}
             >
-              <span className={`${errors.workingDays ? "text-red-500" : "text-gray-700"}`}>
+              <span className={`${errors.timings ? "text-red-500" : "text-gray-700"}`}>
                 {getSelectedDaysLabel()}
               </span>
               <ChevronDown
-                className={`h-5 w-5 ${errors.workingDays ? "text-red-500" : "text-gray-400"} transition-transform ${isDaysDropdownOpen ? "transform rotate-180" : ""}`}
+                className={`h-5 w-5 ${errors.timings ? "text-red-500" : "text-gray-400"} transition-transform ${isDaysDropdownOpen ? "transform rotate-180" : ""}`}
               />
             </button>
 
             {isDaysDropdownOpen && (
               <div className="absolute z-50 w-full mt-1 bg-white rounded-lg border border-gray-200 shadow-lg max-h-60 overflow-y-auto">
-                {DAYS_OF_WEEK.map((day) => (
-                  <div
-                    key={day.id}
-                    onClick={() => toggleDay(day.id)}
-                    className={`px-4 py-3 cursor-pointer hover:bg-gray-50 flex items-center transition-colors ${
-                      workingDays.includes(day.id) ? "bg-teal-50" : ""
-                    }`}
-                  >
-                    <div
-                      className={`w-5 h-5 rounded border flex items-center justify-center mr-3 transition-colors ${
-                        workingDays.includes(day.id) ? "bg-teal-500 border-teal-500" : "border-gray-300"
-                      }`}
-                    >
-                      {workingDays.includes(day.id) && (
-                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                        </svg>
+                {DAYS_OF_WEEK.map((day) => {
+                  const isSelected = timings.some(t => t.dayOfWeek === day.label)
+                  return (
+                    <div key={day.id}>
+                      <div
+                        onClick={() => toggleDay(day.id)}
+                        className={`px-4 py-3 cursor-pointer hover:bg-gray-50 flex items-center transition-colors ${
+                          isSelected ? "bg-teal-50" : ""
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 rounded border flex items-center justify-center mr-3 transition-colors ${
+                            isSelected ? "bg-teal-500 border-teal-500" : "border-gray-300"
+                          }`}
+                        >
+                          {isSelected && (
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="text-gray-700">{day.label}</span>
+                      </div>
+                      {isSelected && (
+                        <div className="px-4 py-2 bg-gray-50 border-t border-gray-100">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label className="text-xs text-gray-500">Open Time</Label>
+                              <Input
+                                type="time"
+                                value={timings.find(t => t.dayOfWeek === day.label)?.openTime || "09:00"}
+                                onChange={(e) => updateTiming(day.label, "openTime", e.target.value)}
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-500">Close Time</Label>
+                              <Input
+                                type="time"
+                                value={timings.find(t => t.dayOfWeek === day.label)?.closeTime || "18:00"}
+                                onChange={(e) => updateTiming(day.label, "closeTime", e.target.value)}
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
-                    <span className="text-gray-700">{day.label}</span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
-          {errors.workingDays && <p className="text-red-500 text-sm mt-2">{errors.workingDays.message}</p>}
-        </div>
-
-        {/* Hours Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <Label htmlFor="startTime" className="text-sm font-medium text-gray-900 mb-2 block">
-              Start Time
-            </Label>
-            <Input
-              id="startTime"
-              type="time"
-              {...register("startTime")}
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
-            />
-            {errors.startTime && <p className="text-red-500 text-sm mt-2">{errors.startTime.message}</p>}
-          </div>
-
-          <div>
-            <Label htmlFor="endTime" className="text-sm font-medium text-gray-900 mb-2 block">
-              End Time
-            </Label>
-            <Input
-              id="endTime"
-              type="time"
-              {...register("endTime")}
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
-            />
-            {errors.endTime && <p className="text-red-500 text-sm mt-2">{errors.endTime.message}</p>}
-          </div>
+          {errors.timings && <p className="text-red-500 text-sm mt-2">{errors.timings.message}</p>}
         </div>
 
         {/* Address Section */}

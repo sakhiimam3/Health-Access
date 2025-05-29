@@ -1,10 +1,10 @@
 import { OTPForm, otpSchema } from "@/lib/schema";
 import { useApiQuery, useApiMutation } from "@/lib/useApiQuery";
-import { createPartnerCreate, User, userCreate } from "@/lib/type";
+import { createPartnerCreate, getServicesParams, User, userCreate, GetServicesParamsType, PartnerOnboarding } from "@/lib/type";
 import { ForgotPasswordForm, LoginFormValues } from "./schema";
 
 export const useGetUser = () => {
-  const { data, isLoading, error } = useApiQuery<User>("/api/user/123");
+  const { data, isLoading, error } = useApiQuery("/api/user/123");
   return { data, isLoading, error };
 };
 
@@ -71,24 +71,28 @@ export const useGetPartners = () => {
   return { data, isLoading, error, refetch };
 };
 
-export const getServicesParams = {
-  limit: 100,
-  page: 1,
-  isActive: true,
-  includeChildren: true,
-  sortBy: "name",
-  sortOrder: "asc"
-}
+export const usePartnerOnboarding = () => {
+  const { mutate, isPending, error } = useApiMutation<User, PartnerOnboarding>(
+    "/v1/api/partners/onboarding",
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
 
-export type GetServicesParams = typeof getServicesParams
-
-export const useGetServices = (params?: Partial<GetServicesParams>) => {
+export const useGetServices = (params?: Partial<GetServicesParamsType>) => {
   const { data, isLoading, error, refetch } = useApiQuery({
     endpoint: "/v1/api/services",
-    // params: {
-    //   ...getServicesParams,
-    //   ...params
-    // }
+    params: {
+      ...params,
+    }
   })
   return { data, isLoading, error, refetch }
 }
+
+export const useGetSeriveTypes = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/service-types",
+  })
+  return { data, isLoading, error, refetch }
+}
+
