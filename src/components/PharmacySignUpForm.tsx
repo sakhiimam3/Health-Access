@@ -12,10 +12,11 @@ import Wrapper from "./layout/wrapper"
 import ButtonTheme from "./shared/ButtonTheme"
 import PhoneInput from "react-phone-input-2"
 import "react-phone-input-2/lib/style.css"
-import { useCreatePartner } from "@/lib/hooks"
+import { useCreatePartner, useCheckEmail } from "@/lib/hooks"
 import { toast } from "react-toastify"
 import { useRouter } from "next/navigation"
 import { AxiosError } from "axios"
+import da from "date-fns/locale/da"
 
 // Declare global google types
 declare global {
@@ -61,6 +62,7 @@ const postalCodeOptions = [
 
 const PharmacySignUpForm = () => {
   const { mutate: createPartner, isPending, error } = useCreatePartner()
+  const { mutate: checkEmail } = useCheckEmail()
   const router = useRouter()
 
   // Google Maps states
@@ -162,7 +164,7 @@ const PharmacySignUpForm = () => {
   }, [isGoogleLoaded, setValue, clearErrors])
 
   const onSubmit = (data: PharmacySignUpFormValues) => {
-    const { location, postalCode, ...rest } = data
+    const { location, postalCode, ...rest } = data;
     const dataTosend = {
       ...rest,
       location: {
@@ -170,27 +172,46 @@ const PharmacySignUpForm = () => {
         latitude: data.location.latitude,
         longitude: data.location.longitude,
       },
-    }
+    };
 
     createPartner(dataTosend, {
-      onSuccess: () => {
-        toast.success("Your application has been submitted successfully", {
-          onClose: () => {
-            router.push("/login")
-          },
-        })
-        reset()
+      onSuccess: (response) => {
+        // Check if user is not verified
+        if (!response?.isVerified) {
+          // Call check email API
+          checkEmail({ email: data.email }, {
+            onSuccess: () => {
+              toast.success("Your application has been submitted successfully", {
+                onClose: () => {
+                                  router.push(`/verify?email=${data.email}&id=${response?.data?.partner?.user?.id}`);
+                },
+              });
+            },
+            onError: (error: unknown) => {
+              if (error instanceof AxiosError) {
+                toast.error(error.response?.data?.message || "Error checking email");
+              }
+            }
+          });
+        } else {
+          toast.success("Your application has been submitted successfully", {
+            onClose: () => {
+              router.push("/login");
+            },
+          });
+        }
+        reset();
       },
       onError: (error: unknown) => {
         if (error instanceof AxiosError) {
-          const errorMessage = error.response?.data?.message || "Error creating partner"
-          toast.error("Error creating partner: " + errorMessage)
+          const errorMessage = error.response?.data?.message || "Error creating partner";
+          toast.error("Error creating partner: " + errorMessage);
         } else {
-          toast.error("An unexpected error occurred.")
+          toast.error("An unexpected error occurred.");
         }
       },
-    })
-  }
+    });
+  };
 
   const businessTypeOptions = [
     { value: "pharmacy", label: "Pharmacy" },

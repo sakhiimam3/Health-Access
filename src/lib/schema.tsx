@@ -62,19 +62,37 @@ export const pharmacySignUpSchema = z.object({
   notificationToken: z.string().optional(), // Assuming this can be optional
 });
 
-
-
-
 export const otpSchema = z.object({
   otp: z.string().length(6, { message: "OTP must be 6 digits" }),
   newPassword: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
+export const VerifyotpSchema = z.object({
+  code: z.string().length(6, { message: "OTP must be 6 digits" }),
+});
+
+
 export const forgotPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
 });
 
+export const changePasswordSchema = z.object({
+  oldPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
+  confirmPassword: z.string()
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
 export type OTPForm = z.infer<typeof otpSchema>;
+export type VerifyotpFORM=z.infer<typeof VerifyotpSchema>;
 export type PharmacySignUpFormValues = z.infer<typeof pharmacySignUpSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
+export type ChangePasswordForm = z.infer<typeof changePasswordSchema>;

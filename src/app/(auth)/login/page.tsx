@@ -69,7 +69,6 @@ export default function AuthPage() {
     };
     loginMutate(dataToSend, {
       onSuccess: (data) => {
-        console.log(data?.data)
         setUserData(data);
         toast.success("Login successfully", {
           onClose: () => {
@@ -82,6 +81,7 @@ export default function AuthPage() {
         });
       },
       onError: (error: unknown) => {
+        console.log(error,"errro")
         if (error instanceof AxiosError) {
           const errorMessage =
             error.response?.data?.message || "Error creating partner";

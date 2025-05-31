@@ -20,16 +20,22 @@ export const useApiQuery = (options: string | QueryOptions) => {
   })
 }
 
-// Custom hook for POST/PUT/DELETE requests
-export function useApiMutation<TData, TVariables>(endpoint: string, method: 'POST' | 'PUT' | 'DELETE' = 'POST') {
-  return useMutation<TData, Error, TVariables>({
-    mutationFn: async (variables) => {
-      const response = await api({
-        method,
-        url: endpoint,
-        data: variables,
-      });
-      return response.data;
-    },
+type EndpointType = string | ((...args: any[]) => string);
+
+export const useApiMutation = <T, D>(endpoint: EndpointType, method: string) => {
+  const mutate = async (data: D, ...args: any[]) => {
+    const url = typeof endpoint === 'function' ? endpoint(...args) : endpoint;
+    const response = await api({
+      method,
+      url,
+      data,
+    });
+    return response.data as T;
+  };
+
+  const { mutate: mutation, isPending, error } = useMutation({
+    mutationFn: mutate,
   });
-}
+
+  return { mutate: mutation, isPending, error };
+};

@@ -1,4 +1,4 @@
-import { OTPForm, otpSchema } from "@/lib/schema";
+import { OTPForm, otpSchema, VerifyotpFORM } from "@/lib/schema";
 import { useApiQuery, useApiMutation } from "@/lib/useApiQuery";
 import { createPartnerCreate, getServicesParams, User, userCreate, GetServicesParamsType, PartnerOnboarding } from "@/lib/type";
 import { ForgotPasswordForm, LoginFormValues } from "./schema";
@@ -58,6 +58,14 @@ export const useVerifyOTP = () => {
   return { mutate, isPending, error };
 };
 
+export const useUserVerifyOTP = (userId: string) => {
+  const { mutate, isPending, error } = useApiMutation<void, { code: number }>(
+    `/v1/api/auth/verify/${userId}`,
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+
 export const useUpload = () => {
   const { mutate, isPending, error } = useApiMutation<{ url: string }, FormData>(
     "/v1/api/media/upload",
@@ -95,4 +103,20 @@ export const useGetSeriveTypes = () => {
   })
   return { data, isLoading, error, refetch }
 }
+
+export const useChangePassword = () => {
+  const { mutate, isPending, error } = useApiMutation<void, { oldPassword: string; newPassword: string }>(
+    "/v1/api/auth/partner/password/change",
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+
+export const useCheckEmail = () => {
+  const { mutate, isPending, error } = useApiMutation<void, { email: string }>(
+    "/v1/api/auth/check-email",
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
 

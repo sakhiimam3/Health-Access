@@ -10,6 +10,7 @@ import Step3ServicesOffered from "./step3-services-offered"
 import Step4Success from "./step4-success"
 import { useUpload, usePartnerOnboarding } from "@/lib/hooks"
 import { Loader2 } from "lucide-react"
+import { toast } from "react-toastify"
 
 const formSchema = z.object({
   // Step 1 - Basic Details
@@ -186,11 +187,12 @@ export default function MultiStepForm() {
           setIsSubmitting(false)
           setIsSubmitted(true)
           setCurrentStep(4)
+          toast.success("Pharmacy details submitted successfully!")
         },
         onError: (error) => {
           setIsSubmitting(false)
           console.error("Onboarding submission failed:", error)
-          // You can add toast notification here
+          toast.error("Failed to submit pharmacy details. Please try again.")
         },
       })
     } catch (error) {
@@ -268,7 +270,6 @@ export default function MultiStepForm() {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     Submitting...
                   </>
                 ) : (
