@@ -1,11 +1,11 @@
 import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import LayoutWrapper from "@/components/layout/wrapper";
 import React from "react";
-import pharmacy1 from "../../../public/images/pharmacy-1.png";
-import pharmacy2 from "../../../public/images/pharmacy-2.png";
-import pharmacy3 from "../../../public/images/pharmacy-3.png";
-import pharmacy4 from "../../../public/images/pharmacy-1.png";
-import pharmacy5 from "../../../public/images/pharmacy-2.png";
+import pharmacy1 from "@public/images/pharmacy-1.png";
+import pharmacy2 from "@public/images/pharmacy-2.png";
+import pharmacy3 from "@public/images/pharmacy-3.png";
+import pharmacy4 from "@public/images/pharmacy-1.png";
+import pharmacy5 from "@public/images/pharmacy-2.png";
 import { PharmacyCard } from "@/components/sliderCard";
 import Image from "next/image";
 

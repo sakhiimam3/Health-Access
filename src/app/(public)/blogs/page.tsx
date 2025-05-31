@@ -6,9 +6,9 @@ import PagesBanner from "@/components/pagesBanner";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import Image from "next/image";
 import React, { useState } from "react";
-import Blog1 from "../../../public/images/blogslide.png";
-import Blog2 from "../../../public/images/blog-2.png";
-import Blog3 from "../../../public/images/blog-3.png";
+import Blog1 from "@public/images/blogslide.png";
+import Blog2 from "@public/images/blog-2.png";
+import Blog3 from "@public/images/blog-3.png";
 
 const BlogsPage = () => {
   const [selectedBlog, setSelectedBlog] = useState(null);
@@ -76,7 +76,7 @@ const BlogsPage = () => {
       category: "Health Tips",
       title: "Staying Healthy During Winter",
       description:
-        "Winter brings more than cold weather—here’s how to protect your health with extra tips and pharmacy services.",
+        "Winter brings more than cold weather—here's how to protect your health with extra tips and pharmacy services.",
       author: "Admin",
       date: "01 Jan 2025",
       read_time: "5 min read",
@@ -106,7 +106,7 @@ const BlogsPage = () => {
       category: "Health Tips",
       title: "Staying Healthy During Winter",
       description:
-        "Winter brings more than cold weather—here’s how to protect your health with extra tips and pharmacy services.",
+        "Winter brings more than cold weather—here's how to protect your health with extra tips and pharmacy services.",
       author: "Admin",
       date: "01 Jan 2025",
       read_time: "5 min read",
@@ -136,7 +136,7 @@ const BlogsPage = () => {
       category: "Health Tips",
       title: "Staying Healthy During Winter",
       description:
-        "Winter brings more than cold weather—here’s how to protect your health with extra tips and pharmacy services.",
+        "Winter brings more than cold weather—here's how to protect your health with extra tips and pharmacy services.",
       author: "Admin",
       date: "01 Jan 2025",
       read_time: "5 min read",
