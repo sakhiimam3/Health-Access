@@ -1,11 +1,11 @@
 import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import LayoutWrapper from "@/components/layout/wrapper";
 import React from "react";
-import pharmacy1 from "../../../public/images/pharmacy-1.png";
-import pharmacy2 from "../../../public/images/pharmacy-2.png";
-import pharmacy3 from "../../../public/images/pharmacy-3.png";
-import pharmacy4 from "../../../public/images/pharmacy-1.png";
-import pharmacy5 from "../../../public/images/pharmacy-2.png";
+import pharmacy1 from "@public/images/pharmacy-1.png";
+import pharmacy2 from "@public/images/pharmacy-2.png";
+import pharmacy3 from "@public/images/pharmacy-3.png";
+import pharmacy4 from "@public/images/pharmacy-1.png";
+import pharmacy5 from "@public/images/pharmacy-2.png";
 import { PharmacyCard } from "@/components/sliderCard";
 import Image from "next/image";
 
@@ -83,7 +83,7 @@ const SearchPage = () => {
         },
   ];
   return (
-    <PagesWrapper isSearchPage={true} bgColor="bg-[#189BA3]" btnColor="#189BA3">
+    <PagesWrapper isSearchPage={true}  bgColor="bg-[#189BA3]" btnColor="#189BA3">
       <LayoutWrapper>
         <section className="mt-60 mb-10">
           <div className="w-full flex gap-10">

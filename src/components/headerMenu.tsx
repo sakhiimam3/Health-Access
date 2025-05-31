@@ -9,17 +9,12 @@ import { toast } from "react-toastify";
 const CustomDropdownMenu = () => {
   const { user, logout } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
-
   const handleLogout = () => {
-    if(user?.role === "partner"){
+    
       logout()
-      toast.success("Logout successfully",{
-        onClose(){
-          if(user?.role === "partner")
-          window.location.href = "/partner/partner-login";
-        }
-      });
-    }
+      toast.success("Logout successfully");
+      window.location.href = "/login";
+    
   };
 
   return (
@@ -30,7 +25,7 @@ const CustomDropdownMenu = () => {
             src={"/images/Profile_avatar.png"}
             width={36}
             height={36}
-            alt={user ? user.firstName : "@shadcn"}
+            alt={true ? "N/A" : "N/A"}
           />
         </Avatar>
         <button type="button" onClick={() => setIsOpen(!isOpen)}>
@@ -54,7 +49,7 @@ const CustomDropdownMenu = () => {
       {isOpen && (
         <div className="absolute right-0 z-10 w-56 mt-2 origin-top-right bg-white border border-gray-300 rounded-md shadow-lg">
           <div className="py-1">
-            {user ? (
+            {true ? (
               <>
                 <div className="px-4 py-2 font-normal text-sm">
                  <span className="font-roboto"> Name: {user?.firstName} {user?.lastName}</span>
@@ -62,7 +57,9 @@ const CustomDropdownMenu = () => {
                 <div className="border-t border-gray-200"></div>
 
                 <div className="px-4 py-2 text-sm text-gray-500">
-                  <span>Dashboard coming soon</span> 
+                  <Link href="/partner/dashboard">
+                  <span>Dashboard </span> 
+                  </Link>
                 </div>
                 <div className="border-t border-gray-200"></div>
                 <button

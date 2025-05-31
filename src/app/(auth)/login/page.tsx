@@ -69,14 +69,19 @@ export default function AuthPage() {
     };
     loginMutate(dataToSend, {
       onSuccess: (data) => {
-        setUserData(data?.data);
-        toast.success("Login successfully",{
-          onClose(){
-            router.push("/");
+        setUserData(data);
+        toast.success("Login successfully", {
+          onClose: () => {
+            if (!data?.data?.onboardingCompleted && data?.data?.user.role === "partner") {
+              router.push("/partner/onboarding");
+            } else {
+              router.push("/");
+            }
           }
         });
       },
       onError: (error: unknown) => {
+        console.log(error,"errro")
         if (error instanceof AxiosError) {
           const errorMessage =
             error.response?.data?.message || "Error creating partner";
@@ -252,6 +257,7 @@ export default function AuthPage() {
                     <Button
                       variant="link"
                       type="button"
+                      onClick={()=>router.push("/forgot-password")}
                       className="text-[#737373] p-0 text-sm underline font-roboto"
                     >
                       Forgot Password?

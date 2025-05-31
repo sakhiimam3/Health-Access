@@ -1,10 +1,10 @@
-import { OTPForm, otpSchema } from "@/lib/schema";
+import { OTPForm, otpSchema, VerifyotpFORM } from "@/lib/schema";
 import { useApiQuery, useApiMutation } from "@/lib/useApiQuery";
-import { createPartnerCreate, User, userCreate } from "@/lib/type";
+import { createPartnerCreate, getServicesParams, User, userCreate, GetServicesParamsType, PartnerOnboarding } from "@/lib/type";
 import { ForgotPasswordForm, LoginFormValues } from "./schema";
 
 export const useGetUser = () => {
-  const { data, isLoading, error } = useApiQuery<User>("/api/user/123");
+  const { data, isLoading, error } = useApiQuery("/api/user/123");
   return { data, isLoading, error };
 };
 
@@ -58,7 +58,65 @@ export const useVerifyOTP = () => {
   return { mutate, isPending, error };
 };
 
+export const useUserVerifyOTP = (userId: string) => {
+  const { mutate, isPending, error } = useApiMutation<void, { code: number }>(
+    `/v1/api/auth/verify/${userId}`,
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+
+export const useUpload = () => {
+  const { mutate, isPending, error } = useApiMutation<{ url: string }, FormData>(
+    "/v1/api/media/upload",
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+
 export const useGetPartners = () => {
   const { data, isLoading, error, refetch } = useApiQuery("/v1/api/partners");
   return { data, isLoading, error, refetch };
 };
+
+export const usePartnerOnboarding = () => {
+  const { mutate, isPending, error } = useApiMutation<User, PartnerOnboarding>(
+    "/v1/api/partners/onboarding",
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+
+export const useGetServices = (params?: Partial<GetServicesParamsType>) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/services",
+    params: {
+      ...params,
+    }
+  })
+  return { data, isLoading, error, refetch }
+}
+
+export const useGetSeriveTypes = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/service-types",
+  })
+  return { data, isLoading, error, refetch }
+}
+
+export const useChangePassword = () => {
+  const { mutate, isPending, error } = useApiMutation<void, { oldPassword: string; newPassword: string }>(
+    "/v1/api/auth/partner/password/change",
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+
+export const useCheckEmail = () => {
+  const { mutate, isPending, error } = useApiMutation<void, { email: string }>(
+    "/v1/api/auth/check-email",
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+

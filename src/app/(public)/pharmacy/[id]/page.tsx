@@ -4,8 +4,8 @@ import LayoutWrapper from "@/components/layout/wrapper";
 import PagesBanner from "@/components/pagesBanner";
 import React, { Suspense, useState } from "react";
 
-import consultant from "../../../../public/images/consultant.png";
-import warbunsdeatil from "../../../../public/images/warbunsdeatil.png";
+import consultant from "@public/images/consultant.png";
+import warbunsdeatil from "@public/images/warbunsdeatil.png";
 import { useParams } from "next/navigation";
 import ButtonTheme from "@/components/shared/ButtonTheme";
 import Image from "next/image";
@@ -17,7 +17,7 @@ import ContactUs from "@/components/contactus";
 import { partners } from "@/mockdata";
 import { useGetPartners } from "@/lib/hooks";
 import Modal from "@/components/modal";
-import pharmacy1 from "../../../../public/images/pharmacy-1.png";
+import pharmacy1 from "@public/images/pharmacy-1.png";
 
 const PharmacyDetails = () => {
   return (

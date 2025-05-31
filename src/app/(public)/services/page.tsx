@@ -5,11 +5,11 @@ import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import LayoutWrapper from "@/components/layout/wrapper";
 import PagesBanner from "@/components/pagesBanner";
 import Image from "next/image";
-import Vs1 from "../../../public/images/vs-1.png";
-import Vs2 from "../../../public/images/vs-2.png";
-import Vs3 from "../../../public/images/vs-3.png";
-import Vs4 from "../../../public/images/vs-4.png";
-import Vs5 from "../../../public/images/service-detail.png";
+import Vs1 from "@public/images/vs-1.png";
+import Vs2 from "@public/images/vs-2.png";
+import Vs3 from "@public/images/vs-3.png";
+import Vs4 from "@public/images/vs-4.png";
+import Vs5 from "@public/images/service-detail.png";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const ServicesDetails = () => {
