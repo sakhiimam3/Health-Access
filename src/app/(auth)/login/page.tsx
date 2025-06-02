@@ -59,9 +59,16 @@ export default function AuthPage() {
     },
   });
 
+  const setCookie=async(userData)=>{
+    await fetch('/api/set-user-cookie', {
+      method: 'POST',
+      body: JSON.stringify({ userData }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   // Form submission handlers
   const onLoginSubmit = (data: LoginFormValues) => {
-    // toast.success("login successfully");
     const dataToSend = {
       email: data.email,
       password: data.password,
@@ -70,9 +77,12 @@ export default function AuthPage() {
     loginMutate(dataToSend, {
       onSuccess: (data) => {
         setUserData(data);
+        // Set cookie with 10 days expiry
+        setCookie(data)
+       
         toast.success("Login successfully", {
           onClose: () => {
-            if (!data?.data?.onboardingCompleted && data?.data?.user.role === "partner") {
+            if (!data?.data?.onboardingCompleted && data?.data?.user?.role === "partner") {
               router.push("/partner/onboarding");
             } else {
               router.push("/");

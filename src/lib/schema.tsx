@@ -9,6 +9,28 @@ export const loginSchema = z.object({
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
+// Partner Profile Schema
+export const partnerProfileSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  businessName: z.string().min(1, "Business name is required"),
+  website: z.string().url("Invalid website URL").optional().or(z.literal("")),
+  businessType: z.string().min(1, "Business type is required"),
+  schedulingPlatform: z.string().min(1, "Scheduling platform is required"),
+  location: z.object({
+    name: z.string().min(1, "Location name is required"),
+    latitude: z.number(),
+    longitude: z.number()
+  }),
+  termsAccepted: z.boolean(),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  notificationToken: z.string().optional(),
+  describeYourBusiness: z.string().min(1, "Business description is required")
+});
+
+export type PartnerProfileFormValues = z.infer<typeof partnerProfileSchema>;
+
 // Registration Form Schema
 export const registerSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),

@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Clock, Check, X } from "lucide-react"
+import { useGetPartnerProfile, useUpdatePartnerProfile, useUpdatePharmacyTiming } from "@/lib/hooks"
+import { toast } from "react-toastify"
 
 interface DayTiming {
   day: string
@@ -12,6 +14,9 @@ interface DayTiming {
 }
 
 export function PharmacyTiming() {
+  const { data: profile, isLoading } = useGetPartnerProfile()
+
+  const { mutate: updateTiming, isPending } = useUpdatePartnerProfile(profile?.data?.id || "")
   const [timings, setTimings] = useState<DayTiming[]>([
     { day: "Monday", enabled: true, startTime: "10:00", endTime: "01:00" },
     { day: "Tuesday", enabled: true, startTime: "10:00", endTime: "01:00" },
@@ -21,10 +26,31 @@ export function PharmacyTiming() {
     { day: "Saturday", enabled: true, startTime: "10:00", endTime: "01:00" },
   ])
 
-  const updateTiming = (index: number, field: keyof DayTiming, value: string | boolean) => {
+  const updateTimingState = (index: number, field: keyof DayTiming, value: string | boolean) => {
     const updatedTimings = [...timings]
     updatedTimings[index] = { ...updatedTimings[index], [field]: value }
     setTimings(updatedTimings)
+  }
+
+  const handleSave = () => {
+    const formattedTimings = timings.map(timing => ({
+      dayOfWeek: timing.day,
+      openTime: timing.startTime,
+      closeTime: timing.endTime,
+      isClosed: !timing.enabled
+    }))
+
+    updateTiming(
+      { timings: formattedTimings },
+      {
+        onSuccess: () => {
+          toast.success("Pharmacy timings updated successfully")
+        },
+        onError: () => {
+          toast.error("Failed to update pharmacy timings")
+        }
+      }
+    )
   }
 
   const CustomToggle = ({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) => (
@@ -64,7 +90,6 @@ export function PharmacyTiming() {
       <h2 className="text-2xl font-ubuntu font-bold text-gray-900">Pharmacy Timing</h2>
 
       <div className="space-y-8">
-        {/* Paired days in 2-column grid */}
         {dayPairs.map((pair, pairIndex) => (
           <div key={pairIndex} className="grid grid-cols-2 gap-8">
             {pair.map((timing, dayIndex) => {
@@ -75,7 +100,7 @@ export function PharmacyTiming() {
                     <h3 className="text-lg font-roboto font-semibold text-gray-900">{timing.day}</h3>
                     <CustomToggle
                       checked={timing.enabled}
-                      onChange={(checked) => updateTiming(actualIndex, "enabled", checked)}
+                      onChange={(checked) => updateTimingState(actualIndex, "enabled", checked)}
                     />
                   </div>
 
@@ -88,10 +113,10 @@ export function PharmacyTiming() {
                           value={timing.startTime + " AM"}
                           onChange={(e) => {
                             const value = e.target.value.replace(" AM", "").replace(" PM", "")
-                            updateTiming(actualIndex, "startTime", value)
+                            updateTimingState(actualIndex, "startTime", value)
                           }}
                           disabled={!timing.enabled}
-                          className="w-full  py-3 px-4 pr-10 border border-gray-200 rounded-[20px] shadow-sm text-gray-900 font-roboto focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:bg-gray-100 disabled:text-gray-400"
+                          className="w-full py-3 px-4 pr-10 border border-gray-200 rounded-[20px] shadow-sm text-gray-900 font-roboto focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:bg-gray-100 disabled:text-gray-400"
                         />
                       </div>
                     </div>
@@ -103,7 +128,7 @@ export function PharmacyTiming() {
                           value={timing.endTime + " PM"}
                           onChange={(e) => {
                             const value = e.target.value.replace(" AM", "").replace(" PM", "")
-                            updateTiming(actualIndex, "endTime", value)
+                            updateTimingState(actualIndex, "endTime", value)
                           }}
                           disabled={!timing.enabled}
                           className="w-full py-3 px-4 pr-10 border border-gray-200 rounded-[20px] shadow-sm text-gray-900 font-roboto focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:bg-gray-100 disabled:text-gray-400"
@@ -119,7 +144,13 @@ export function PharmacyTiming() {
       </div>
 
       <div className="border-t border-gray-200 pt-6 mt-8">
-        <Button className="bg-teal-500 hover:bg-teal-600 font-roboto font-semibold px-8 py-2.5">Save Changes</Button>
+        <Button 
+          onClick={handleSave}
+          disabled={isPending}
+          className="bg-teal-500 text-white hover:bg-teal-600 font-roboto font-semibold px-8 py-2.5"
+        >
+          {isPending ? "Saving..." : "Save Changes"}
+        </Button>
       </div>
     </div>
   )

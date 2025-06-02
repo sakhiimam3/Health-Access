@@ -5,17 +5,29 @@ import Link from "next/link";
 import { useUserContext } from "@/context/userStore";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import { Loader2 } from "lucide-react";
 
 const CustomDropdownMenu = () => {
   const { user, logout } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
-  const handleLogout = () => {
-    
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true)
       logout()
-      toast.success("Logout successfully");
-      window.location.href = "/login";
-    
-  };
+      toast.success("Logout successfully")
+      await fetch('/api/clear-user-cookie', {
+        method: 'POST',
+      })
+      window.location.href = "/login"
+    } catch (error) {
+      console.error("Failed to clear cookie:", error)
+      toast.error("Failed to logout. Please try again.")
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
 
   return (
     <div className="relative inline-block text-left">
@@ -57,7 +69,7 @@ const CustomDropdownMenu = () => {
                 <div className="border-t border-gray-200"></div>
 
                 <div className="px-4 py-2 text-sm text-gray-500">
-                  <Link href="/partner/dashboard">
+                  <Link href="/dashboard">
                   <span>Dashboard </span> 
                   </Link>
                 </div>
@@ -66,7 +78,14 @@ const CustomDropdownMenu = () => {
                   className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   onClick={handleLogout}
                 >
-                  Logout
+                  {isLoggingOut ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Logging out...
+                        </>
+                      ) : (
+                        "Logout"
+                      )}
                 </button>
               </>
             ) : (
