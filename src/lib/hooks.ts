@@ -1,6 +1,6 @@
 import { OTPForm, otpSchema, VerifyotpFORM } from "@/lib/schema";
 import { useApiQuery, useApiMutation } from "@/lib/useApiQuery";
-import { createPartnerCreate, getServicesParams, User, userCreate, GetServicesParamsType, PartnerOnboarding } from "@/lib/type";
+import { createPartnerCreate, getServicesParams, User, userCreate, GetServicesParamsType, PartnerOnboarding, PartnerProfile, UpdatePartnerProfile } from "@/lib/type";
 import { ForgotPasswordForm, LoginFormValues } from "./schema";
 
 export const useGetUser = () => {
@@ -106,7 +106,7 @@ export const useGetSeriveTypes = () => {
 
 export const useChangePassword = () => {
   const { mutate, isPending, error } = useApiMutation<void, { oldPassword: string; newPassword: string }>(
-    "/v1/api/auth/partner/password/change",
+    "/v1/api/auth/password/change",
     "POST"
   );
   return { mutate, isPending, error };
@@ -116,6 +116,34 @@ export const useCheckEmail = () => {
   const { mutate, isPending, error } = useApiMutation<void, { email: string }>(
     "/v1/api/auth/check-email",
     "POST"
+  );
+  return { mutate, isPending, error };
+};
+
+export const useGetPartnerProfile = () => {
+  const { data, isLoading, error, refetch } = useApiQuery("/v1/api/partners/my-profile");
+  return { data, isLoading, error, refetch };
+};
+
+export const useUpdatePartnerProfile = (partnerId: string) => {
+  const { mutate, isPending, error } = useApiMutation<PartnerProfile, UpdatePartnerProfile>(
+    `/v1/api/partners/${partnerId}`,
+    "PATCH"
+  );
+  return { mutate, isPending, error };
+};
+
+export const useUpdatePharmacyTiming = (partnerId: string) => {
+  const { mutate, isPending, error } = useApiMutation<void, {
+    timings: Array<{
+      dayOfWeek: string;
+      openTime: string;
+      closeTime: string;
+      isClosed: boolean;
+    }>
+  }>(
+    `/v1/api/partners/${partnerId}/timing`,
+    "PATCH"
   );
   return { mutate, isPending, error };
 };
