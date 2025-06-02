@@ -56,7 +56,7 @@ const OTPPage = () => {
       },
     })
   }
-
+// console.log("bb")
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#00A0AA]/10 via-white to-[#00A0AA]/5 flex items-center justify-center p-4">
       {/* Background Pattern */}
