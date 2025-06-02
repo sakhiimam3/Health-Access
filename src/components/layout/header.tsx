@@ -17,7 +17,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathName = usePathname();
-  const {user}=useUserContext();
+  const { user } = useUserContext();
 
   const dropdownRef = useRef(null);
   const scrollPositionRef = useRef(0);
@@ -68,7 +68,7 @@ const Header = () => {
               className="h-10 w-auto"
             />
           </Link>
-          {pathName !== '/partner/onboarding' && (
+          {pathName !== "/partner/onboarding" && (
             <>
               {!isScrolled && (
                 <div
@@ -95,15 +95,23 @@ const Header = () => {
                   >
                     <div className="text-black">
                       <span className="font-semibold text-xs">Location</span>
-                      <div className="text-gray-400 text-xs">Search Location</div>
+                      <div className="text-gray-400 text-xs">
+                        Search Location
+                      </div>
                     </div>
                     <div className="text-black">
-                      <span className="font-semibold text-xs">Type Vaccine</span>
+                      <span className="font-semibold text-xs">
+                        Type Vaccine
+                      </span>
                       <div className="text-gray-400 text-xs">Add dates</div>
                     </div>
                     <div className="text-black">
-                      <span className="font-semibold text-xs">No of people</span>
-                      <div className="text-gray-400 text-xs">Add No of people</div>
+                      <span className="font-semibold text-xs">
+                        No of people
+                      </span>
+                      <div className="text-gray-400 text-xs">
+                        Add No of people
+                      </div>
                     </div>
                   </div>
                   <Button
@@ -117,8 +125,7 @@ const Header = () => {
                 </div>
               )}
               {user ? (
-                <HeaderMenu
-                 />
+                <HeaderMenu />
               ) : (
                 <div className="flex items-center space-x-4">
                   <ButtonTheme
@@ -141,7 +148,7 @@ const Header = () => {
             </>
           )}
         </nav>
-        {pathName !== '/partner/onboarding' && (
+        {pathName !== "/partner/onboarding" && (
           <div
             className={`w-full bg-white transition-all z-50 duration-300 ${
               isScrolled ? "py-2 opacity-0 h-0" : "py-6 opacity-100 h-auto"
