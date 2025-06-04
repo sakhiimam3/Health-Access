@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChevronDown, MapPin } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
+import { useGoogleMaps } from '@/lib/hooks/useGoogleMaps'
 
 declare global {
   interface Window {
@@ -31,7 +32,7 @@ interface Step2Props {
 export default function Step2LocationHours({ form }: Step2Props) {
   const [map, setMap] = useState<google.maps.Map | null>(null)
   const [marker, setMarker] = useState<google.maps.Marker | null>(null)
-  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
+  const isGoogleLoaded = useGoogleMaps()
   const [isDaysDropdownOpen, setIsDaysDropdownOpen] = useState(false)
    
   const mapRef = useRef<HTMLDivElement>(null)
@@ -47,21 +48,6 @@ export default function Step2LocationHours({ form }: Step2Props) {
   } = form
 
   const timings = watch("timings") || []
-
-  // Load Google Maps
-  useEffect(() => {
-    if (window.google?.maps) {
-      setIsGoogleLoaded(true)
-      return
-    }
-
-    const script = document.createElement("script")
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`
-    script.async = true
-    script.defer = true
-    script.onload = () => setIsGoogleLoaded(true)
-    document.head.appendChild(script)
-  }, [])
 
   // Create/Update marker
   const updateMarker = (lat: number, lng: number) => {

@@ -17,6 +17,7 @@ import { toast } from "react-toastify"
 import { useRouter } from "next/navigation"
 import { AxiosError } from "axios"
 import da from "date-fns/locale/da"
+import { useGoogleMaps } from '@/lib/hooks/useGoogleMaps'
 
 // Declare global google types
 declare global {
@@ -66,7 +67,7 @@ const PharmacySignUpForm = () => {
   const router = useRouter()
 
   // Google Maps states
-  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
+  const isGoogleLoaded = useGoogleMaps()
   const locationInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<PharmacySignUpFormValues>({
@@ -92,27 +93,6 @@ const PharmacySignUpForm = () => {
   })
 
   const { reset, setValue, clearErrors } = form
-
-  // Load Google Maps Script
-  useEffect(() => {
-    if (window.google?.maps?.places?.Autocomplete) {
-      setIsGoogleLoaded(true)
-      return
-    }
-
-    const script = document.createElement("script")
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`
-    script.async = true
-    script.defer = true
-    script.onload = () => setIsGoogleLoaded(true)
-    document.head.appendChild(script)
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script)
-      }
-    }
-  }, [])
 
   // Setup Google Places Autocomplete
   useEffect(() => {
