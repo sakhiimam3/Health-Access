@@ -44,7 +44,7 @@ export const useLogin = () => {
 
 export const useRequestResetPartner = () => {
   const { mutate, isPending, error } = useApiMutation<void, ForgotPasswordForm>(
-    "/v1/api/auth/partner/password/request-reset",
+    "/v1/api/auth/password/request-reset",
     "POST"
   );
   return { mutate, isPending, error };
@@ -52,7 +52,7 @@ export const useRequestResetPartner = () => {
 
 export const useVerifyOTP = () => {
   const { mutate, isPending, error } = useApiMutation<void, OTPForm>(
-    "/v1/api/auth/partner/password/reset",
+    "/v1/api/auth/password/reset",
     "POST"
   );
   return { mutate, isPending, error };
