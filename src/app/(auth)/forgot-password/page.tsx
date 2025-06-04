@@ -34,7 +34,7 @@ const ForgotPassword = () => {
       onSuccess: () => {
         toast.success("Email sent successfully", {
           onClose() {
-            router.push(`/partner/otp?email=${data.email}`);
+            router.push(`/otp?email=${data.email}`);
           },
         });
       },
