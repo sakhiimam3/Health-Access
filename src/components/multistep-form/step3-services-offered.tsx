@@ -22,6 +22,10 @@ interface ServiceData {
   parentId?: string
 }
 
+interface ServiceResponse {
+  data: ServiceData[]
+}
+
 interface Service {
   id: string
   name: string
@@ -49,13 +53,13 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
   >([])
   // Add new state to cache services data
   const [cachedMainServices, setCachedMainServices] = useState<{
-    [key: string]: ServiceData[]
+    [key: string]: ServiceResponse
   }>({})
   const [cachedChildServices, setCachedChildServices] = useState<{
-    [key: string]: ServiceData[]
+    [key: string]: ServiceResponse
   }>({})
   const [cachedSubChildServices, setCachedSubChildServices] = useState<{
-    [key: string]: ServiceData[]
+    [key: string]: ServiceResponse
   }>({})
 
   const {
@@ -86,7 +90,7 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
     if (mainServicesData && selectedTypeId) {
       setCachedMainServices((prev) => ({
         ...prev,
-        [selectedTypeId]: mainServicesData,
+        [`type_${selectedTypeId}`]: mainServicesData,
       }))
     }
   }, [mainServicesData, selectedTypeId])
@@ -104,7 +108,7 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
     if (childServicesData && selectedParentId) {
       setCachedChildServices((prev) => ({
         ...prev,
-        [selectedParentId]: childServicesData,
+        [`parent_${selectedParentId}`]: childServicesData,
       }))
     }
   }, [childServicesData, selectedParentId])
@@ -122,7 +126,7 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
     if (subChildServicesData && selectedSubParentId) {
       setCachedSubChildServices((prev) => ({
         ...prev,
-        [selectedSubParentId]: subChildServicesData,
+        [`subparent_${selectedSubParentId}`]: subChildServicesData,
       }))
     }
   }, [subChildServicesData, selectedSubParentId])
@@ -131,17 +135,57 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
     const isSelected = selectedServices.some((s) => s === service.id)
 
     if (isSelected) {
+      // Remove the service and its related services
       const updatedServices = selectedServices.filter((s) => s !== service.id)
       setValue('selectedServices', updatedServices)
       setSelectedServiceNames((prev) => prev.filter((s) => s.id !== service.id))
     } else {
-      setValue('selectedServices', [...selectedServices, service.id])
-      setSelectedServiceNames((prev) => [
-        ...prev,
-        { id: service.id, name: service.name },
-      ])
+      // Find parent and child services
+      let parentService: ServiceData | undefined
+      let childService: ServiceData | undefined
 
-      // Scroll to end after a short delay to ensure the new item is rendered
+      // Find child service
+      Object.values(cachedChildServices).forEach((childServices) => {
+        const found = childServices.data.find((s) => s.id === service.parentId)
+        if (found) {
+          childService = found
+        }
+      })
+
+      // Find parent service
+      if (childService) {
+        Object.values(cachedMainServices).forEach((mainServices) => {
+          const found = mainServices.data.find((s) => s.id === childService?.parentId)
+          if (found) {
+            parentService = found
+          }
+        })
+      }
+
+      // Add all services to the selection
+      const newServices = [...selectedServices]
+      const newServiceNames = [...selectedServiceNames]
+
+      // Add parent service if found
+      if (parentService && !newServices.includes(parentService.id)) {
+        newServices.push(parentService.id)
+        newServiceNames.push({ id: parentService.id, name: parentService.name })
+      }
+
+      // Add child service if found
+      if (childService && !newServices.includes(childService.id)) {
+        newServices.push(childService.id)
+        newServiceNames.push({ id: childService.id, name: childService.name })
+      }
+
+      // Add the selected service
+      newServices.push(service.id)
+      newServiceNames.push({ id: service.id, name: service.name })
+
+      setValue('selectedServices', newServices)
+      setSelectedServiceNames(newServiceNames)
+
+      // Scroll to end after a short delay to ensure the new items are rendered
       setTimeout(() => {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollLeft =
@@ -154,9 +198,36 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
   }
 
   const removeService = (serviceId: string) => {
-    const updatedServices = selectedServices.filter((s) => s !== serviceId)
+    // Find all related services
+    let relatedServiceIds = [serviceId]
+    let parentId: string | undefined
+    let childId: string | undefined
+
+    // Find child service
+    Object.values(cachedChildServices).forEach((childServices) => {
+      const found = childServices.data.find((s) => s.id === serviceId)
+      if (found) {
+        childId = found.id
+        parentId = found.parentId
+      }
+    })
+
+    // Find parent service
+    Object.values(cachedMainServices).forEach((mainServices) => {
+      const found = mainServices.data.find((s) => s.id === serviceId)
+      if (found) {
+        parentId = found.id
+      }
+    })
+
+    // Add related service IDs
+    if (parentId) relatedServiceIds.push(parentId)
+    if (childId) relatedServiceIds.push(childId)
+
+    // Remove all related services
+    const updatedServices = selectedServices.filter((s) => !relatedServiceIds.includes(s))
     setValue('selectedServices', updatedServices)
-    setSelectedServiceNames((prev) => prev.filter((s) => s.id !== serviceId))
+    setSelectedServiceNames((prev) => prev.filter((s) => !relatedServiceIds.includes(s.id)))
     trigger('selectedServices')
   }
 
@@ -192,29 +263,28 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
     })
   }
 
-  // Update the counting functions to use cached data
+  // Update the counting functions to use cached data with prefixed keys
   const getSelectedServicesCountByType = (typeId: string) => {
     return selectedServiceNames.filter((service) => {
-      // Look through all cached sub-child services
       let foundSubService = false
       let foundParentService = false
       let foundMainService = false
 
       // Check in all cached sub-child services
       Object.values(cachedSubChildServices).forEach((services) => {
-        const subService = services?.find((s) => s.id === service.id)
+        const subService = services.data.find((s) => s.id === service.id)
         if (subService) {
           foundSubService = true
           // Check in all cached child services
           Object.values(cachedChildServices).forEach((childServices) => {
-            const parentService = childServices?.find(
+            const parentService = childServices.data.find(
               (s) => s.id === subService.parentId,
             )
             if (parentService) {
               foundParentService = true
               // Check in cached main services
-              const mainServices = cachedMainServices[typeId] || []
-              const mainService = mainServices.find(
+              const mainServices = cachedMainServices[`type_${typeId}`] || { data: [] }
+              const mainService = mainServices.data.find(
                 (s) => s.id === parentService.parentId,
               )
               if (mainService?.typeId === typeId) {
@@ -234,11 +304,12 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
       let found = false
       // Check in all cached sub-child services
       Object.values(cachedSubChildServices).forEach((services) => {
-        const subService = services?.find((s) => s.id === service.id)
+        console.log(services,"cccccc")
+        const subService = services.data.find((s) => s.id === service.id)
         if (subService) {
           // Check in all cached child services
           Object.values(cachedChildServices).forEach((childServices) => {
-            const parentService = childServices?.find(
+            const parentService = childServices.data.find(
               (s) => s.id === subService.parentId,
             )
             if (parentService?.parentId === parentId) {
@@ -261,6 +332,11 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
       ))}
     </div>
   )
+
+
+  console.log(mainServicesData,"mamamam")
+  console.log(childServicesData,"child")
+  console.log(subChildServicesData,"ss")
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -354,12 +430,12 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
                   <div className="space-y-2">
                     {mainServicesLoading ? (
                       <LoadingSkeleton count={4} />
-                    ) : mainServicesData?.length === 0 ? (
+                    ) : mainServicesData?.data?.length === 0 ? (
                       <div className="p-4 text-center text-gray-500 border border-[#E7E7E7] rounded-[20px] shadow-sm">
                         No services available for {type.name}
                       </div>
                     ) : (
-                      mainServicesData?.map((service: ServiceData) => (
+                      mainServicesData?.data?.map((service: ServiceData) => (
                         <button
                           key={service.id}
                           type="button"
@@ -415,7 +491,7 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
                     No sub-services available
                   </div>
                 ) : (
-                  childServicesData?.map((service: ServiceData) => (
+                  childServicesData?.data?.map((service: ServiceData) => (
                     <button
                       key={service.id}
                       type="button"
@@ -466,7 +542,7 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
                     No additional options available
                   </div>
                 ) : (
-                  subChildServicesData?.map((service: ServiceData) => (
+                  subChildServicesData?.data?.map((service: ServiceData) => (
                     <button
                       key={service.id}
                       type="button"

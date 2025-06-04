@@ -10,6 +10,7 @@ import { toast } from "react-toastify"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useGoogleMaps } from '@/lib/hooks/useGoogleMaps'
 
 declare global {
   interface Window {
@@ -30,7 +31,7 @@ type LocationFormValues = z.infer<typeof locationSchema>
 export function LocationSettings() {
   const [map, setMap] = useState(null)
   const [marker, setMarker] = useState(null)
-  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
+  const isGoogleLoaded = useGoogleMaps()
   const mapRef = useRef(null)
   const addressInputRef = useRef(null)
   const { data: profile, isLoading: isLoadingProfile } = useGetPartnerProfile()
@@ -67,21 +68,6 @@ export function LocationSettings() {
       }
     }
   }, [profile, map, setValue])
-
-  // Load Google Maps
-  useEffect(() => {
-    if (window.google?.maps) {
-      setIsGoogleLoaded(true)
-      return
-    }
-
-    const script = document.createElement("script")
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`
-    script.async = true
-    script.defer = true
-    script.onload = () => setIsGoogleLoaded(true)
-    document.head.appendChild(script)
-  }, [])
 
   // Create/Update marker
   const updateMarker = (lat: number, lng: number) => {
