@@ -22,7 +22,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  console.log(userData,'userData11111')
 
   // If user is logged in, prevent access to login/register/forgot-password pages
   if (userData && publicRoutes.includes(pathname)) {
@@ -38,9 +37,9 @@ export function middleware(request: NextRequest) {
 
   // If user is logged in but onboarding is not completed, redirect to onboarding
   // unless they are already on an onboarding route
-//   if (userData && !userData.user.onboardingCompleted && !onboardingRoutes.some(route => pathname.startsWith(route))) {
-//     return NextResponse.redirect(new URL('/onboarding', request.url));
-//   }
+  // if (userData && !userData.onboardingCompleted && !onboardingRoutes.some(route => pathname.startsWith(route))) {
+  //   return NextResponse.redirect(new URL('/partner/onboarding', request.url));
+  // }
 
   return NextResponse.next()
 }

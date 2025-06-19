@@ -57,23 +57,88 @@ export interface PartnerProfile {
 
 export interface UpdatePartnerProfile {
   email: string;
-  firstName: string;
-  lastName: string;
-  businessName: string;
+  firstName?: string;
+  lastName?: string;
+  businessName?: string;
   website: string;
-  businessType: string;
-  schedulingPlatform: string;
-  location: {
+  businessType?: string;
+  schedulingPlatform?: string;
+  location?: {
     name: string;
     latitude: number;
     longitude: number;
   };
-  termsAccepted: boolean;
-  phoneNumber: string;
+  termsAccepted?: boolean;
+  phoneNumber?: string;
   notificationToken?: string;
-  image: string;
-  coverImage: string;
-  describeYourBusiness: string;
+  image?: string;
+  coverImage?: string;
+  describeYourBusiness?: string;
+}
+
+export interface UserCreate {
+  firstName: string;
+  lastName: string;
+  email: string;
+  dateOfBirth: string;
+  postcode: string;
+  address: string;
+  city: string;
+  country: string;
+  password: string;
+}
+
+export interface CreatePartnerCreate {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  businessName?: string;
+  website?: string;
+  businessType?: string;
+  schedulingPlatform?: string;
+  location?: {
+    name: string;
+    latitude: number;
+    longitude: number;
+  };
+  termsAccepted?: boolean;
+  notificationToken?: string;
+}
+
+export interface GetServicesParams {
+  sortOrder?: string;
+  parentId?: string;
+  categoryId?: string;
+  typeId?: string;
+  search?: string;
+  
+}
+
+export interface PartnerOnboarding {
+  email?: string;
+  businessName?: string;
+  website?: string;
+  location?: {
+    name: string;
+    latitude: number;
+    longitude: number;
+  };
+  termsAccepted?: boolean;
+  describeYourBusiness?: string;
+  phoneNumber?: string;
+  timings?: Array<{
+    dayOfWeek?: string;
+    openTime?: string;
+    closeTime?: string;
+    isClosed?: boolean;
+  }>;
+  image?: string;
+  coverImage?: string;
+  serviceIds?: string[];
 }
 
 // ... rest of the types ... 
+
+export interface UpdatePartnerServices {
+  serviceIds: string[];
+}

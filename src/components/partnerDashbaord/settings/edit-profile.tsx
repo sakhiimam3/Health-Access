@@ -20,26 +20,28 @@ const editProfileSchema = z.object({
   email: z.string().email("Invalid email address"),
   phoneNumber: z.string().min(1, "Phone number is required"),
   website: z.string().url("Invalid website URL").optional().or(z.literal("")),
-  describeYourBusiness: z.string().min(1, "Business description is required")
+  describeYourBusiness: z.string().min(1, "Business description is required"),
 })
 
 type EditProfileFormValues = z.infer<typeof editProfileSchema>
 
 export function EditProfile() {
-  const [profileImage, setProfileImage] = useState<string | null>(null)
-  const [coverImage, setCoverImage] = useState<string | null>(null)
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null)
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
   const [selectedProfileFile, setSelectedProfileFile] = useState<File | null>(null)
   const [selectedCoverFile, setSelectedCoverFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
-  const { data: profile, isLoading } = useGetPartnerProfile()
-  const { mutate: updateProfile, isPending } = useUpdatePartnerProfile(profile?.data?.id || "")
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null)
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null)
+  const { data: profile, isLoading,refetch } = useGetPartnerProfile()
+  const { mutate: updateProfile, isPending } = useUpdatePartnerProfile()
   const { mutate: uploadImage } = useUpload()
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<EditProfileFormValues>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
@@ -47,8 +49,8 @@ export function EditProfile() {
       email: "",
       phoneNumber: "",
       website: "",
-      describeYourBusiness: ""
-    }
+      describeYourBusiness: "",
+    },
   })
 
   useEffect(() => {
@@ -59,10 +61,21 @@ export function EditProfile() {
         email: profileData.user?.email || "",
         phoneNumber: profileData.phoneNumber || "",
         website: profileData.website || "",
-        describeYourBusiness: profileData.describeYourBusiness || ""
+        describeYourBusiness: profileData.describeYourBusiness || "",
       })
-      setProfileImage(profileData.image)
-      setCoverImage(profileData.coverImage)
+      // Set actual URLs from server data
+      setProfileImageUrl(profileData.image || null)
+      setCoverImageUrl(profileData.coverImage || null)
+    } else {
+      reset({
+        businessName: "",
+        email: "",
+        phoneNumber: "",
+        website: "",
+        describeYourBusiness: "",
+      })
+      setProfileImageUrl(null)
+      setCoverImageUrl(null)
     }
   }, [profile, reset])
 
@@ -72,7 +85,7 @@ export function EditProfile() {
       setSelectedProfileFile(file)
       const reader = new FileReader()
       reader.onload = (e) => {
-        setProfileImage(e.target?.result as string)
+        setProfileImagePreview(e.target?.result as string)
       }
       reader.readAsDataURL(file)
     }
@@ -84,34 +97,37 @@ export function EditProfile() {
       setSelectedCoverFile(file)
       const reader = new FileReader()
       reader.onload = (e) => {
-        setCoverImage(e.target?.result as string)
+        setCoverImagePreview(e.target?.result as string)
       }
       reader.readAsDataURL(file)
     }
   }
 
   const removeProfileImage = () => {
-    setProfileImage(null)
+    setProfileImageUrl(null)
+    setProfileImagePreview(null)
     setSelectedProfileFile(null)
   }
 
   const removeCoverImage = () => {
-    setCoverImage(null)
+    setCoverImageUrl(null)
+    setCoverImagePreview(null)
     setSelectedCoverFile(null)
   }
 
-  const uploadFile = (file: File): Promise<string> => {
+  const uploadFile = (file: File, type: "profile" | "cover"): Promise<string> => {
     return new Promise((resolve, reject) => {
       const formData = new FormData()
       formData.append("file", file)
-      
+
       uploadImage(formData, {
         onSuccess: (response) => {
-          resolve(response.url)
+          resolve(response.data.url) 
         },
         onError: (error) => {
+          toast.error(`Failed to upload ${type} image`)
           reject(error)
-        }
+        },
       })
     })
   }
@@ -119,53 +135,49 @@ export function EditProfile() {
   const onSubmit = async (data: EditProfileFormValues) => {
     try {
       setIsUploading(true)
-      let profileImageUrl = profileImage
-      let coverImageUrl = coverImage
+      let finalProfileImageUrl = profileImageUrl
+      let finalCoverImageUrl = coverImageUrl
 
-      // Upload profile image if a new one is selected
+      // First, upload profile image if a new one is selected
       if (selectedProfileFile) {
         try {
-          profileImageUrl = await uploadFile(selectedProfileFile)
-          toast.success("Profile image uploaded successfully")
+          finalProfileImageUrl = await uploadFile(selectedProfileFile, "profile")
+          setProfileImageUrl(finalProfileImageUrl)
+          setProfileImagePreview(null)
         } catch (error) {
-          if (error instanceof AxiosError) {
-            toast.error(error.response?.data?.message || "Failed to upload profile image")
-          } else {
-            toast.error("Failed to upload profile image")
-          }
+          console.error("Profile image upload failed:", error)
           return
         }
       }
 
-      // Upload cover image if a new one is selected
+      // Then, upload cover image if a new one is selected
       if (selectedCoverFile) {
         try {
-          coverImageUrl = await uploadFile(selectedCoverFile)
-          toast.success("Cover image uploaded successfully")
+          finalCoverImageUrl = await uploadFile(selectedCoverFile, "cover")
+          setCoverImageUrl(finalCoverImageUrl)
+          setCoverImagePreview(null)
         } catch (error) {
-          if (error instanceof AxiosError) {
-            toast.error(error.response?.data?.message || "Failed to upload cover image")
-          } else {
-            toast.error("Failed to upload cover image")
-          }
+          console.error("Cover image upload failed:", error)
           return
         }
       }
 
-      // Only send the fields we have in the form
-      const updateData = {
+      // Simplified update payload - only form fields + image URLs (never base64)
+      const updatePayload = {
         businessName: data.businessName,
         email: data.email,
         phoneNumber: data.phoneNumber,
-        website: data.website,
+        website: data.website || "",
         describeYourBusiness: data.describeYourBusiness,
-        image: profileImageUrl || "",
-        coverImage: coverImageUrl || ""
+        image: finalProfileImageUrl || "",
+        coverImage: finalCoverImageUrl || "",
       }
 
-      updateProfile(updateData, {
+      // Update profile with the new data
+      updateProfile(updatePayload, {
         onSuccess: () => {
           toast.success("Profile updated successfully")
+          refetch()
           setSelectedProfileFile(null)
           setSelectedCoverFile(null)
         },
@@ -175,9 +187,12 @@ export function EditProfile() {
           } else {
             toast.error("Failed to update profile")
           }
-          console.error(error)
-        }
+          console.error("Profile update failed:", error)
+        },
       })
+    } catch (error) {
+      console.error("Unexpected error:", error)
+      toast.error("An unexpected error occurred")
     } finally {
       setIsUploading(false)
     }
@@ -186,7 +201,10 @@ export function EditProfile() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-teal-500" />
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-teal-500 mx-auto mb-2" />
+          <p className="text-gray-600">Loading your profile data...</p>
+        </div>
       </div>
     )
   }
@@ -201,7 +219,7 @@ export function EditProfile() {
           {/* Profile/Logo Upload */}
           <div className="flex gap-4 items-center">
             <div className="relative">
-              {profileImage && (
+              {(profileImagePreview || profileImageUrl) && (
                 <button
                   type="button"
                   onClick={removeProfileImage}
@@ -211,9 +229,13 @@ export function EditProfile() {
                 </button>
               )}
               <div className="w-32 h-32 bg-[#E7E7E7] rounded-full flex items-center justify-center overflow-hidden">
-                {profileImage ? (
+                {profileImagePreview || profileImageUrl ? (
                   <div className="relative w-full h-full">
-                    <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                    <img
+                      src={profileImagePreview || profileImageUrl || "/placeholder.svg"}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 ) : (
                   <Camera className="w-8 h-8 text-gray-400" />
@@ -227,15 +249,13 @@ export function EditProfile() {
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
             </div>
-            <Label className="text-sm font-medium text-gray-700 mt-3">
-              Profile/Logo
-            </Label>
+            <Label className="text-sm font-medium text-gray-700 mt-3">Profile/Logo</Label>
           </div>
 
           {/* Cover Photo Upload */}
           <div className="w-[400px]">
             <div className="relative">
-              {coverImage && (
+              {(coverImagePreview || coverImageUrl) && (
                 <button
                   type="button"
                   onClick={removeCoverImage}
@@ -245,16 +265,18 @@ export function EditProfile() {
                 </button>
               )}
               <div className="w-full h-32 bg-[#E7E7E7] rounded-lg flex items-center justify-center overflow-hidden">
-                {coverImage ? (
+                {coverImagePreview || coverImageUrl ? (
                   <div className="relative w-full h-full">
-                    <img src={coverImage} alt="Cover" className="w-full h-full object-cover" />
+                    <img
+                      src={coverImagePreview || coverImageUrl || "/placeholder.svg"}
+                      alt="Cover"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 ) : (
                   <div className="flex justify-center items-center flex-col">
                     <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <span className="text-sm text-gray-500 mt-2 block">
-                      Upload Cover Photo
-                    </span>
+                    <span className="text-sm text-gray-500 mt-2 block">Upload Cover Photo</span>
                   </div>
                 )}
               </div>
@@ -275,14 +297,12 @@ export function EditProfile() {
             <Label htmlFor="businessName" className="text-sm font-medium text-gray-900 mb-2 block">
               Pharmacy Name
             </Label>
-            <Input 
-              id="businessName" 
+            <Input
+              id="businessName"
               {...register("businessName")}
               className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
             />
-            {errors.businessName && (
-              <p className="text-red-500 text-sm mt-1">{errors.businessName.message}</p>
-            )}
+            {errors.businessName && <p className="text-red-500 text-sm mt-1">{errors.businessName.message}</p>}
           </div>
 
           <div>
@@ -295,37 +315,31 @@ export function EditProfile() {
               {...register("email")}
               className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="phoneNumber" className="text-sm font-medium text-gray-900 mb-2 block">
               Contact Number
             </Label>
-            <Input 
-              id="phoneNumber" 
+            <Input
+              id="phoneNumber"
               {...register("phoneNumber")}
               className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
             />
-            {errors.phoneNumber && (
-              <p className="text-red-500 text-sm mt-1">{errors.phoneNumber.message}</p>
-            )}
+            {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="website" className="text-sm font-medium text-gray-900 mb-2 block">
               Website <span className="text-gray-500">(optional)</span>
             </Label>
-            <Input 
-              id="website" 
+            <Input
+              id="website"
               {...register("website")}
               className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
             />
-            {errors.website && (
-              <p className="text-red-500 text-sm mt-1">{errors.website.message}</p>
-            )}
+            {errors.website && <p className="text-red-500 text-sm mt-1">{errors.website.message}</p>}
           </div>
         </div>
 
@@ -346,12 +360,12 @@ export function EditProfile() {
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button 
+          <Button
             type="submit"
             disabled={isPending || isUploading}
             className="bg-teal-500 hover:bg-teal-600 font-roboto text-white rounded-full"
           >
-            {isPending ? "Saving..." : isUploading ? "Uploading..." : "Save Changes"}
+            {isPending || isUploading ? "Updating..." : "Save Changes"}
           </Button>
         </div>
       </form>

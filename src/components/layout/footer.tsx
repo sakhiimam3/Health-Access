@@ -26,10 +26,8 @@ export default function Footer() {
     },
     {
         title: "Anti-Sweat Injections",
-    
-        id:"12312313wd3493"
-
-      },
+        id:"12312313wd3494"
+    },
       
   ];
   return (
