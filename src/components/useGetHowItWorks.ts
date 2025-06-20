@@ -13,9 +13,15 @@ export interface FaqItem {
   answer: string;
 }
 
+export interface MenuType {
+  id: string;
+  name: string;
+}
+
 export function useGetHowItWorks() {
   const [data, setData] = useState<HowItWorksItem[]>([]);
   const [faqs, setFaqs] = useState<FaqItem[]>([]);
+  const [menuTypes, setMenuTypes] = useState<MenuType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +35,7 @@ export function useGetHowItWorks() {
       .then((json) => {
         setData(json.data?.howItWorks || []);
         setFaqs(json.data?.faqs || []);
+        setMenuTypes(json.data?.menuTypes || []);
         setLoading(false);
       })
       .catch((err) => {
@@ -37,5 +44,5 @@ export function useGetHowItWorks() {
       });
   }, []);
 
-  return { data, faqs, loading, error };
+  return { data, faqs, menuTypes, loading, error };
 } 
