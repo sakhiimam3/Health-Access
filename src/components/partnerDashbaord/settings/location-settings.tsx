@@ -2,15 +2,14 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MapPin } from "lucide-react"
-import { useGetPartnerProfile, useUpdatePartnerProfile } from "@/lib/hooks"
+import { useGetPartnerProfile, useUpdatePartnerLocation } from "@/lib/hooks"
 import { toast } from "react-toastify"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useGoogleMaps } from '@/lib/hooks/useGoogleMaps'
+import { useGoogleMaps } from "@/lib/hooks/useGoogleMaps"
 
 declare global {
   interface Window {
@@ -22,8 +21,8 @@ const locationSchema = z.object({
   location: z.object({
     name: z.string().min(1, "Location name is required"),
     latitude: z.number(),
-    longitude: z.number()
-  })
+    longitude: z.number(),
+  }),
 })
 
 type LocationFormValues = z.infer<typeof locationSchema>
@@ -35,22 +34,25 @@ export function LocationSettings() {
   const mapRef = useRef(null)
   const addressInputRef = useRef(null)
   const { data: profile, isLoading: isLoadingProfile } = useGetPartnerProfile()
-  const { mutate: updateProfile, isPending } = useUpdatePartnerProfile(profile?.data?.id || "")
+  const { mutate: updateLocation, isPending } = useUpdatePartnerLocation(profile?.data?.id || "")
 
   const {
     handleSubmit,
     setValue,
-    formState: { errors }
+    watch,
+    formState: { errors },
   } = useForm<LocationFormValues>({
     resolver: zodResolver(locationSchema),
     defaultValues: {
       location: {
         name: "",
         latitude: 0,
-        longitude: 0
-      }
-    }
+        longitude: 0,
+      },
+    },
   })
+
+  const currentLocation = watch("location")
 
   // Load initial location from profile
   useEffect(() => {
@@ -58,13 +60,18 @@ export function LocationSettings() {
       const { name, latitude, longitude } = profile.data.location
       setValue("location", {
         name,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude)
+        latitude: Number.parseFloat(latitude),
+        longitude: Number.parseFloat(longitude),
       })
-      
+
+      // Update address input
+      if (addressInputRef.current) {
+        addressInputRef.current.value = name
+      }
+
       // Update map marker if map is loaded
       if (map) {
-        updateMarker(parseFloat(latitude), parseFloat(longitude))
+        updateMarker(Number.parseFloat(latitude), Number.parseFloat(longitude))
       }
     }
   }, [profile, map, setValue])
@@ -99,6 +106,11 @@ export function LocationSettings() {
     newMarker.addListener("dragend", () => {
       const pos = newMarker.getPosition()
       if (pos) {
+        const newLat = pos.lat()
+        const newLng = pos.lng()
+        setValue("location.latitude", newLat)
+        setValue("location.longitude", newLng)
+
         const geocoder = new window.google.maps.Geocoder()
         geocoder.geocode({ location: pos }, (results: any, status: any) => {
           if (status === "OK" && results[0]) {
@@ -139,6 +151,7 @@ export function LocationSettings() {
           if (addressInputRef.current) {
             addressInputRef.current.value = address
           }
+          setValue("location.name", address)
         }
       })
     })
@@ -165,10 +178,11 @@ export function LocationSettings() {
         // Update marker and map
         updateMarker(lat, lng)
 
-        // Update input
+        // Update input and form
         if (addressInputRef.current) {
           addressInputRef.current.value = address
         }
+        setValue("location.name", address)
       }
     })
 
@@ -194,14 +208,19 @@ export function LocationSettings() {
         if (addressInputRef.current) {
           addressInputRef.current.value = formattedAddress
         }
+        setValue("location.name", formattedAddress)
       }
     })
   }
 
   const onSubmit = (data: LocationFormValues) => {
-    updateProfile(
+    updateLocation(
       {
-        location: data.location
+        location: {
+          name: data.location.name,
+          latitude: data.location.latitude,
+          longitude: data.location.longitude,
+        },
       },
       {
         onSuccess: () => {
@@ -209,14 +228,14 @@ export function LocationSettings() {
         },
         onError: (error) => {
           toast.error("Failed to update location")
-        }
-      }
+        },
+      },
     )
   }
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">Location</h2>
+      <h2 className="text-xl font-semibold text-gray-900">Location Settings</h2>
 
       {/* Address Input */}
       <div>
@@ -231,17 +250,17 @@ export function LocationSettings() {
             className="w-full h-12 px-4 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 focus:outline-none transition-colors"
             autoComplete="off"
             type="text"
-            
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault()
                 searchAddress((e.target as HTMLInputElement).value)
               }
             }}
+            onChange={(e) => {
+              setValue("location.name", e.target.value)
+            }}
           />
-          {errors.location?.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.location.name.message}</p>
-          )}
+          {errors.location?.name && <p className="text-red-500 text-sm mt-1">{errors.location.name.message}</p>}
         </div>
       </div>
 
@@ -266,11 +285,14 @@ export function LocationSettings() {
         </div>
       </div>
 
+      {/* Current Location Info */}
+  
+
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button 
+        <Button
           onClick={handleSubmit(onSubmit)}
-          disabled={isPending}
+          disabled={isPending || !currentLocation.name}
           className="h-12 text-white rounded-full bg-teal-500 hover:bg-teal-600 shadow-sm"
         >
           {isPending ? "Saving..." : "Save Location"}

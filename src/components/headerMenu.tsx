@@ -6,11 +6,13 @@ import { useUserContext } from "@/context/userStore";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { Loader2 } from "lucide-react";
+import { useGetPartnerProfile } from "@/lib/hooks";
 
 const CustomDropdownMenu = () => {
   const { user, logout } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const {data:partnerProfile}=useGetPartnerProfile()
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true)
@@ -34,7 +36,7 @@ const CustomDropdownMenu = () => {
       <div className="flex items-center">
         <Avatar className="h-9 w-9">
           <Image
-            src={"/images/Profile_avatar.png"}
+            src={partnerProfile?.data?.image || "/images/Profile_avatar.png"}
             width={36}
             height={36}
             alt={true ? "N/A" : "N/A"}

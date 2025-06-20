@@ -9,9 +9,11 @@ import { Avatar } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Logo from "@public/images/logo.png";
+import { useGetPartnerProfile } from "@/lib/hooks";
 
 export function DashboardHeader() {
   const { user, logout } = useUserContext();
+  const { data: partnerProfile, isLoading: isLoadingProfile } = useGetPartnerProfile();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   console.log(user,"baba");
@@ -69,8 +71,19 @@ export function DashboardHeader() {
                 >
                   {/* Using Avatar component for potential future image integration */}
                   <Avatar className="h-8 w-8 flex items-center justify-center">
-                    {/* Replace with actual Image component and user image when available */}
-                    <User className="h-5 w-5 text-gray-700" />
+                    {isLoadingProfile ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : partnerProfile?.data?.image ? (
+                      <Image
+                        src={partnerProfile.data.image}
+                        alt="Profile"
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <User className="h-5 w-5 text-gray-700" />
+                    )}
                   </Avatar>
                 </div>
                 <button

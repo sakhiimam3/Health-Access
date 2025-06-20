@@ -8,7 +8,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useGetServices } from "@/lib/hooks";
+import { Suspense } from "react";
 
 import React from "react";
 import Vs1 from "@public/images/vs-1.png";
@@ -33,6 +35,20 @@ import Link from "next/link";
 
 const PharmacyServices = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const name = searchParams.get("name") || "N/A";
+  const typeid = searchParams.get("typeid") || undefined;
+
+  // Fetch services by typeid
+  const { data: services, isLoading, error } = useGetServices({
+    typeId:typeid || ""
+  });
+  React.useEffect(() => {
+    if (services) {
+      console.log("Fetched services:", services);
+    }
+  }, [services]);
+
   const servicesData = [
     {
       title: "Travel Vaccines",
@@ -108,7 +124,7 @@ const PharmacyServices = () => {
     <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
       <div className="mt-56">
         <PagesBanner
-          title="Pharmacy Services"
+          title={name}
           image="/images/phr-banner.png"
           height="h-60"
           textColor="white"
@@ -367,4 +383,10 @@ const PharmacyServices = () => {
   );
 };
 
-export default PharmacyServices;
+const PharmacyServicesPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <PharmacyServices />
+  </Suspense>
+);
+
+export default PharmacyServicesPage;

@@ -41,7 +41,7 @@ const ServicesDetails = () => {
     {
       title: "Anti-Sweat Injections",
       image: Vs5,
-      id: "12312313wd3493",
+      id: "12312313wd3494",
     },
   ];
 

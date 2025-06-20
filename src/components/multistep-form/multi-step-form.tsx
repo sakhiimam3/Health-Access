@@ -1,31 +1,32 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import Step1BasicDetails from './step1-basic-details'
-import Step2LocationHours from './step2-location-hours'
-import Step3ServicesOffered from './step3-services-offered'
-import Step4Success from './step4-success'
-import { useUpload, usePartnerOnboarding } from '@/lib/hooks'
-import { toast } from 'react-toastify'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import Step1BasicDetails from "./step1-basic-details";
+import Step2LocationHours from "./step2-location-hours";
+import Step3ServicesOffered from "./step3-services-offered";
+import Step4Success from "./step4-success";
+import { useUpload, usePartnerOnboarding } from "@/lib/hooks";
+import { toast } from "react-toastify";
+import { useUserContext } from "@/context/userStore";
 
 const formSchema = z.object({
   // Step 1 - Basic Details
   profileLogo: z.any().refine((val) => val !== null && val !== undefined, {
-    message: 'Profile logo is required',
+    message: "Profile logo is required",
   }),
   coverPhoto: z.any().refine((val) => val !== null && val !== undefined, {
-    message: 'Cover photo is required',
+    message: "Cover photo is required",
   }),
-  pharmacyName: z.string().min(1, 'Pharmacy name is required'),
-  pharmacyEmail: z.string().email('Invalid email address'),
+  pharmacyName: z.string().min(1, "Pharmacy name is required"),
+  pharmacyEmail: z.string().email("Invalid email address"),
   contactNumber: z
     .string()
-    .min(10, 'Contact number must be at least 10 digits'),
-  website: z.string().url('Invalid website URL').optional().or(z.literal('')),
-  shortBio: z.string().min(10, 'Short bio must be at least 10 characters'),
+    .min(10, "Contact number must be at least 10 digits"),
+  website: z.string().url("Invalid website URL").optional().or(z.literal("")),
+  shortBio: z.string().min(10, "Short bio must be at least 10 characters"),
 
   // Step 2 - Location & Hours
   timings: z
@@ -35,128 +36,128 @@ const formSchema = z.object({
         openTime: z.string(),
         closeTime: z.string(),
         isClosed: z.boolean().default(false),
-      }),
+      })
     )
-    .min(1, 'At least one working day is required'),
-  address: z.string().min(5, 'Address must be at least 5 characters'),
+    .min(1, "At least one working day is required"),
+  address: z.string().min(5, "Address must be at least 5 characters"),
   pinLocation: z
     .object({
       lat: z.number(),
       lng: z.number(),
     })
-    .optional(),
+    .default({ lat: 37.7749, lng: -122.4194 }),
 
   // Step 3 - Services
-  selectedServices: z.array(z.string()).min(1, 'Select at least one service'),
-})
+  selectedServices: z.array(z.string()).min(1, "Select at least one service"),
+});
 
-export type FormData = z.infer<typeof formSchema>
+export type FormData = z.infer<typeof formSchema>;
 
 export default function MultiStepForm() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user, setUserData } = useUserContext();
 
-  const { mutate: uploadFile } = useUpload()
-  const { mutate: submitOnboarding } = usePartnerOnboarding()
+  const { mutate: uploadFile } = useUpload();
+  const { mutate: submitOnboarding } = usePartnerOnboarding();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       profileLogo: null,
       coverPhoto: null,
-      pharmacyName: '',
-      pharmacyEmail: '',
-      contactNumber: '',
-      website: '',
-      shortBio: '',
+      pharmacyName: "",
+      pharmacyEmail: "",
+      contactNumber: "",
+      website: "",
+      shortBio: "",
       timings: [],
-      address: '',
-      pinLocation: undefined,
+      address: "123 Main Street, San Francisco, CA 94105",
+      pinLocation: { lat: 37.7749, lng: -122.4194 },
       selectedServices: [],
     },
-    mode: 'onChange',
-  })
-  console.log(form?.formState?.errors, 'erros')
+    mode: "onChange",
+  });
 
   const nextStep = async () => {
-    let fieldsToValidate: (keyof FormData)[] = []
+    let fieldsToValidate: (keyof FormData)[] = [];
 
     switch (currentStep) {
       case 1:
         fieldsToValidate = [
-          'profileLogo',
-          'coverPhoto',
-          'pharmacyName',
-          'pharmacyEmail',
-          'contactNumber',
-          'shortBio',
-        ]
-        break
+          "profileLogo",
+          "coverPhoto",
+          "pharmacyName",
+          "pharmacyEmail",
+          "contactNumber",
+          "shortBio",
+        ];
+        break;
       case 2:
-        fieldsToValidate = ['timings', 'address']
-        break
+        fieldsToValidate = ["timings", "address"];
+        break;
       case 3:
-        fieldsToValidate = ['selectedServices']
-        break
+        fieldsToValidate = ["selectedServices"];
+        break;
     }
 
-    const isValid = await form.trigger(fieldsToValidate)
+    const isValid = await form.trigger(fieldsToValidate);
 
     if (isValid && currentStep < 4) {
-      setCurrentStep(currentStep + 1)
+      setCurrentStep(currentStep + 1);
     }
-  }
+  };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
+      setCurrentStep(currentStep - 1);
     }
-  }
+  };
 
   // Upload image helper function
   const uploadImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       if (!file || !(file instanceof File)) {
-        console.error('Invalid file object:', file)
-        reject(new Error('Invalid file object'))
-        return
+        console.error("Invalid file object:", file);
+        reject(new Error("Invalid file object"));
+        return;
       }
 
-      const formData = new FormData()
-      formData.append('file', file, file.name)
+      const formData = new FormData();
+      formData.append("file", file, file.name);
 
       uploadFile(formData, {
-        onSuccess: (data: { url: string }) => {
-          console.log('Upload successful:', data)
-          resolve(data.url)
+        onSuccess: (response: { data: { url: string } }) => {
+          console.log("Upload successful:", response);
+          resolve(response.data.url);
         },
         onError: (error) => {
-          console.error('Upload failed:', error)
-          reject(error)
+          console.error("Upload failed:", error);
+          reject(error);
         },
-      })
-    })
-  }
+      });
+    });
+  };
 
   const onSubmit = async (data: FormData) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
-      let profileImageUrl = ''
-      let coverImageUrl = ''
+      let profileImageUrl = "";
+      let coverImageUrl = "";
 
       if (data.profileLogo) {
-        profileImageUrl = await uploadImage(data.profileLogo)
+        profileImageUrl = await uploadImage(data.profileLogo);
       }
 
       if (data.coverPhoto) {
-        coverImageUrl = await uploadImage(data.coverPhoto)
+        coverImageUrl = await uploadImage(data.coverPhoto);
       }
 
       const payload = {
         email: data.pharmacyEmail,
         businessName: data.pharmacyName,
-        website: data.website || '',
+        website: data.website || "",
         location: {
           name: data.address,
           latitude: data.pinLocation?.lat || 0,
@@ -174,43 +175,56 @@ export default function MultiStepForm() {
         image: profileImageUrl,
         coverImage: coverImageUrl,
         serviceIds: data.selectedServices,
-      }
+      };
 
       submitOnboarding(payload, {
         onSuccess: () => {
-          setIsSubmitting(false)
-          setCurrentStep(4)
-          toast.success('Pharmacy details submitted successfully!')
+          setIsSubmitting(false);
+          setCurrentStep(4);
+
+          // Update user context with onboarding completed
+          if (user) {
+            const updatedUser = {
+              ...user,
+              data: {
+                ...user.data,
+                onboardingCompleted: true,
+              },
+            };
+            setUserData(updatedUser);
+          }
+
+          toast.success("Pharmacy details submitted successfully!");
         },
         onError: (error) => {
-          setIsSubmitting(false)
-          console.error('Onboarding submission failed:', error)
-          toast.error('Failed to submit pharmacy details. Please try again.')
+          setIsSubmitting(false);
+          console.error("Onboarding submission failed:", error);
+          toast.error("Failed to submit pharmacy details. Please try again.");
         },
-      })
+      });
     } catch (error) {
-      setIsSubmitting(false)
-      console.error('Error during submission:', error)
+      setIsSubmitting(false);
+      console.error("Error during submission:", error);
     }
-  }
+  };
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <Step1BasicDetails form={form} />
+        return <Step1BasicDetails form={form} />;
       case 2:
-        return <Step2LocationHours form={form} />
+        return <Step2LocationHours form={form} />;
       case 3:
-        return <Step3ServicesOffered form={form} />
+        return <Step3ServicesOffered form={form} />;
       case 4:
-        return <Step4Success />
+        return <Step4Success />;
       default:
-        return <Step1BasicDetails form={form} />
+        return <Step1BasicDetails form={form} />;
     }
-  }
+  };
 
   if (currentStep === 4) {
-    return <Step4Success />
+    return <Step4Success />;
   }
 
   return (
@@ -266,7 +280,7 @@ export default function MultiStepForm() {
                   disabled={isSubmitting}
                   className="px-8 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? <>Submitting...</> : 'Submit'}
+                  {isSubmitting ? <>Submitting...</> : "Submit"}
                 </button>
               ) : (
                 <button
@@ -283,5 +297,5 @@ export default function MultiStepForm() {
         </form>
       </div>
     </div>
-  )
+  );
 }

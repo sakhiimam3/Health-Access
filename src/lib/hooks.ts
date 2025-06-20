@@ -1,6 +1,6 @@
 import { OTPForm, otpSchema, VerifyotpFORM } from "@/lib/schema";
 import { useApiQuery, useApiMutation } from "@/lib/useApiQuery";
-import { createPartnerCreate, getServicesParams, User, userCreate, GetServicesParamsType, PartnerOnboarding, PartnerProfile, UpdatePartnerProfile } from "@/lib/type";
+import { User, PartnerProfile, UpdatePartnerProfile, UserCreate, CreatePartnerCreate, GetServicesParams, PartnerOnboarding, UpdatePartnerServices } from "@/lib/type";
 import { ForgotPasswordForm, LoginFormValues } from "./schema";
 
 export const useGetUser = () => {
@@ -9,7 +9,7 @@ export const useGetUser = () => {
 };
 
 export const useCreateUser = () => {
-  const { mutate, isPending, error } = useApiMutation<User, userCreate>(
+  const { mutate, isPending, error } = useApiMutation<User, UserCreate>(
     "/api/create",
     "POST"
   );
@@ -17,10 +17,10 @@ export const useCreateUser = () => {
 };
 
 export const useCreatePartner = () => {
-  const { mutate, isPending, error } = useApiMutation<
-    User,
-    createPartnerCreate
-  >("/v1/api/auth/partner/register", "POST");
+  const { mutate, isPending, error } = useApiMutation<User, CreatePartnerCreate>(
+    "/v1/api/auth/partner/register",
+    "POST"
+  );
   return { mutate, isPending, error };
 };
 
@@ -67,11 +67,19 @@ export const useUserVerifyOTP = (userId: string) => {
 };
 
 export const useUpload = () => {
-  const { mutate, isPending, error } = useApiMutation<{ url: string }, FormData>(
+  const { mutate, mutateAsync, isPending, error } = useApiMutation<{ statusCode: number; message: string; data: { url: string } }, FormData>(
     "/v1/api/media/upload",
     "POST"
   );
-  return { mutate, isPending, error };
+  return { mutate, mutateAsync, isPending, error };
+};
+
+export const useUploadVedio = () => {
+  const { mutate, mutateAsync, isPending, error } = useApiMutation<{ statusCode: number; message: string; data: { url: string } }, FormData>(
+    "/v1/api/media/upload-video",
+    "POST"
+  );
+  return { mutate, mutateAsync, isPending, error };
 };
 
 export const useGetPartners = () => {
@@ -87,7 +95,7 @@ export const usePartnerOnboarding = () => {
   return { mutate, isPending, error };
 };
 
-export const useGetServices = (params?: Partial<GetServicesParamsType>) => {
+export const useGetServices = (params?: Partial<GetServicesParams>) => {
   const { data, isLoading, error, refetch } = useApiQuery({
     endpoint: "/v1/api/services",
     params: {
@@ -125,9 +133,14 @@ export const useGetPartnerProfile = () => {
   return { data, isLoading, error, refetch };
 };
 
-export const useUpdatePartnerProfile = (partnerId: string) => {
-  const { mutate, isPending, error } = useApiMutation<PartnerProfile, UpdatePartnerProfile>(
-    `/v1/api/partners/${partnerId}`,
+export const useGetMyServices = () => {
+  const { data, isLoading, error, refetch } = useApiQuery("/v1/api/partners/my-selected-services");
+  return { data, isLoading, error, refetch };
+};
+
+export const useUpdatePartnerProfile = () => {
+  const { mutate, isPending, error } = useApiMutation<PartnerProfile, PartnerOnboarding>(
+    `/v1/api/partners/`,
     "PATCH"
   );
   return { mutate, isPending, error };
@@ -148,3 +161,125 @@ export const useUpdatePharmacyTiming = (partnerId: string) => {
   return { mutate, isPending, error };
 };
 
+export const useUpdatePartnerLocation = (partnerId: string) => {
+  const { mutate, isPending, error } = useApiMutation<PartnerProfile, {
+    location: {
+      name: string;
+      latitude: number;
+      longitude: number;
+    }
+  }>(
+    `/v1/api/partners/${partnerId}`,
+    "PATCH"
+  );
+  return { mutate, isPending, error };
+};
+
+export const useGetPartnerServices = (params?: {
+  page?: number;
+  limit?: number;
+  typeId?: string;
+}) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/services/partner",
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+      typeId: params?.typeId,
+    }
+  });
+  return { data, isLoading, error, refetch };
+};
+
+export const useDeletePartnerService = (serviceId: string) => {
+  const { mutate, isPending, error } = useApiMutation<void, void>(
+    `/v1/api/services/partner/${serviceId}`,
+    "DELETE"
+  );
+  return { mutate, isPending, error };
+};
+
+export const useCreateUpdatePartnerService = (serviceId?: string) => {
+  const { mutate, isPending, error } = useApiMutation<void, {
+    price: number;
+    description: string;
+    isActive: boolean;
+    image: string;
+    serviceId?: string;
+  }>(
+    serviceId ? `/v1/api/services/partner/${serviceId}` : "/v1/api/services/partner",
+    serviceId ? "PUT" : "POST"
+  );
+  return { mutate, isPending, error };
+};
+
+export const useGetPartnerServiceDetails = (serviceId: string) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/services/partner/${serviceId}`,
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Types for service sections
+interface ServiceSectionColumn {
+  type: "text" | "image" | "video" | "list";
+  content: string | { src: string };
+  columnOrder: number;
+  isActive: boolean;
+}
+
+interface ServiceSection {
+  id?: string;
+  layout: "one_column" | "two_column" | "three_column" | "two_by_two_column" | "three_by_three_column";
+  title: string;
+  isActive: boolean;
+  columns: ServiceSectionColumn[];
+}
+
+interface CreateServiceSectionPayload {
+  title: string;
+  layout: ServiceSection['layout'];
+  columns: ServiceSectionColumn[];
+  isActive?: boolean;
+}
+
+interface UpdateServiceSectionPayload {
+  title: string;
+  layout: ServiceSection['layout'];
+  isActive: boolean;
+  columns: ServiceSectionColumn[];
+}
+
+// Get service sections
+export const useGetServiceSections = (serviceId: string) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/services/partner/${serviceId}/sections`,
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Create service section
+export const useCreateServiceSection = (serviceId: string) => {
+  const { mutate, isPending, error } = useApiMutation<ServiceSection, CreateServiceSectionPayload>(
+    `/v1/api/services/partner/${serviceId}/sections`,
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+
+// Update service section
+export const useUpdateServiceSection = (serviceId: string, sectionId: string) => {
+  const { mutate, isPending, error } = useApiMutation<ServiceSection, UpdateServiceSectionPayload>(
+    `/v1/api/services/partner/${serviceId}/sections/${sectionId}`,
+    "PUT"
+  );
+  return { mutate, isPending, error };
+};
+
+// Delete service section
+export const useDeleteServiceSection = (serviceId: string, sectionId: string) => {
+  const { mutate, isPending, error } = useApiMutation<void, void>(
+    `/v1/api/services/partner/${serviceId}/sections/${sectionId}`,
+    "DELETE"
+  );
+};

@@ -102,9 +102,7 @@ export default function AuthPage() {
       },
     });
 
-    console.log("%c Login form submission:", "color: #00A0AA; font-weight: bold; font-size: 14px;");
-    console.table(data);
-    // Handle login logic here
+   
   };
 
   const onRegisterSubmit = (data: RegisterFormValues) => {

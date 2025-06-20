@@ -20,11 +20,11 @@ export const useApiQuery = (options: string | QueryOptions) => {
   })
 }
 
-type EndpointType = string | ((...args: any[]) => string);
+type EndpointType<D> = string | ((data: D) => string);
 
-export const useApiMutation = <T, D>(endpoint: EndpointType, method: string) => {
-  const mutate = async (data: D, ...args: any[]) => {
-    const url = typeof endpoint === 'function' ? endpoint(...args) : endpoint;
+export const useApiMutation = <T, D>(endpoint: EndpointType<D>, method: string) => {
+  const mutate = async (data: D) => {
+    const url = typeof endpoint === 'function' ? endpoint(data) : endpoint;
     const response = await api({
       method,
       url,
@@ -33,9 +33,9 @@ export const useApiMutation = <T, D>(endpoint: EndpointType, method: string) => 
     return response.data as T;
   };
 
-  const { mutate: mutation, isPending, error } = useMutation({
+  const { mutate: mutation, mutateAsync, isPending, error } = useMutation({
     mutationFn: mutate,
   });
 
-  return { mutate: mutation, isPending, error };
+  return { mutate: mutation, mutateAsync, isPending, error };
 };
