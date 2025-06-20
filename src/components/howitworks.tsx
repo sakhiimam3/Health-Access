@@ -1,68 +1,60 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 // import Image from 'next/image';
 // import HowItWorksImage from '../../public/images/howitworks.png';
 import LayoutWrapper from './layout/wrapper';
 import { BookIcon, CompassIcon, Computer, GitCompareIcon } from 'lucide-react';
 import { ComputerIcon, SearchIcon, TextBoxIcon, VerifyIcon } from './icons/icons';
 import HowItWorksCard from './howitworksCard';
+import { useGetHowItWorks } from './useGetHowItWorks';
 
+const icons = [SearchIcon, TextBoxIcon, ComputerIcon, VerifyIcon];
 
 const HowItWorks = ({isNested}:{isNested?:boolean}) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const { data, loading, error } = useGetHowItWorks();
 
+  // Pick a single random icon for all cards (static for this render)
+  const StaticIcon = useMemo(() => {
+    return icons[Math.floor(Math.random() * icons.length)];
+  }, []);
 
-    const howItWorks = [
-      {
-        icon: <SearchIcon color={hoveredIndex === 0 ? "white" : "#189BA3"} />,
-        title: "Search for Services",
-        text: "Enter your postcode and the service you need, such as vaccinations, health checks, or consultations."
-      },
-      {
-        icon: <TextBoxIcon color={hoveredIndex === 1 ? "white" : "#189BA3"} />,
-        title: "Compare Pharmacies",
-        text: "Browse nearby pharmacies, compare prices, check availability, and read reviews to make an informed decision."
-      },
-      {
-        icon: <ComputerIcon color={hoveredIndex === 2 ? "white" : "#189BA3"} />,
-        title: "Book Online",
-        text: "Select your preferred pharmacy and schedule your appointment through our secure online booking system."
-      },
-      {
-        icon: <VerifyIcon color={hoveredIndex === 3 ? "white" : "#189BA3"} />,
-        title: "Receive Confirmation",
-        text: "Your chosen pharmacy will receive a notification of your booking, and you'll get a confirmation email or SMS with all the details."
-      }
-    ]
-  
+  // Render icon (same for all cards)
+  const renderStaticIcon = (index: number) => (
+    <StaticIcon color={hoveredIndex === index ? "white" : "#189BA3"} />
+  );
+
   return (
-    <section className={`${isNested ? 'mt-20' : 'mt-80'} mb-4`}> 
-        <LayoutWrapper>
-       
-      {/* Main Title */}
-      {!isNested && (
-      <div className="text-center mb-16">
-      
-        <h1 className="text-5xl font-bold">
-          <span className="text-teal-500">Connecting</span>
-          <span className="text-gray-700"> You To</span>
-        </h1>
-        <h2 className="text-4xl text-gray-700 font-bold mt-2">Health Services</h2>
-      </div>
-      )}
+    <section className={`${isNested ? 'mt-20' : 'mt-80'} mb-4`}>
+      <LayoutWrapper>
+        {/* Main Title */}
+        {!isNested && (
+          <div className="text-center mb-16">
+            <h1 className="text-5xl font-bold">
+              <span className="text-teal-500">Connecting</span>
+              <span className="text-gray-700"> You To</span>
+            </h1>
+            <h2 className="text-4xl text-gray-700 font-bold mt-2">Health Services</h2>
+          </div>
+        )}
         <div>
           <h1 className='text-4xl font-bold text-center'>How it works</h1>
+          {loading && <div className="text-center my-8">Loading...</div>}
+          {error && <div className="text-center my-8 text-red-500">{error}</div>}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 my-8 gap-4'>
-          {howItWorks.map((item, index) => (
-            <div 
-              key={index}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-                
-            >
-              <HowItWorksCard {...item} />
-            </div>
-          ))}
+            {!loading && !error && data.slice(0, 4).map((item, index) => (
+              <div
+                key={item._id}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+              >
+                <HowItWorksCard
+                  icon={renderStaticIcon(index)}
+                  title={item.title}
+                  text={item.description}
+                />
+              </div>
+            ))}
           </div>
         </div>
 

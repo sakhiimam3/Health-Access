@@ -1,0 +1,41 @@
+import { useEffect, useState } from 'react';
+
+export interface HowItWorksItem {
+  _id: string;
+  title: string;
+  description: string;
+  image?: string;
+}
+
+export interface FaqItem {
+  _id: string;
+  question: string;
+  answer: string;
+}
+
+export function useGetHowItWorks() {
+  const [data, setData] = useState<HowItWorksItem[]>([]);
+  const [faqs, setFaqs] = useState<FaqItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('https://node.hostingladz.com:3837/v1/api/cms/how-it-works')
+      .then((res) => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
+      .then((json) => {
+        setData(json.data?.howItWorks || []);
+        setFaqs(json.data?.faqs || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  return { data, faqs, loading, error };
+} 

@@ -1,10 +1,15 @@
+"use client"
 import React from "react";
 import LayoutWrapper from "./layout/wrapper";
 import ButtonTheme from "./shared/ButtonTheme";
+import { useGetHowItWorks } from "./useGetHowItWorks";
+import { Loader2 } from "lucide-react";
 
-const FrequentlyAsked = ({btnColor}: {btnColor:string}) => {
+const FrequentlyAsked = ({ btnColor }: { btnColor: string }) => {
   const hexColor = btnColor.match(/#[0-9a-fA-F]{6}/)[0];
-  const faqItems = [
+  const { faqs, loading, error } = useGetHowItWorks();
+
+  const fallbackFaqItems = [
     {
       question: "How do I book a service with Health Access?",
       answer:
@@ -47,6 +52,10 @@ const FrequentlyAsked = ({btnColor}: {btnColor:string}) => {
     },
   ];
 
+  // Use API FAQ if available, otherwise fallback
+  const hasApiFaqs = faqs && faqs.length > 0;
+  const faqsToShow = hasApiFaqs ? faqs : fallbackFaqItems;
+
   return (
     <section className="py-16 bg-white">
       <LayoutWrapper>
@@ -55,15 +64,27 @@ const FrequentlyAsked = ({btnColor}: {btnColor:string}) => {
             <h1 className="text-4xl font-bold  mb-5">
               Frequently Asked Questions
             </h1>
-            <p className="mb-14 font-roboto">
-              Have questions? We've got answers! Explore our FAQs to learn more
-              about our services, booking process, and how we ensure seamless
-              healthcare access.
-            </p>
+            {faqsToShow.length > 0 && (
+              <div className="pb-12">
+                <h3 className="font-semibold  text-lg  mb-2">
+                  {faqsToShow[0].question}
+                </h3>
+                <p className="font-roboto text-sm">{faqsToShow[0].answer}</p>
+              </div>
+            )}
           </div>
 
+          {loading && (
+            <div className="flex justify-center items-center my-8">
+              <Loader2 className="w-8 h-8 animate-spin text-teal-500 mr-2" />
+              <span className="text-gray-600">Loading FAQs...</span>
+            </div>
+          )}
+          {error && <div className="my-8 text-red-500">{error}</div>}
+
+          {/* Show the rest of the FAQ array below */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {faqItems.map((item, index) => (
+            {faqsToShow.slice(1).map((item, index) => (
               <div key={index} className="pb-6">
                 <h3 className="font-semibold  text-lg  mb-2">
                   {item.question}
