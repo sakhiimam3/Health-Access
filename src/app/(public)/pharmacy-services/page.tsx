@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGetServices } from "@/lib/hooks";
+import { Suspense } from "react";
 
 import React from "react";
 import Vs1 from "@public/images/vs-1.png";
@@ -382,4 +383,10 @@ const PharmacyServices = () => {
   );
 };
 
-export default PharmacyServices;
+const PharmacyServicesPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <PharmacyServices />
+  </Suspense>
+);
+
+export default PharmacyServicesPage;

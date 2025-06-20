@@ -15,6 +15,7 @@ import { useGetServices } from "@/lib/hooks";
 import { Loader2 } from "lucide-react";
 import notfound from "@/../public/images/notfound.jpg";
 import isValidUrl from "@/lib/isValidUrl";
+import { Suspense } from "react";
 
 // Skeleton loader for service cards
 const CardSkeleton = ({ count = 6 }: { count?: number }) => (
@@ -112,4 +113,10 @@ const AestheticServices = () => {
   );
 };
 
-export default AestheticServices;
+const AestheticServicesPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <AestheticServices />
+  </Suspense>
+);
+
+export default AestheticServicesPage;
