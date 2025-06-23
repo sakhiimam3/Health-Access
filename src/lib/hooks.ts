@@ -100,6 +100,7 @@ export const useGetServices = (params?: Partial<GetServicesParams>) => {
     endpoint: "/v1/api/services",
     params: {
       ...params,
+
     }
   })
   return { data, isLoading, error, refetch }

@@ -43,6 +43,9 @@ const PharmacyServices = () => {
   const { data: services, isLoading, error } = useGetServices({
     typeId:typeid || ""
   });
+
+    console.log(services,"services111111")
+
   React.useEffect(() => {
     if (services) {
       console.log("Fetched services:", services);
