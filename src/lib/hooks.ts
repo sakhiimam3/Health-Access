@@ -283,4 +283,12 @@ export const useDeleteServiceSection = (serviceId: string, sectionId: string) =>
     `/v1/api/services/partner/${serviceId}/sections/${sectionId}`,
     "DELETE"
   );
+  return { mutate, isPending, error };
+};
+
+export const useGetServiceContent = (serviceId: string) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/cms/service-content/${serviceId}`,
+  });
+  return { data, isLoading, error, refetch };
 };
