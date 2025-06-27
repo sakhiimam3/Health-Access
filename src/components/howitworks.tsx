@@ -35,7 +35,7 @@ console.log(data,"data")
           {loading && <div className="text-center my-8">Loading...</div>}
           {error && <div className="text-center my-8 text-red-500">{error}</div>}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 my-8 gap-4'>
-            {!loading && !error && data?.map((item, index) => (
+            {!loading && !error && data?.slice(0,4).map((item, index) => (
               <div
                 key={item._id}
                 onMouseEnter={() => setHoveredIndex(index)}
