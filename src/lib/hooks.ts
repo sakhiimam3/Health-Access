@@ -292,3 +292,39 @@ export const useGetServiceContent = (serviceId: string) => {
   });
   return { data, isLoading, error, refetch };
 };
+
+export const useGetAllBlogs = (params?: { page?: number; limit?: number }) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/blogs",
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+    },
+  });
+  return { data, isLoading, error, refetch };
+};
+
+export const useGetFeaturedBlogs = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/admin/blogs/featured",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+export const useGetPopularBlogs = (params?: { page?: number; limit?: number }) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/blogs/popular",
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+    },
+  });
+  return { data, isLoading, error, refetch };
+};
+
+export const useGetBlogById = (slug: string) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/blogs/${slug}`,
+  });
+  return { data, isLoading, error, refetch };
+};
