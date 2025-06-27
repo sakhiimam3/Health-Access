@@ -1,8 +1,11 @@
-import React from 'react'
-import { Card, CardContent } from './ui/card';
+import React from "react";
+import { Card, CardContent } from "./ui/card";
+import Image from "next/image";
+import { isValid } from "date-fns";
+import isValidUrl from "@/lib/isValidUrl";
 
 interface HowItWorksCardProps {
-  icon: React.ReactNode;
+  icon: string;
   title: string;
   text: string;
 }
@@ -13,16 +16,25 @@ const HowItWorksCard = ({ icon, title, text }: HowItWorksCardProps) => {
       <CardContent className="p-6 h-full flex flex-col justify-center">
         <div className="flex flex-col items-start gap-5 h-full justify-center">
           <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-white/20">
-            {icon}
+            <Image
+              src={isValidUrl(icon) ? icon : "/images/notfound.jpg"}
+              width={30}
+              height={20}
+              alt={`name-${title}`}
+            />
           </div>
           <div className="space-y-1 w-full">
-            <h3 className="text-sm font-semibold mb-2 group-hover:text-white line-clamp-1">{title}</h3>
-            <p className="text-sm text-[#52525B] group-hover:text-white line-clamp-3 overflow-hidden text-ellipsis">{text}</p>
+            <h3 className="text-sm font-semibold mb-2 group-hover:text-white line-clamp-1">
+              {title}
+            </h3>
+            <p className="text-sm text-[#52525B] group-hover:text-white line-clamp-3 overflow-hidden text-ellipsis">
+              {text}
+            </p>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
-}   
+  );
+};
 
-export default HowItWorksCard
+export default HowItWorksCard;

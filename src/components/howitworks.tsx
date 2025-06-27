@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 // import Image from 'next/image';
 // import HowItWorksImage from '../../public/images/howitworks.png';
 import LayoutWrapper from './layout/wrapper';
-import { BookIcon, CompassIcon, Computer, GitCompareIcon } from 'lucide-react';
 import { ComputerIcon, SearchIcon, TextBoxIcon, VerifyIcon } from './icons/icons';
 import HowItWorksCard from './howitworksCard';
 import { useGetHowItWorks } from './useGetHowItWorks';
@@ -14,15 +13,9 @@ const HowItWorks = ({isNested}:{isNested?:boolean}) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { data, loading, error } = useGetHowItWorks();
 
-  // Pick a single random icon for all cards (static for this render)
-  const StaticIcon = useMemo(() => {
-    return icons[Math.floor(Math.random() * icons.length)];
-  }, []);
+console.log(data,"data")
 
-  // Render icon (same for all cards)
-  const renderStaticIcon = (index: number) => (
-    <StaticIcon color={hoveredIndex === index ? "white" : "#189BA3"} />
-  );
+ 
 
   return (
     <section className={`${isNested ? 'mt-20' : 'mt-80'} mb-4`}>
@@ -42,14 +35,14 @@ const HowItWorks = ({isNested}:{isNested?:boolean}) => {
           {loading && <div className="text-center my-8">Loading...</div>}
           {error && <div className="text-center my-8 text-red-500">{error}</div>}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 my-8 gap-4'>
-            {!loading && !error && data.slice(0, 4).map((item, index) => (
+            {!loading && !error && data?.slice(0,4).map((item, index) => (
               <div
                 key={item._id}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
               >
                 <HowItWorksCard
-                  icon={renderStaticIcon(index)}
+                  icon={item.icon}
                   title={item.title}
                   text={item.description}
                 />

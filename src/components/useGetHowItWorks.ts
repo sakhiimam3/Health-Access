@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 
 export interface HowItWorksItem {
+
   _id: string;
   title: string;
   description: string;
+  icon:string
   image?: string;
 }
 

@@ -7,6 +7,7 @@ import { FC } from 'react';
 import { useRouter } from "next/navigation";
 
 interface NHSCardProps {
+  id?:string
   imageSrc: string | StaticImageData;
   title: string;
   description: string;
@@ -19,7 +20,8 @@ interface NHSCardProps {
 }
 
 const NHSCard: FC<NHSCardProps> = ({
-  imageSrc = "/images/blog1.png",
+  id,
+  imageSrc,
   title = "Default Title", 
   description = "Default description for the NHS services.", 
   author = "Admin", 
@@ -28,11 +30,12 @@ const NHSCard: FC<NHSCardProps> = ({
   height = "300px",
 }) => {
   const router = useRouter();
+  console.log(id,"idddd")
   return (
-    <Card onClick={() => router.push(`/blogs/23423414234`)} className=" cursor-pointer overflow-hidden border-none shadow-none">
+    <Card onClick={() => router.push(`/blogs/${id}`)} className=" cursor-pointer overflow-hidden border-none shadow-none">
       <div className={`relative ${height ? `h-[${height}]` : "h-[300px]"} rounded-[16px] w-full`}>
         <Image
-          src={imageSrc}
+          src={imageSrc || ""}
           alt="Medical consultation"
           fill
           className="object-cover rounded-[10px]"
