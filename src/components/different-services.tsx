@@ -34,7 +34,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold mb-8 text-[#52525B]">{title}</h2>
 
-        {viewAllLink && (
+        {viewAllLink && services.length > 4 && (
           <div>
             <Link
               href={`/services/?type=${type}`}
@@ -49,7 +49,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
         {services.map((service, index) => (
           <div
             key={index}
-            onClick={() => router.push(`${isNested ? `${link}` :  `${link}/vaccinations-services?serviceName=${service.title}`}`)}
+            onClick={() => router.push(`${isNested ? `${link}` :  `${link}/${service?.title.replace(/\s+/g, "-")}?serviceName=${service.title.replace(/\s+/g, "-")}`}`)}
             className="rounded-lg cursor-pointer overflow-hidden min-h-[200px] group"
           >
             <div className="relative rounded">

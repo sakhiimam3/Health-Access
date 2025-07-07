@@ -120,7 +120,7 @@ const Header = () => {
                         : menuTypes.slice(0, 2).map((type, idx) => (
                             <Link
                               key={type.id}
-                              href={`${NavItems[idx + 1].href}?typeid=${
+                              href={`/${type?.name?.replace(/\s+/g, "-")}?typeid=${
                                 type.id
                               }&name=${encodeURIComponent(type.name)}`}
                               className="capitalize text-sm font-[400] font-ubuntu relative group"
