@@ -66,7 +66,7 @@ const CustomDropdownMenu = () => {
             {true ? (
               <>
                 <div className="px-4 py-2 font-normal text-sm">
-                 <span className="font-roboto"> Name: {user?.firstName} {user?.lastName}</span>
+                 <span className="font-roboto"> Name: {user?.data?.user?.firstName} {user?.data?.user?.lastName}</span>
                 </div>
                 <div className="border-t border-gray-200"></div>
 
