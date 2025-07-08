@@ -3,21 +3,15 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 export interface User {
-  id: string;
- 
+  email?: string;
+  firstName?: string;
+  id?: string;
+  isActive?: boolean;
+  isApproved?: boolean;
+  isVerified?: boolean;
+  lastName?: string;
+  role?: string;
   token?: string;
-  data?: {
-    user: {
-      id: string;
-      isVerified: boolean;
-      email: string;
-      firstName: string;
-      lastName: string;
-      isActive: boolean;
-      isApproved: boolean;
-      role: string;
-    }
-  }
 }
 
 

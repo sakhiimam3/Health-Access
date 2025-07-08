@@ -337,34 +337,4 @@ export const useHomeServices = () => {
   return { data, isLoading, error, refetch };
 };
 
-// Fetch available appointment slots for a partner on a specific date
-export const useGetAvailableSlots = (partnerId: string, date: string, options = {}) => {
-  console.log(partnerId, "data111", date);
-  
-  const { data, isLoading, error, refetch } = useApiQuery({
-    endpoint: `/v1/api/appointments/available-slots/${partnerId}`,
-    params: { date },
-    ...options, 
-  });
- 
-  return { data, isLoading, error, refetch };
-};
-// Fetch health questions for booking
-export const useGetHealthQuestions = (category?: string) => {
-  const { data, isLoading,error, refetch } = useApiQuery({
-    endpoint: "/v1/api/appointments/health-questions",
-    params: category ? { category } : undefined,
-  });
-  return { data, isLoading, error, refetch };
-};
-
-// Appointment booking mutation
-export const useAppointmentMutation = () => {
-  const { mutate, isPending, error } = useApiMutation<any, any>(
-    "/v1/api/appointments/book",
-    "POST"
-  );
-  return { mutate, isPending, error };
-};
-
 

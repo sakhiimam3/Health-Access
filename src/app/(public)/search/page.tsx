@@ -1,24 +1,87 @@
-"use client"
 import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import LayoutWrapper from "@/components/layout/wrapper";
-import React, { useState } from "react";
+import React from "react";
+import pharmacy1 from "@public/images/pharmacy-1.png";
+import pharmacy2 from "@public/images/pharmacy-2.png";
+import pharmacy3 from "@public/images/pharmacy-3.png";
+import pharmacy4 from "@public/images/pharmacy-1.png";
+import pharmacy5 from "@public/images/pharmacy-2.png";
 import { PharmacyCard } from "@/components/sliderCard";
 import Image from "next/image";
-import { useGetPartners } from "@/lib/hooks";
 
 const SearchPage = () => {
-  // State for filter and limit
-  const [limit, setLimit] = useState(10);
-  // Add more filter states as needed
-
-  // Fetch partners with current limit (and filters if any)
-  const { data:partnersdata, isLoading, error } = useGetPartners();
-  console.log(partnersdata,"partnersdata11")
-  // Handle select changes
-  const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLimit(Number(e.target.value));
-  };
-
+  const pharmacies = [
+    {
+      id: "123",
+      imageSrc: pharmacy1,
+      title: "CarePlus Pharmacy",
+      description: "45 High Street, Birmingham, B4 7SL",
+      address: "Pharmacy Address",
+      btnText: "View services",
+    },
+    {
+      id: "1234",
+      imageSrc: pharmacy2,
+      title: "Warburtons Pharmacy ",
+      address: "78 Deansgate, Manchester, M3 2FW",
+      btnText: "View services",
+    },
+    {
+      id: "1235",
+      imageSrc: pharmacy3,
+      title: "Warburtons Pharmacy",
+      address: "78 Deansgate, Manchester, M3 2FW",
+      btnText: "View services",
+    },
+    {
+      id: "1236",
+      imageSrc: pharmacy4,
+      title: "CityCare Pharmacy",
+      address: "101 Queen Street, Glasgow, G1 3DN",
+      phone: "12345 678910",
+      btnText: "View services",
+    },
+    {
+      id: "1237",
+      imageSrc: pharmacy5,
+      title: "New Pharmacy",
+      address: "123 New Street, London, E1 6AN",
+      phone: "11122 334455",
+      btnText: "View services",
+    },
+    {
+        id: "1238",
+        imageSrc: pharmacy4,
+        title: "CityCare Pharmacy",
+        address: "101 Queen Street, Glasgow, G1 3DN",
+        phone: "12345 678910",
+        btnText: "View services",
+      },
+      {
+        id: "1236",
+        imageSrc: pharmacy4,
+        title: "CityCare Pharmacy",
+        address: "101 Queen Street, Glasgow, G1 3DN",
+        phone: "12345 678910",
+        btnText: "View services",
+      },
+      {
+        id: "1237",
+        imageSrc: pharmacy5,
+        title: "New Pharmacy",
+        address: "123 New Street, London, E1 6AN",
+        phone: "11122 334455",
+        btnText: "View services",
+      },
+      {
+          id: "1238",
+          imageSrc: pharmacy4,
+          title: "CityCare Pharmacy",
+          address: "101 Queen Street, Glasgow, G1 3DN",
+          phone: "12345 678910",
+          btnText: "View services",
+        },
+  ];
   return (
     <PagesWrapper isSearchPage={true} bgColor="bg-[#189BA3]" btnColor="#189BA3">
       <LayoutWrapper>
@@ -43,17 +106,15 @@ const SearchPage = () => {
                 </div>
               </div>
               <div>
-                <div className="grid my-10 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {isLoading && <div>Loading...</div>}
-                  {error && <div>Error loading pharmacies</div>}
-                  {partnersdata?.data?.map((pharmacy: any) => (
+                <div  className="grid  my-10  md:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {pharmacies.map((pharmacy) => (
                     <PharmacyCard
                       key={pharmacy.id}
                       id={pharmacy.id}
-                      title={pharmacy.businessName}
-                      address={pharmacy?.location?.name}
+                      title={pharmacy.title}
+                      address={pharmacy.address}
                       image={pharmacy.imageSrc}
-                      btnText="View services"
+                      btnText={pharmacy.btnText}
                       isSearch={true}
                       services={[]}
                     />
@@ -62,17 +123,17 @@ const SearchPage = () => {
               </div>
             </div>
             <div className="w-[40%]">
-              <div className="relative w-full h-full">
-                <Image
-                  src="/images/search-map.png"
-                  alt="Map"
-                  className="w-full h-full object-cover rounded-[10px]"
-                  fill
-                  priority
-                  objectFit="cover"
-                />
-              </div>
-            </div>
+      <div className="relative w-full h-full">
+        <Image
+          src="/images/search-map.png"
+          alt="Map"
+          className="w-full h-full object-cover rounded-[10px]"
+          fill
+          priority
+          objectFit="cover"
+        />
+      </div>
+    </div>
           </div>
         </section>
       </LayoutWrapper>

@@ -106,7 +106,7 @@ const PharmacyContent = () => {
             Our Services
           </div>
 
-          <HomeServices isNested={false} link={`/services`} />
+          <HomeServices isNested={true} link={`/services`} />
         </section>
         <section>
           <VaccinationPriceList />
