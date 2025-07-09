@@ -103,7 +103,7 @@ export const useUploadVedio = () => {
 };
 
 export const useGetPartners = () => {
-  const { data, isLoading, error, refetch } = useApiQuery("/v1/api/partners");
+  const { data, isLoading, error, refetch } = useApiQuery("/v1/api/public/partners");
   return { data, isLoading, error, refetch };
 };
 
@@ -381,10 +381,51 @@ export const useGetHealthQuestions = (category?: string) => {
 // Appointment booking mutation
 export const useAppointmentMutation = () => {
   const { mutate, isPending, error } = useApiMutation<any, any>(
-    "/v1/api/appointments/book",
+    "/v1/api/appointments",
     "POST"
   );
   return { mutate, isPending, error };
+};
+
+// Fetch upcoming appointments
+export const useUpcomingAppointments = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/api/appointments/upcoming",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get partner services by ID
+export const useGetPartnerServicesById = (partnerId: string, params?: { page?: number; limit?: number }) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/partners/${partnerId}/services`,
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+    }
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get partner services by ID (Public endpoint)
+export const useGetPublicPartnerServices = (partnerId: string, params?: { page?: number; limit?: number; typeId?: string }) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/public/partners/${partnerId}`,
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+      typeId: params?.typeId,
+    }
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get single partner by ID
+export const useGetPartnerById = (partnerId: string) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/public/partners/${partnerId}`,
+  });
+  return { data, isLoading, error, refetch };
 };
 
 

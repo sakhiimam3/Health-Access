@@ -18,6 +18,34 @@ type Step1Props = {
   selectedTime: string; // single selection
   setSelectedTime: (time: string) => void; // single setter
   setCurrentStep: (step: number) => void;
+  setAppointmentDate?: (date: string) => void; // Add this prop
+};
+
+// Function to convert time to HH:MM format
+const formatTimeToHHMM = (time: string): string => {
+  // Handle "10:00 AM" or "2:30 PM" format
+  const [timeStr, period] = time.split(' ');
+  let [hours, minutes] = timeStr.split(':').map(num => parseInt(num));
+  
+  // Convert to 24-hour format
+  if (period === 'PM' && hours !== 12) {
+    hours += 12;
+  } else if (period === 'AM' && hours === 12) {
+    hours = 0;
+  }
+  
+  // Ensure two digits
+  const formattedHours = hours.toString().padStart(2, '0');
+  const formattedMinutes = minutes.toString().padStart(2, '0');
+  
+  return `${formattedHours}:${formattedMinutes}`;
+};
+
+// Function to format date to ISO 8601 (YYYY-MM-DD)
+const formatDateToISO = (year: number, month: number, date: number): string => {
+  const formattedMonth = (month + 1).toString().padStart(2, '0'); // month is 0-based
+  const formattedDate = date.toString().padStart(2, '0');
+  return `${year}-${formattedMonth}-${formattedDate}`;
 };
 
 const Step1: React.FC<Step1Props> = ({
@@ -36,6 +64,7 @@ const Step1: React.FC<Step1Props> = ({
   selectedTime, // single
   setSelectedTime, // single
   setCurrentStep,
+  setAppointmentDate,
 }) => (
   <div className=" mx-auto bg-white rounded-lg shadow-sm border border-gray-200">
     <div className="p-6 border-b border-gray-100">
@@ -126,7 +155,15 @@ const Step1: React.FC<Step1Props> = ({
 
       <div className="flex justify-end items-center mt-8">
         <button
-          onClick={() => setCurrentStep(2)}
+          onClick={() => {
+            const formattedTime = formatTimeToHHMM(selectedTime);
+            const formattedDate = formatDateToISO(selectedYear, selectedMonth, selectedDate);
+            setSelectedTime(formattedTime);
+            if (setAppointmentDate) {
+              setAppointmentDate(formattedDate);
+            }
+            setCurrentStep(2);
+          }}
           className="bg-teal-600 text-white px-6 py-2 rounded-[16px] hover:bg-teal-700 transition-colors"
           disabled={!selectedTime}
         >

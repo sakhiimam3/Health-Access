@@ -8,16 +8,21 @@ import Step2 from "@/components/booking-form-steps/Step2";
 import Step3 from "@/components/booking-form-steps/Step3";
 import { useAppointmentMutation } from "@/lib/hooks";
 import { toast } from "react-toastify";
+import { useSearchParams } from "next/navigation";
 
 const AppointmentBooking = () => {
   const { user } = useUserContext();
+  const searchParams = useSearchParams();
+  const partnerId = searchParams.get('partnerId');
+  const serviceId = searchParams.get('serviceId');
 
-  if (!user)
+  if (!partnerId || !serviceId) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        Loading...
+        Missing required parameters. Please try booking again.
       </div>
     );
+  }
 
   const today = new Date();
   const [currentStep, setCurrentStep] = useState(1);
@@ -42,8 +47,8 @@ const AppointmentBooking = () => {
     return `${selectedYear}-${month}-${day}`;
   }, [selectedDate, selectedMonth, selectedYear]);
 
-  // Memoize partnerId to prevent unnecessary refetches
-  const partnerId = useMemo(() => user?.data?.user?.id, [user?.data?.user?.id]);
+  // Update the partnerId memo to use the query param instead of user context
+  const partnerIdMemo = useMemo(() => partnerId, [partnerId]);
 
   // Fetch available slots for selected date - only if partnerId exists
   const {
@@ -52,12 +57,12 @@ const AppointmentBooking = () => {
     error: slotsError,
     refetch: refetchSlots,
   } = useQuery({
-    queryKey: ["available-slots", partnerId, dateString],
+    queryKey: ["available-slots", partnerIdMemo, dateString],
     queryFn: async () => {
-      if (!partnerId) return [];
+      if (!partnerIdMemo) return [];
       try {
         const { data } = await api.get(
-          `/v1/api/appointments/available-slots/${partnerId}`,
+          `/v1/api/appointments/available-slots/${partnerIdMemo}`,
           {
             params: { date: dateString },
           }
@@ -68,7 +73,7 @@ const AppointmentBooking = () => {
         throw err;
       }
     },
-    enabled: !!partnerId && !!dateString,
+    enabled: !!partnerIdMemo && !!dateString,
   });
 
   // Only show available time slots from API
@@ -90,7 +95,7 @@ const AppointmentBooking = () => {
     "04:00 PM",
     "04:30 PM",
   ];
-  const availableTimeSlots = staticTimeSlots;
+  const availableTimeSlots = slotsData?.data?.slots || staticTimeSlots;
 
   // Calendar navigation handlers
   const handlePrevMonth = () => {
@@ -124,19 +129,42 @@ const AppointmentBooking = () => {
   } = useAppointmentMutation();
 
   const handleFinalSubmit = async () => {
+    // Format date to ISO 8601 (YYYY-MM-DD)
+    const formattedDate = `${selectedYear}-${(selectedMonth + 1)
+      .toString()
+      .padStart(2, "0")}-${selectedDate?.toString().padStart(2, "0")}`;
+
+    // Format time to HH:MM (24-hour format)
+    const formatTimeToHHMM = (time: string): string => {
+      const [timeStr, period] = time.split(' ');
+      let [hours, minutes] = timeStr.split(':').map(num => parseInt(num));
+      
+      // Convert to 24-hour format
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      
+      // Ensure two digits
+      const formattedHours = hours.toString().padStart(2, '0');
+      const formattedMinutes = minutes.toString().padStart(2, '0');
+      
+      return `${formattedHours}:${formattedMinutes}`;
+    };
+
     const payload = {
-      partnerId: user.id,
-      serviceId: "SERVICE_ID", // TODO: Replace with actual serviceId
-      appointmentDate: `${selectedYear}-${(selectedMonth + 1)
-        .toString()
-        .padStart(2, "0")}-${selectedDate?.toString().padStart(2, "0")}`,
-      appointmentTime: selectedTime,
+      partnerId: partnerId,
+      serviceId: serviceId,
+      appointmentDate: formattedDate,
+      appointmentTime: formatTimeToHHMM(selectedTime),
       notes,
       healthAnswers: Object.entries(answers).map(([questionId, answer]) => ({
         questionId,
         answer,
       })),
     };
+
     bookAppointment(payload, {
       onSuccess: () => {
         toast.success("Appointment booked successfully!");

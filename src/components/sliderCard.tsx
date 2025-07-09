@@ -136,7 +136,7 @@ export const PharmacyCard = ({
           </div>
         </CardContent>
         <CardFooter className="p-2 pt-0 flex  gap-4">
-          <ButtonTheme
+          {/* <ButtonTheme
             bgColor="bg-[#189BA3]"
             paddingX={isSearch ? "px-3" : "px-8"}
             textColor="text-white"
@@ -146,7 +146,7 @@ export const PharmacyCard = ({
             onClick={() => setIsModalOpen(true)}
           >
             Book Now
-          </ButtonTheme>
+          </ButtonTheme> */}
           <Button
             variant={"link"}
             onClick={() => router.push(`/pharmacy/${id}`)}

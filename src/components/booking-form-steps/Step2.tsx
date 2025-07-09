@@ -184,7 +184,7 @@ const Step2: React.FC<Step2Props> = ({ formData, handleFormChange, setCurrentSte
             onClick={() => setCurrentStep(1)}
             className="text-gray-600 hover:text-gray-800"
           >
-            Cancel
+            Previous
           </button>
           <button
             onClick={handleSubmit}

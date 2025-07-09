@@ -5,7 +5,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  { name: "Dashboard", href: "/customer/dashboard" },
+  // { name: "Dashboard", href: "/customer/dashboard" },
   { name: "Appointments", href: "/customer/appointment" },
 ];
 
@@ -28,7 +28,7 @@ export function CustomerDashboardTabs() {
                 "px-6 py-3 text-base font-roboto font-medium rounded-[20px] transition-colors",
                 isActive
                   ? "bg-teal-600 text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  : "bg-black text-white hover:bg-gray-800"
               )}
             >
               {tab.name}

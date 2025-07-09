@@ -36,31 +36,12 @@ export const registerSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
   lastName: z.string().min(1, { message: "Last name is required" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
-  dateOfBirth: z.string()
-    .min(1, { message: "Date of birth is required" })
-    .refine((date) => {
-      if (!date) return false;
-      // Check if it's a valid date
-      const parsedDate = new Date(date);
-      return !isNaN(parsedDate.getTime());
-    }, { message: "Please enter a valid date" })
-    .refine((date) => {
-      if (!date) return false;
-      // Check if the date is not in the future
-      const parsedDate = new Date(date);
-      const today = new Date();
-      return parsedDate <= today;
-    }, { message: "Date of birth cannot be in the future" }),
-  postcode: z.string().min(1, { message: "Postcode is required" }),
-  address: z.string().min(1, { message: "Address is required" }),
-  city: z.string().min(1, { message: "City is required" }),
-  country: z.string().min(1, { message: "Country is required" }),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters" })
     .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
     .regex(/[0-9]/, { message: "Password must contain at least one number" }),
-  phoneNumber: z.string().min(1, { message: "Phone number is required" }), // Added phoneNumber
+  phoneNumber: z.string().min(1, { message: "Phone number is required" }),
 });
 
 export const pharmacySignUpSchema = z.object({
