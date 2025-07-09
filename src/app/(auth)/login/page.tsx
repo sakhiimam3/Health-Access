@@ -27,6 +27,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { useUserContext } from "@/context/userStore";
+import { useCustomerRegister } from "@/lib/hooks";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -34,6 +35,7 @@ export default function AuthPage() {
   const { mutate: loginMutate, isPending: loginPending, error: loginError } = useLogin();
   const {setUserData}=useUserContext()
   const router=useRouter()
+  const { mutate: registerMutate, isPending: registerPending } = useCustomerRegister();
   // Login form
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -56,6 +58,7 @@ export default function AuthPage() {
       city: "",
       country: "",
       password: "",
+      phoneNumber: "", // Added phoneNumber
     },
   });
 
@@ -106,31 +109,26 @@ export default function AuthPage() {
   };
 
   const onRegisterSubmit = (data: RegisterFormValues) => {
-    console.log("%c Registration form submission:", "color: #00A0AA; font-weight: bold; font-size: 14px;");
-    console.table(data);
-    console.log("Date of Birth:", data.dateOfBirth);
-    // mutate(
-    //   {
-    //     firstName: data.firstName,
-    //     lastName: data.lastName,
-    //     email: data.email,
-    //     dateOfBirth: data.dateOfBirth,
-    //     postcode: data.postcode,
-    //     address: data.address,
-    //     city: data.city,
-    //     country: data.country,
-    //     password: data.password,
-    //   },
-    //   {
-    //     onSuccess: () => {
-    //       toast.success("User created successfully");
-    //     },
-    //     onError: (error) => {
-    //       toast.error("Error creating user: " + error.message);
-    //     },
-    //   }
-    // );
-    // Handle registration logic here
+    const payload = {
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phoneNumber: data.phoneNumber ,
+      notificationToken: "", // Set as needed
+      password: data.password,
+    };
+    registerMutate(payload, {
+      onSuccess: (response) => {
+        toast.success("Registration successful", {
+          onClose: () => {
+            router.push(`/verify?email=${response?.data?.customer?.user?.email}&id=${response?.data?.customer?.id}`);
+          }
+        });
+      },
+      onError: (error) => {
+        toast.error("Registration failed.");
+      },
+    });
   };
 
   // For debugging form errors
@@ -197,9 +195,10 @@ export default function AuthPage() {
                     ? "bg-[#00A0AA] text-white"
                     : "bg-transparent text-[#00A0AA]"
                 )}
+
                 onClick={() => setIsLogin(false)}
               >
-                Register
+           {registerPending ? "Register......":"Register"}     
               </Button>
             </div>
 
@@ -371,6 +370,27 @@ export default function AuthPage() {
                         </FormItem>
                       );
                     }}
+                  />
+
+                  <FormField
+                    control={registerForm.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="block text-lg mb-2 textColor">
+                          Phone Number
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="tel"
+                            placeholder="Phone Number"
+                            className="rounded-full placeholder:text-[#B8B8B8] h-11 border-[#737373]"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-500" />
+                      </FormItem>
+                    )}
                   />
 
                   <div className="grid grid-cols-2 gap-4">
@@ -611,6 +631,7 @@ export default function AuthPage() {
 
                   <Button
                     type="submit"
+                    disabled={registerPending}
                     className="w-full  hover:bg-[#00B0B0] rounded-full bg-[#00A0AA] text-white py-2 h-11 mt-6"
                     onClick={() => {
                       console.log("Register button clicked");
@@ -618,7 +639,7 @@ export default function AuthPage() {
                       registerForm.handleSubmit(onRegisterSubmit, onRegisterError)();
                     }}
                   >
-                    Register
+                    {registerPending ?"Registering..." :"Register" } 
                   </Button>
                 </form>
               </Form>

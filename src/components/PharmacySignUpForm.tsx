@@ -163,7 +163,7 @@ const PharmacySignUpForm = () => {
             onSuccess: () => {
               toast.success("Your application has been submitted successfully", {
                 onClose: () => {
-                                  router.push(`/verify?email=${data.email}&id=${response?.data?.partner?.user?.id}`);
+                  router.push(`/verify?email=${data.email}&id=${response?.data?.partner?.user?.id}`);
                 },
               });
             },

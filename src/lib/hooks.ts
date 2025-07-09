@@ -2,6 +2,26 @@ import { OTPForm, otpSchema, VerifyotpFORM } from "@/lib/schema";
 import { useApiQuery, useApiMutation } from "@/lib/useApiQuery";
 import { User, PartnerProfile, UpdatePartnerProfile, UserCreate, CreatePartnerCreate, GetServicesParams, PartnerOnboarding, UpdatePartnerServices } from "@/lib/type";
 import { ForgotPasswordForm, LoginFormValues } from "./schema";
+import { useMutation } from "@tanstack/react-query";
+import axios from "@/lib/axios";
+
+export interface CustomerRegisterPayload {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  notificationToken: string;
+  password: string;
+}
+
+export function useCustomerRegister() {
+  return useMutation({
+    mutationFn: async (payload: CustomerRegisterPayload) => {
+      const { data } = await axios.post("/v1/api/auth/customer/register", payload);
+      return data;
+    },
+  });
+}
 
 export const useGetUser = () => {
   const { data, isLoading, error } = useApiQuery("/api/user/123");

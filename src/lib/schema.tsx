@@ -60,7 +60,7 @@ export const registerSchema = z.object({
     .min(6, { message: "Password must be at least 6 characters" })
     .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
     .regex(/[0-9]/, { message: "Password must contain at least one number" }),
- 
+  phoneNumber: z.string().min(1, { message: "Phone number is required" }), // Added phoneNumber
 });
 
 export const pharmacySignUpSchema = z.object({
