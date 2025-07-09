@@ -36,7 +36,7 @@ const pharmacySlider = () => {
     error: any;
     refetch: () => void;
   };
-
+  console.log(data,"pharmacydata");
   // If no data exists, show nothing
   if (!data) {
     return null;

@@ -328,3 +328,13 @@ export const useGetBlogById = (slug: string) => {
   });
   return { data, isLoading, error, refetch };
 };
+
+
+export const useHomeServices = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/cms/home",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+

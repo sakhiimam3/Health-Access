@@ -4,12 +4,12 @@ import PagesBanner from "@/components/pagesBanner";
 import React from "react";
 import Image from "next/image";
 import HowItWorksImage from "../../../public/images/howitworks.png";
-import {
-  BookIcon,
-  ComputerIcon,
-  SearchIcon,
-  VerifyIcon,
-} from "@/components/icons/icons";
+// import {
+//   BookIcon,
+//   ComputerIcon,
+//   SearchIcon,
+//   VerifyIcon,
+// } from "@/components/icons/icons";
 import HowItWorks from "@/components/howitworks";
 
 const HowItWorksPage = () => {

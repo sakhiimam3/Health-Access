@@ -29,7 +29,7 @@ export function useGetHowItWorks() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('https://node.hostingladz.com:3837/v1/api/cms/how-it-works')
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/api/cms/how-it-works`)
       .then((res) => {
         if (!res.ok) throw new Error('Network response was not ok');
         return res.json();

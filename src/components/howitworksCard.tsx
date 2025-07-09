@@ -18,8 +18,8 @@ const HowItWorksCard = ({ icon, title, text }: HowItWorksCardProps) => {
           <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-white/20">
             <Image
               src={isValidUrl(icon) ? icon : "/images/notfound.jpg"}
-              width={30}
-              height={20}
+              width={50}
+              height={30}
               alt={`name-${title}`}
             />
           </div>

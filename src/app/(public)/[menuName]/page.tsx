@@ -26,7 +26,6 @@ const ServiceCarousel = ({ parentService, router }) => {
   } = useGetServices({
     parentId: parentService.id || "",
   });
-  console.log(childServices,"childServices")
 
   if (childLoading) {
     return (
@@ -90,12 +89,13 @@ const ServiceCarousel = ({ parentService, router }) => {
               className="w-[50%] cursor-pointer"
               onClick={() =>
                 router.push(
-                  `/services/vaccinations-services?serviceName=${
+                  `/services/${service.title.replace(/\s+/g, "-")}?serviceName=${
                     service.name || service.title
                   }`
                 )
               }
             >
+
               <div className="h-[200px] relative overflow-hidden">
                 <Image
                   src={
@@ -123,7 +123,7 @@ const ServiceCarousel = ({ parentService, router }) => {
                 <CarouselItem
                   onClick={() =>
                     router.push(
-                      `/services/vaccinations-services?serviceName=${
+                      `/services/${service.name.replace(/\s+/g, "-")}?serviceName=${
                         service.name || service.title
                       }&serviceId=${service?.id}`
                     )
