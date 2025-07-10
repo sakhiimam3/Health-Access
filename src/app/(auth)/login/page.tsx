@@ -27,6 +27,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { useUserContext } from "@/context/userStore";
+import { useCustomerRegister } from "@/lib/hooks";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -34,6 +35,7 @@ export default function AuthPage() {
   const { mutate: loginMutate, isPending: loginPending, error: loginError } = useLogin();
   const {setUserData}=useUserContext()
   const router=useRouter()
+  const { mutate: registerMutate, isPending: registerPending } = useCustomerRegister();
   // Login form
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -50,12 +52,8 @@ export default function AuthPage() {
       firstName: "",
       lastName: "",
       email: "",
-      dateOfBirth: "",
-      postcode: "",
-      address: "",
-      city: "",
-      country: "",
       password: "",
+      phoneNumber: "",
     },
   });
 
@@ -79,12 +77,17 @@ export default function AuthPage() {
         setUserData(data);
         // Set cookie with 10 days expiry
         setCookie(data)
+        console.log(data?.data,"data")
        
         toast.success("Login successfully", {
           onClose: () => {
             if (!data?.data?.onboardingCompleted && data?.data?.user?.role === "partner") {
               router.push("/partner/onboarding");
-            } else {
+            }
+            else if (data?.data?.role === "customer") {
+              router.push("/customer/appointment");
+            }
+            else {
               router.push("/");
             }
           }
@@ -106,31 +109,26 @@ export default function AuthPage() {
   };
 
   const onRegisterSubmit = (data: RegisterFormValues) => {
-    console.log("%c Registration form submission:", "color: #00A0AA; font-weight: bold; font-size: 14px;");
-    console.table(data);
-    console.log("Date of Birth:", data.dateOfBirth);
-    // mutate(
-    //   {
-    //     firstName: data.firstName,
-    //     lastName: data.lastName,
-    //     email: data.email,
-    //     dateOfBirth: data.dateOfBirth,
-    //     postcode: data.postcode,
-    //     address: data.address,
-    //     city: data.city,
-    //     country: data.country,
-    //     password: data.password,
-    //   },
-    //   {
-    //     onSuccess: () => {
-    //       toast.success("User created successfully");
-    //     },
-    //     onError: (error) => {
-    //       toast.error("Error creating user: " + error.message);
-    //     },
-    //   }
-    // );
-    // Handle registration logic here
+    const payload = {
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phoneNumber: data.phoneNumber ,
+      notificationToken: "", // Set as needed
+      password: data.password,
+    };
+    registerMutate(payload, {
+      onSuccess: (response) => {
+        toast.success("Registration successful", {
+          onClose: () => {
+            router.push(`/verify?email=${response?.data?.customer?.user?.email}&id=${response?.data?.customer?.user?.id}`);
+          }
+        });
+      },
+      onError: (error) => {
+        toast.error("Registration failed.");
+      },
+    });
   };
 
   // For debugging form errors
@@ -197,9 +195,10 @@ export default function AuthPage() {
                     ? "bg-[#00A0AA] text-white"
                     : "bg-transparent text-[#00A0AA]"
                 )}
+
                 onClick={() => setIsLogin(false)}
               >
-                Register
+           {registerPending ? "Register......":"Register"}     
               </Button>
             </div>
 
@@ -351,7 +350,7 @@ export default function AuthPage() {
                               id="register-email"
                               type="email"
                               placeholder="Email"
-                              className="w-full px-3 py-2 rounded-full h-11 border border-[#737373] placeholder:text-[#B8B8B8]  "
+                              className="w-full px-3 py-2 rounded-full h-11 border border-[#737373] placeholder:text-[#B8B8B8]"
                               value={field.value}
                               onChange={(e) => {
                                 const newValue = e.target.value;
@@ -373,220 +372,26 @@ export default function AuthPage() {
                     }}
                   />
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={registerForm.control}
-                      name="dateOfBirth"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="block text-lg mb-2 textColor">
-                            Date Of Birth
-                          </FormLabel>
-                          <FormControl>
-                            <DatePicker
-                              value={field.value ? new Date(field.value) : undefined}
-                              onChange={(date) => {
-                                const formattedDate = date ? date.toISOString().split('T')[0] : '';
-                                field.onChange(formattedDate);
-                                console.log("Date selected:", formattedDate);
-                              }}
-                              placeholder="Select Date of Birth"
-                              showYearDropdown={true}
-                              yearDropdownItemNumber={100}
-                              maxDate={new Date()}
-                              error={!!registerForm.formState.errors.dateOfBirth}
-                            />
-                          </FormControl>
-                          <FormMessage className="text-red-500" />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={registerForm.control}
-                      name="postcode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="block text-lg mb-2 textColor">
-                            Postcode
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="text"
-                              placeholder="Postcode"
-                              className="rounded-full placeholder:text-[#B8B8B8] h-11 border-[#737373]"
-                            />
-                          </FormControl>
-                          <FormMessage className="text-red-500" />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
                   <FormField
                     control={registerForm.control}
-                    name="address"
+                    name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="block text-lg mb-2 textColor">
-                          Address
+                          Phone Number
                         </FormLabel>
                         <FormControl>
-                          <div className="relative">
-                            <select
-                              {...field}
-                              style={{
-                                border: "1px solid #737373",
-                                borderRadius: "25px",
-                                padding: "10px",
-                                height: "50px",
-                                width: "100%",
-                                outline: "none",
-                                appearance: "none",
-                                WebkitAppearance: "none",
-                                MozAppearance: "none",
-                              }}
-                            >
-                              <option value="" disabled>
-                                Select Address
-                              </option>
-                              <option value="address1">Address 1</option>
-                              <option value="address2">Address 2</option>
-                            </select>
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                              <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M4 6L8 10L12 6"
-                                  stroke="#737373"
-                                  strokeWidth="1.5"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </div>
-                          </div>
+                          <Input
+                            {...field}
+                            type="tel"
+                            placeholder="Phone Number"
+                            className="rounded-full placeholder:text-[#B8B8B8] h-11 border-[#737373]"
+                          />
                         </FormControl>
                         <FormMessage className="text-red-500" />
                       </FormItem>
                     )}
                   />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={registerForm.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="block text-lg mb-2 textColor">
-                            City/Town
-                          </FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <select
-                                {...field}
-                                style={{
-                                  border: "1px solid #737373",
-                                  borderRadius: "25px",
-                                  padding: "10px",
-                                  height: "50px",
-                                  width: "100%",
-                                  outline: "none",
-                                  appearance: "none",
-                                  WebkitAppearance: "none",
-                                  MozAppearance: "none",
-                                }}
-                              >
-                                <option value="" disabled>
-                                  Select City
-                                </option>
-                                <option value="city1">City 1</option>
-                                <option value="city2">City 2</option>
-                              </select>
-                              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 16 16"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M4 6L8 10L12 6"
-                                    stroke="#737373"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-                          </FormControl>
-                          <FormMessage className="text-red-500" />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={registerForm.control}
-                      name="country"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="block text-lg mb-2 textColor">
-                            Country
-                          </FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <select
-                                {...field}
-                                style={{
-                                  border: "1px solid #737373",
-                                  borderRadius: "25px",
-                                  padding: "10px",
-                                  height: "50px",
-                                  width: "100%",
-                                  outline: "none",
-                                  appearance: "none",
-                                  WebkitAppearance: "none",
-                                  MozAppearance: "none",
-                                }}
-                              >
-                                <option value="" disabled>
-                                  Select Country
-                                </option>
-                                <option value="country1">Country 1</option>
-                                <option value="country2">Country 2</option>
-                              </select>
-                              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 16 16"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M4 6L8 10L12 6"
-                                    stroke="#737373"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-                          </FormControl>
-                          <FormMessage className="text-red-500" />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
 
                   <FormField
                     control={registerForm.control}
@@ -611,14 +416,15 @@ export default function AuthPage() {
 
                   <Button
                     type="submit"
-                    className="w-full  hover:bg-[#00B0B0] rounded-full bg-[#00A0AA] text-white py-2 h-11 mt-6"
+                    disabled={registerPending}
+                    className="w-full hover:bg-[#00B0B0] rounded-full bg-[#00A0AA] text-white py-2 h-11 mt-6"
                     onClick={() => {
                       console.log("Register button clicked");
                       console.log("Current email value:", registerForm.getValues("email"));
                       registerForm.handleSubmit(onRegisterSubmit, onRegisterError)();
                     }}
                   >
-                    Register
+                    {registerPending ? "Registering..." : "Register"} 
                   </Button>
                 </form>
               </Form>

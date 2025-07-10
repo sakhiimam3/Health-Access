@@ -2,6 +2,26 @@ import { OTPForm, otpSchema, VerifyotpFORM } from "@/lib/schema";
 import { useApiQuery, useApiMutation } from "@/lib/useApiQuery";
 import { User, PartnerProfile, UpdatePartnerProfile, UserCreate, CreatePartnerCreate, GetServicesParams, PartnerOnboarding, UpdatePartnerServices } from "@/lib/type";
 import { ForgotPasswordForm, LoginFormValues } from "./schema";
+import { useMutation } from "@tanstack/react-query";
+import axios from "@/lib/axios";
+
+export interface CustomerRegisterPayload {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  notificationToken: string;
+  password: string;
+}
+
+export function useCustomerRegister() {
+  return useMutation({
+    mutationFn: async (payload: CustomerRegisterPayload) => {
+      const { data } = await axios.post("/v1/api/auth/customer/register", payload);
+      return data;
+    },
+  });
+}
 
 export const useGetUser = () => {
   const { data, isLoading, error } = useApiQuery("/api/user/123");
@@ -83,7 +103,7 @@ export const useUploadVedio = () => {
 };
 
 export const useGetPartners = () => {
-  const { data, isLoading, error, refetch } = useApiQuery("/v1/api/partners");
+  const { data, isLoading, error, refetch } = useApiQuery("/v1/api/public/partners");
   return { data, isLoading, error, refetch };
 };
 
@@ -333,6 +353,77 @@ export const useGetBlogById = (slug: string) => {
 export const useHomeServices = () => {
   const { data, isLoading, error, refetch } = useApiQuery({
     endpoint: "/v1/api/cms/home",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Fetch available appointment slots for a partner on a specific date
+export const useGetAvailableSlots = (partnerId: string, date: string, options = {}) => {
+  console.log(partnerId, "data111", date);
+  
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/appointments/available-slots/${partnerId}`,
+    params: { date },
+    ...options, 
+  });
+ 
+  return { data, isLoading, error, refetch };
+};
+// Fetch health questions for booking
+export const useGetHealthQuestions = (category?: string) => {
+  const { data, isLoading,error, refetch } = useApiQuery({
+    endpoint: "/v1/api/appointments/health-questions",
+    params: category ? { category } : undefined,
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Appointment booking mutation
+export const useAppointmentMutation = () => {
+  const { mutate, isPending, error } = useApiMutation<any, any>(
+    "/v1/api/appointments",
+    "POST"
+  );
+  return { mutate, isPending, error };
+};
+
+// Fetch upcoming appointments
+export const useUpcomingAppointments = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/api/appointments/upcoming",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get partner services by ID
+export const useGetPartnerServicesById = (partnerId: string, params?: { page?: number; limit?: number }) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/partners/${partnerId}/services`,
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+    }
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get partner services by ID (Public endpoint)
+export const useGetPublicPartnerServices = (partnerId: string, params?: { page?: number; limit?: number; typeId?: string }) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/public/partners/${partnerId}`,
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+      typeId: params?.typeId,
+    }
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get single partner by ID
+export const useGetPartnerById = (partnerId: string) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/public/partners/${partnerId}`,
   });
   return { data, isLoading, error, refetch };
 };
