@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios"; // If you want to use your axios instance
 import { useUserContext } from "@/context/userStore";
@@ -10,7 +10,8 @@ import { useAppointmentMutation } from "@/lib/hooks";
 import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
 
-const AppointmentBooking = () => {
+// Create a separate component for the form content
+const BookingFormContent = () => {
   const { user } = useUserContext();
   const searchParams = useSearchParams();
   const partnerId = searchParams.get('partnerId');
@@ -240,6 +241,15 @@ const AppointmentBooking = () => {
         {currentStep === 3 && <Step3 appointmentTime={selectedTime} />}
       </div>
     </div>
+  );
+};
+
+// Main component with Suspense boundary
+const AppointmentBooking = () => {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center min-h-screen">Loading...</div>}>
+      <BookingFormContent />
+    </Suspense>
   );
 };
 
