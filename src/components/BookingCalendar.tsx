@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface BookingCalendarProps {
   selectedDate: number;
@@ -12,7 +13,12 @@ interface BookingCalendarProps {
   isPastDate: (year: number, month: number, day: number) => boolean;
 }
 
-const BookingCalendar: React.FC<BookingCalendarProps> = ({
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   selectedDate,
   selectedMonth,
   selectedYear,
@@ -23,86 +29,79 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
   onYearChange,
   isPastDate,
 }) => {
-  const totalDays = new Date(selectedYear, selectedMonth + 1, 0).getDate();
-  const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).getDay(); // 0 = Sunday
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
 
-  const today = new Date();
+  const getFirstDayOfMonth = (year: number, month: number) => {
+    return new Date(year, month, 1).getDay();
+  };
 
-  const calendarCells = [
-    ...Array(firstDayOfMonth).fill(null), // Padding for first week
-    ...Array.from({ length: totalDays }, (_, i) => i + 1),
-  ];
+  const daysInMonth = getDaysInMonth(selectedYear, selectedMonth);
+  const firstDayOfMonth = getFirstDayOfMonth(selectedYear, selectedMonth);
 
   return (
-    <div className="flex-1">
+    <div className="w-[400px] p-4 bg-white rounded-lg">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-base font-medium text-gray-900 flex items-center gap-2">
-          {`${new Date(selectedYear, selectedMonth).toLocaleString("default", {
-            month: "long",
-          })}`}
-          <select
-            className="ml-2 border border-gray-300 rounded px-2 py-1 text-sm"
-            value={selectedYear}
-            onChange={(e) => onYearChange(Number(e.target.value))}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onPrevMonth}
+            className="p-1 hover:bg-gray-100 rounded-full"
           >
-            {yearOptions.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        </h4>
-        <div className="flex items-center space-x-2">
-          <button className="p-1 hover:bg-gray-100 rounded" onClick={onPrevMonth}>
-            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <button className="p-1 hover:bg-gray-100 rounded" onClick={onNextMonth}>
-            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+          <span className="text-lg font-medium">
+            {MONTHS[selectedMonth]} {selectedYear}
+          </span>
+          <button
+            onClick={onNextMonth}
+            className="p-1 hover:bg-gray-100 rounded-full"
+          >
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
+        <select
+          value={selectedYear}
+          onChange={(e) => onYearChange(Number(e.target.value))}
+          className="border rounded px-2 py-1"
+        >
+          {yearOptions.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-sm mb-2">
-        {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-          <div key={day} className="p-2 font-medium text-gray-600">
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+          <div key={day} className="text-center text-sm text-gray-500">
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-sm">
-        {calendarCells.map((date, index) => {
-          if (!date) {
-            return <div key={`blank-${index}`} className="p-2" />; // blank space
-          }
-
-          const disabled = isPastDate(selectedYear, selectedMonth, date);
-
-          const isToday =
-            selectedYear === today.getFullYear() &&
-            selectedMonth === today.getMonth() &&
-            date === today.getDate();
+      <div className="grid grid-cols-7 gap-1">
+        {Array.from({ length: firstDayOfMonth }).map((_, index) => (
+          <div key={`empty-${index}`} />
+        ))}
+        {Array.from({ length: daysInMonth }).map((_, index) => {
+          const day = index + 1;
+          const isDisabled = isPastDate(selectedYear, selectedMonth, day);
+          const isSelected = selectedDate === day;
 
           return (
             <button
-              key={date}
-              onClick={() => !disabled && onDateChange(date)}
-              className={`p-2 rounded-full transition-colors border ${
-                selectedDate === date
-                  ? "bg-teal-500 text-white hover:bg-teal-600"
-                  : disabled
-                  ? "text-gray-300 cursor-not-allowed bg-gray-50 border-transparent"
-                  : isToday
-                  ? "border-teal-300 text-gray-800 hover:bg-teal-50"
-                  : "text-gray-700 hover:bg-gray-100 border-transparent"
-              }`}
-              disabled={disabled}
+              key={day}
+              onClick={() => !isDisabled && onDateChange(day)}
+              disabled={isDisabled}
+              className={`
+                p-2 text-center rounded-lg transition-colors
+                ${isDisabled ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100'}
+                ${isSelected ? 'bg-teal-50 text-teal-600 font-medium' : ''}
+              `}
             >
-              {date}
+              {day}
             </button>
           );
         })}
@@ -111,4 +110,4 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
   );
 };
 
-export default BookingCalendar;
+export default BookingCalendar; 

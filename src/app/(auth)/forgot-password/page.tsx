@@ -25,8 +25,9 @@ const ForgotPassword = () => {
   } = useForm<ForgotPasswordForm>({
     resolver: zodResolver(forgotPasswordSchema),
   });
-
+  // console.log(errors);
   const onSubmit = (data: ForgotPasswordForm) => {
+    console.log(data);
     const dataToSend = {
       email: data.email,
     };

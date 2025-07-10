@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import Image, { StaticImageData } from "next/image";
 import ButtonTheme from "./shared/ButtonTheme";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from 'lucide-react';
 import pharmacy1 from "../../public/images/pharmacy-1.png";
 
 interface PharmacyService {
@@ -19,8 +19,12 @@ interface PharmacyService {
   name: string;
 }
 
-import { X } from "lucide-react"; // Optional: For a nicer close icon
+import { X } from 'lucide-react'; // Optional: For a nicer close icon
 import Modal from "./modal";
+
+
+
+
 
 export const PharmacyCard = ({
   id,
@@ -42,20 +46,12 @@ export const PharmacyCard = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const colors = ["#63DBA3", "#79A6F2", "#AA23DB"];
   const router = useRouter();
-  const imageSrc = typeof image === "string" ? image : pharmacy1.src;
+  const imageSrc = typeof image === 'string' ? image : pharmacy1.src;
   return (
     <>
-      <Card
-        className={`overflow-hidden ${
-          isSearch ? "shadow-none" : "shadow-sm"
-        }  hover:bg-gray-50 ${isSearch && "border-none"} `}
-      >
+      <Card   className={`overflow-hidden ${isSearch ? "shadow-none" : "shadow-sm"}  hover:bg-gray-50 ${isSearch && "border-none"} `}>
         <CardHeader>
-          <div
-            className={`relative rounded-t-[16px] ${
-              isSearch ? "h-[130px]" : "h-[250px]"
-            } `}
-          >
+          <div className={`relative rounded-t-[16px] ${isSearch ? "h-[130px]" : "h-[250px]"} `}>
             <img
               src={imageSrc}
               alt="Medical consultation"
@@ -68,53 +64,42 @@ export const PharmacyCard = ({
               }}
               //   fill
               //   className="object-cover"
+              priority
             />
           </div>{" "}
         </CardHeader>
-        <CardContent>
-          <div
-            className={`space-y-2 ${
-              isSearch ? "min-h-[40px]" : "min-h-[100px]"
-            } `}
-          >
+        <CardContent    >
+          <div className={`space-y-2 ${isSearch ? "min-h-[50px]" : "min-h-[100px]"} `} >
             {!isSearch && (
               <div className="flex flex-wrap gap-2 my-4">
-                {services.length > 0 ? (
-                  services.map((service) => {
-                    const randomColor =
-                      colors[Math.floor(Math.random() * colors.length)];
-                    return (
-                      <Badge
-                        key={service.id}
-                        variant="secondary"
-                        style={{
-                          border: `1px solid ${randomColor} `,
-                          color: randomColor,
-                        }}
-                        className={`bg-transparent hover:bg-opacity-50 `}
-                      >
-                        <span
-                          className={`text-${"green"} font-roboto font-normal`}
-                        >
-                          {service.name || "NHS Services"}
-                        </span>
-                      </Badge>
-                    );
-                  })
-                ) : (
-                  <p></p>
-                )}
-              </div>
+              {services.length > 0 ? (
+                services.map((service) => {
+                  const randomColor =
+                    colors[Math.floor(Math.random() * colors.length)];
+                  return (
+                    <Badge
+                      key={service.id}
+                      variant="secondary"
+                      style={{
+                        border: `1px solid ${randomColor} `,
+                        color: randomColor,
+                      }}
+                      className={`bg-transparent hover:bg-opacity-50 `}
+                    >
+                      <span className={`text-${"green"} font-roboto font-normal`}>
+                        {service.name || "NHS Services"}
+                      </span>
+                    </Badge>
+                  );
+                })
+              ) : (
+                <p></p>
+              )}
+            </div>
             )}
-            <h3 className={`text-lg  font-semibold ${isSearch ? "" : "my-2"}`}>
-              {title}
-            </h3>
+            <h3 className={`text-lg  font-semibold my-2 `}>{title}</h3>
 
-            <div
-              className={`flex ${
-                isSearch ? "items-end" : "items-center"
-              }  gap-2    text-[#52525B] font-roboto`}
-            >
+            <div className={`flex ${isSearch ? "items-end" : "items-center"}  gap-2    text-[#52525B] font-roboto`}>
               <svg
                 width="14"
                 height="18"
@@ -127,11 +112,7 @@ export const PharmacyCard = ({
                   fill="#52525B"
                 />
               </svg>
-              <p
-                className={`text-[12px] ${isSearch ? "mt-3" : "mt-0"} truncate`}
-              >
-                {address}
-              </p>
+              <p className={`text-[12px] ${isSearch ? "mt-3" : "mt-0"} truncate`}>{address}</p>
             </div>
           </div>
         </CardContent>
@@ -140,9 +121,7 @@ export const PharmacyCard = ({
             bgColor="bg-[#189BA3]"
             paddingX={isSearch ? "px-3" : "px-8"}
             textColor="text-white"
-            className={`hover:bg-teal-700 ${
-              isSearch ? "text-[12px]" : "text-sm"
-            }`}
+            className={`hover:bg-teal-700 ${isSearch ? "text-[12px]" : "text-sm"}`}
             onClick={() => setIsModalOpen(true)}
           >
             Book Now
