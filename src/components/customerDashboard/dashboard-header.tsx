@@ -96,7 +96,7 @@ export function CustomerDashboardHeader() {
                   <div className="py-1">
                     {/* Dashboard link */}
                     <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
-                      <Link href="/customer/dashboard">
+                      <Link href="/customer/appointment">
                         <span>Dashboard</span>
                       </Link>
                     </div>

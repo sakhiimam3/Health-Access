@@ -6,7 +6,7 @@ import { useUserContext } from "@/context/userStore";
 import Step1 from "@/components/booking-form-steps/Step1";
 import Step2 from "@/components/booking-form-steps/Step2";
 import Step3 from "@/components/booking-form-steps/Step3";
-import { useAppointmentMutation } from "@/lib/hooks";
+import { useAppointmentMutation, useGetPartnerServicesById } from "@/lib/hooks";
 import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
 
@@ -14,8 +14,10 @@ import { useSearchParams } from "next/navigation";
 const BookingFormContent = () => {
   const { user } = useUserContext();
   const searchParams = useSearchParams();
-  const partnerId = searchParams.get('partnerId');
-  const serviceId = searchParams.get('serviceId');
+  const partnerId = searchParams.get("partnerId");
+  const serviceId = searchParams.get("serviceId");
+  const serviceName = searchParams.get("serviceName");
+  const address = searchParams.get("address");
 
   if (!partnerId || !serviceId) {
     return (
@@ -77,26 +79,14 @@ const BookingFormContent = () => {
     enabled: !!partnerIdMemo && !!dateString,
   });
 
-  // Only show available time slots from API
-  const staticTimeSlots = [
-    "09:00 AM",
-    "09:30 AM",
-    "10:00 AM",
-    "10:30 AM",
-    "11:00 AM",
-    "11:30 AM",
-    "12:00 PM",
-    "12:30 PM",
-    "01:00 PM",
-    "01:30 PM",
-    "02:00 PM",
-    "02:30 PM",
-    "03:00 PM",
-    "03:30 PM",
-    "04:00 PM",
-    "04:30 PM",
-  ];
-  const availableTimeSlots = slotsData?.data?.slots || staticTimeSlots;
+  const availableTimeSlots = (slotsData?.data || []).map((slot: string) => {
+    const [hour, minute] = slot.split(":").map(Number);
+    const period = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+    return `${hour12.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")} ${period}`;
+  });
 
   // Calendar navigation handlers
   const handlePrevMonth = () => {
@@ -137,20 +127,20 @@ const BookingFormContent = () => {
 
     // Format time to HH:MM (24-hour format)
     const formatTimeToHHMM = (time: string): string => {
-      const [timeStr, period] = time.split(' ');
-      let [hours, minutes] = timeStr.split(':').map(num => parseInt(num));
-      
+      const [timeStr, period] = time.split(" ");
+      let [hours, minutes] = timeStr.split(":").map((num) => parseInt(num));
+
       // Convert to 24-hour format
-      if (period === 'PM' && hours !== 12) {
+      if (period === "PM" && hours !== 12) {
         hours += 12;
-      } else if (period === 'AM' && hours === 12) {
+      } else if (period === "AM" && hours === 12) {
         hours = 0;
       }
-      
+
       // Ensure two digits
-      const formattedHours = hours.toString().padStart(2, '0');
-      const formattedMinutes = minutes.toString().padStart(2, '0');
-      
+      const formattedHours = hours.toString().padStart(2, "0");
+      const formattedMinutes = minutes.toString().padStart(2, "0");
+
       return `${formattedHours}:${formattedMinutes}`;
     };
 
@@ -224,6 +214,8 @@ const BookingFormContent = () => {
             selectedTime={selectedTime}
             setSelectedTime={setSelectedTime}
             setCurrentStep={setCurrentStep}
+            serviceName={serviceName}
+            address={address}
           />
         )}
         {currentStep === 2 && (
@@ -247,7 +239,13 @@ const BookingFormContent = () => {
 // Main component with Suspense boundary
 const AppointmentBooking = () => {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center min-h-screen">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center min-h-screen">
+          Loading...
+        </div>
+      }
+    >
       <BookingFormContent />
     </Suspense>
   );

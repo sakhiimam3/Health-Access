@@ -114,12 +114,24 @@ const PharmacyContent = () => {
           <VaccinationPriceList />
         </section>
       </LayoutWrapper>
-      <section className="mt-14">
+      {/* <section className="mt-14">
         <NHSServicesCard />
-      </section>
+      </section> */}
       <LayoutWrapper>
         <section>
-          <ContactUs />
+          <ContactUs  contactInfo={{
+              email: servicesData?.data?.user?.email || '',
+              phone: servicesData?.data?.phoneNumber || '',
+              address: servicesData?.data?.location?.name || '',
+              timings: servicesData?.data?.timings?.map((timing: any) =>
+                `${timing.dayOfWeek}: ${timing.isClosed ? "Closed" : `${timing.openTime} - ${timing.closeTime}`}`
+              ),
+              location: {
+                name: servicesData?.data?.location?.name || '',
+                latitude: servicesData?.data?.location?.latitude || '',
+                longitude: servicesData?.data?.location?.longitude || '',
+              }
+            }} />
         </section>
       </LayoutWrapper>
     </div>

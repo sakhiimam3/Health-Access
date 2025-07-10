@@ -1,30 +1,50 @@
 import React from "react";
 import { EmailIcon, SupportIcon, LocationIcon, ClockIcon } from "@/components/icons/icons";
 
-const contactData = [
-  {
-    icon: EmailIcon,
-    title: 'Email',
-    content: 'contact@warburtonpharmacy.co.uk'
-  },
-  {
-    icon: SupportIcon,
-    title: 'Support',
-    content: '+44 1234 567890'
-  },
-  {
-    icon: LocationIcon,
-    title: 'Address',
-    content: '78 Deansgate, Manchester, M3 2FW, UK'
-  },
-  {
-    icon: ClockIcon,
-    title: 'Opening Hours',
-    content: 'Start new chat'
-  }
-];
+// Define the type for the contactInfo prop
+export type ContactInfo = {
+  email: string;
+  phone: string;
+  address: string;
+  timings: string[];
+  location: {
+    name: string;
+    latitude: string;
+    longitude: string;
+  };
+};
 
-const ContactUs = () => {
+// Add a function to format each timing string
+function formatTiming(timing: string) {
+  return timing.charAt(0).toUpperCase() + timing.slice(1);
+}
+
+const ContactUs = ({ contactInfo }: { contactInfo: ContactInfo }) => {
+  const contactData = [
+    {
+      icon: EmailIcon,
+      title: 'Email',
+      content: contactInfo?.email
+    },
+    {
+      icon: SupportIcon,
+      title: 'Support',
+      content: contactInfo?.phone
+    },
+    {
+      icon: LocationIcon,
+      title: 'Address',
+      content: contactInfo?.address
+    },
+    {
+      icon: ClockIcon,
+      title: 'Opening Hours',
+      content: contactInfo?.timings && contactInfo.timings.length > 0
+        ? contactInfo.timings.map(formatTiming).join(' | ')
+        : "N/A"
+    }
+  ];
+
   return (
     <section>
       <div className="my-14">
@@ -40,11 +60,16 @@ const ContactUs = () => {
           ))}
         </div>
         <div className="w-full mt-14">
-      <img 
-        src="/images/map.png" 
-        alt="City Map" 
-        className="w-full h-auto object-cover"
-      />
+          <iframe
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(contactInfo.location.latitude)},${encodeURIComponent(contactInfo.location.longitude)}&z=15&output=embed`}
+            width="100%"
+            height="350"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Location Map"
+          />
         </div>
       </div>
     </section>

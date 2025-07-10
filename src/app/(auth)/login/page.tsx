@@ -77,7 +77,7 @@ export default function AuthPage() {
         setUserData(data);
         // Set cookie with 10 days expiry
         setCookie(data)
-        console.log(data?.data,"data")
+        console.log(data,"data")
        
         toast.success("Login successfully", {
           onClose: () => {

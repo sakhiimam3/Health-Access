@@ -5,42 +5,53 @@ import Link from "next/link";
 import { useUserContext } from "@/context/userStore";
 import Image from "next/image";
 import { toast } from "react-toastify";
-import { Loader2 } from "lucide-react";
+import { Loader2, User } from "lucide-react";
 import { useGetPartnerProfile } from "@/lib/hooks";
 
 const CustomDropdownMenu = () => {
   const { user, logout } = useUserContext();
+  console.log(user, "baba321");
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const {data:partnerProfile}=useGetPartnerProfile()
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { data: partnerProfile } = useGetPartnerProfile();
   const handleLogout = async () => {
     try {
-      setIsLoggingOut(true)
-      logout()
-      toast.success("Logout successfully")
-      await fetch('/api/clear-user-cookie', {
-        method: 'POST',
-      })
-      window.location.href = "/login"
+      setIsLoggingOut(true);
+      logout();
+      toast.success("Logout successfully");
+      await fetch("/api/clear-user-cookie", {
+        method: "POST",
+      });
+      window.location.href = "/login";
     } catch (error) {
-      console.error("Failed to clear cookie:", error)
-      toast.error("Failed to logout. Please try again.")
+      console.error("Failed to clear cookie:", error);
+      toast.error("Failed to logout. Please try again.");
     } finally {
-      setIsLoggingOut(false)
+      setIsLoggingOut(false);
     }
-  }
-
+  };
 
   return (
     <div className="relative inline-block text-left">
       <div className="flex items-center">
-        <Avatar className="h-9 w-9">
-          <Image
-            src={partnerProfile?.data?.image || "/images/Profile_avatar.png"}
-            width={36}
-            height={36}
-            alt={true ? "N/A" : "N/A"}
-          />
+        <Avatar className="h-9 w-9 flex items-center justify-center">
+          {(
+            (user?.data?.role === "customer" && user?.data?.image) ||
+            (user?.data?.role !== "customer" && user?.data?.user?.image)
+          ) ? (
+            <Image
+              src={
+                user?.data?.role === "customer"
+                  ? user?.data?.image
+                  : user?.data?.user?.image
+              }
+              width={36}
+              height={36}
+              alt="profile-image"
+            />
+          ) : (
+            <User className="w-7 h-7 text-gray-400 mx-auto" />
+          )}
         </Avatar>
         <button type="button" onClick={() => setIsOpen(!isOpen)}>
           <svg
@@ -65,14 +76,28 @@ const CustomDropdownMenu = () => {
           <div className="py-1">
             {true ? (
               <>
-                <div className="px-4 py-2 font-normal text-sm">
-                 <span className="font-roboto"> Name: {user?.firstName} {user?.lastName}</span>
-                </div>
+                {user?.data?.role === "customer" ? (
+                  <div className="px-4 py-2 font-normal text-sm">
+                    <span className="font-roboto">
+                      {" "}
+                      Name: {user?.data?.firstName} {user?.data?.lastName}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="px-4 py-2 font-normal text-sm">
+                    <span className="font-roboto">
+                      {" "}
+                      Name: {user?.data?.user?.firstName}{" "}
+                      {user?.data?.user?.lastName}
+                    </span>
+                  </div>
+                )}
+
                 <div className="border-t border-gray-200"></div>
 
                 <div className="px-4 py-2 text-sm text-gray-500">
-                  <Link href="/dashboard">
-                  <span>Dashboard </span> 
+                  <Link href={user?.data?.role === "customer" ? "/customer/appointment":"/dashboard"}>
+                    <span>Dashboard </span>
                   </Link>
                 </div>
                 <div className="border-t border-gray-200"></div>
@@ -81,13 +106,13 @@ const CustomDropdownMenu = () => {
                   onClick={handleLogout}
                 >
                   {isLoggingOut ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Logging out...
-                        </>
-                      ) : (
-                        "Logout"
-                      )}
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Logging out...
+                    </>
+                  ) : (
+                    "Logout"
+                  )}
                 </button>
               </>
             ) : (

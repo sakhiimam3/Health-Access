@@ -19,32 +19,34 @@ type Step1Props = {
   setSelectedTime: (time: string) => void; // single setter
   setCurrentStep: (step: number) => void;
   setAppointmentDate?: (date: string) => void; // Add this prop
+  serviceName?: string | null;
+  address?: string | null;
 };
 
 // Function to convert time to HH:MM format
 const formatTimeToHHMM = (time: string): string => {
   // Handle "10:00 AM" or "2:30 PM" format
-  const [timeStr, period] = time.split(' ');
-  let [hours, minutes] = timeStr.split(':').map(num => parseInt(num));
-  
+  const [timeStr, period] = time.split(" ");
+  let [hours, minutes] = timeStr.split(":").map((num) => parseInt(num));
+
   // Convert to 24-hour format
-  if (period === 'PM' && hours !== 12) {
+  if (period === "PM" && hours !== 12) {
     hours += 12;
-  } else if (period === 'AM' && hours === 12) {
+  } else if (period === "AM" && hours === 12) {
     hours = 0;
   }
-  
+
   // Ensure two digits
-  const formattedHours = hours.toString().padStart(2, '0');
-  const formattedMinutes = minutes.toString().padStart(2, '0');
-  
+  const formattedHours = hours.toString().padStart(2, "0");
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+
   return `${formattedHours}:${formattedMinutes}`;
 };
 
 // Function to format date to ISO 8601 (YYYY-MM-DD)
 const formatDateToISO = (year: number, month: number, date: number): string => {
-  const formattedMonth = (month + 1).toString().padStart(2, '0'); // month is 0-based
-  const formattedDate = date.toString().padStart(2, '0');
+  const formattedMonth = (month + 1).toString().padStart(2, "0"); // month is 0-based
+  const formattedDate = date.toString().padStart(2, "0");
   return `${year}-${formattedMonth}-${formattedDate}`;
 };
 
@@ -65,6 +67,8 @@ const Step1: React.FC<Step1Props> = ({
   setSelectedTime, // single
   setCurrentStep,
   setAppointmentDate,
+  serviceName,
+  address,
 }) => (
   <div className=" mx-auto bg-white rounded-lg shadow-sm border border-gray-200">
     <div className="p-6 border-b border-gray-100">
@@ -75,18 +79,18 @@ const Step1: React.FC<Step1Props> = ({
           </div>
           <div>
             <h2 className="text-lg font-medium text-gray-900">Service</h2>
-            <p className="text-sm text-gray-500">Nutritionist Consultation</p>
+            <p className="text-sm text-gray-500">{serviceName || "Nutritionist Consultation"}</p>
           </div>
         </div>
         <div className="flex items-center space-x-4 text-sm text-gray-600">
           <div className="flex items-center space-x-1">
             <MapPin className="w-4 h-4" />
-            <span>London</span>
+            <span>{address || "London"}</span>
           </div>
-          <div className="flex items-center space-x-1">
+          {/* <div className="flex items-center space-x-1">
             <Calendar className="w-4 h-4" />
             <span>Face-to-face appointment (English, UK)</span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
@@ -113,18 +117,20 @@ const Step1: React.FC<Step1Props> = ({
           <h4 className="text-base font-medium text-gray-900 mb-4">
             Available times
           </h4>
-          {slotsLoading && <div>Loading available times...</div>}
-          {slotsError && (
-            <div className="text-red-500">Error loading slots</div>
-          )}
-          {!slotsLoading && !slotsError && availableTimeSlots.length === 0 && (
-            <div className="text-gray-500">
-              No available times for this date.
+          {slotsLoading && (
+            <div className="text-gray-500 flex justify-center items-center h-24">
+              Loading available times...
             </div>
           )}
+          {slotsError && (
+            <div className="text-gray-500 flex justify-center items-center h-24">
+              Error loading slots
+            </div>
+          )}
+
           {Array.isArray(availableTimeSlots) &&
-          availableTimeSlots.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
+          availableTimeSlots?.length > 0 ? (
+            <div className="grid grid-cols-4 gap-2">
               {availableTimeSlots.map((time) => {
                 const isSelected = selectedTime === time;
                 return (
@@ -145,7 +151,7 @@ const Step1: React.FC<Step1Props> = ({
           ) : (
             !slotsLoading &&
             !slotsError && (
-              <div className="text-gray-500">
+              <div className="text-gray-500 flex justify-center items-center h-24">
                 No available times for this date.
               </div>
             )
@@ -157,7 +163,11 @@ const Step1: React.FC<Step1Props> = ({
         <button
           onClick={() => {
             const formattedTime = formatTimeToHHMM(selectedTime);
-            const formattedDate = formatDateToISO(selectedYear, selectedMonth, selectedDate);
+            const formattedDate = formatDateToISO(
+              selectedYear,
+              selectedMonth,
+              selectedDate
+            );
             setSelectedTime(formattedTime);
             if (setAppointmentDate) {
               setAppointmentDate(formattedDate);
@@ -165,7 +175,6 @@ const Step1: React.FC<Step1Props> = ({
             setCurrentStep(2);
           }}
           className="bg-teal-600 text-white px-6 py-2 rounded-[16px] hover:bg-teal-700 transition-colors"
-          disabled={!selectedTime}
         >
           Next
         </button>

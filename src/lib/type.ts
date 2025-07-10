@@ -1,18 +1,30 @@
 export interface User {
   id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  isActive: boolean;
-  isApproved: boolean;
-  isVerified: boolean;
-  role: string;
+
   token?: string;
   data?: {
-    user: {
+    
       id: string;
       isVerified: boolean;
-    }
+      email: string;
+      firstName: string;
+      lastName: string;
+      isActive: boolean;
+      isApproved: boolean;
+      role: string;
+      image:string;
+      user :{
+        id: string;
+        isVerified: boolean;
+        email: string;
+        firstName: string;
+        lastName: string;
+        isActive: boolean;
+        isApproved: boolean;
+        role: string;
+        image:string
+      }
+    
   }
 }
 
