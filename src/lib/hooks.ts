@@ -390,7 +390,7 @@ export const useAppointmentMutation = () => {
 // Fetch upcoming appointments
 export const useUpcomingAppointments = () => {
   const { data, isLoading, error, refetch } = useApiQuery({
-    endpoint: "/api/appointments/upcoming",
+    endpoint: "/v1/api/appointments/upcoming",
   });
   return { data, isLoading, error, refetch };
 };
