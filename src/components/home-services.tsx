@@ -10,7 +10,7 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
 
   // Only show main services with children
   const mainServicesWithChildren = servicesData?.data?.services?.filter((main: any) => Array.isArray(main.children) && main.children.length > 0) || [];
-
+ 
   return (
     <section className="mb-12">
       <LayoutWrapper>

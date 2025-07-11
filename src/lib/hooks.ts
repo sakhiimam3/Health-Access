@@ -428,4 +428,44 @@ export const useGetPartnerById = (partnerId: string) => {
   return { data, isLoading, error, refetch };
 };
 
+// Partner Appointments API hooks
+
+// Fetch partner appointments list
+export const useGetPartnerAppointments = (params?: {
+  status?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  limit?: number;
+  page?: number;
+}) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/appointments",
+    params: {
+      status: params?.status,
+      dateFrom: params?.dateFrom,
+      dateTo: params?.dateTo,
+      limit: params?.limit,
+      page: params?.page,
+    },
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Fetch partner appointment by ID
+export const useGetPartnerAppointmentById = (id: string) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: `/v1/api/partner/appointments/${id}`,
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Update partner appointment status
+export const useUpdatePartnerAppointmentStatus = (id: string) => {
+  const { mutate, isPending, error } = useApiMutation<any, { status: string }>(
+    `/v1/api/partner/appointments/${id}/status`,
+    "PUT"
+  );
+  return { mutate, isPending, error };
+};
+
 

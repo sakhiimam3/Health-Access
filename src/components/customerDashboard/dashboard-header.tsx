@@ -18,9 +18,12 @@ export function CustomerDashboardHeader() {
       setIsLoggingOut(true);
       logout();
       toast.success("Logout successfully");
+      await fetch("/api/clear-user-cookie", {
+        method: "POST",
+      });
       window.location.href = "/login";
     } catch (error) {
-      console.error("Failed to logout:", error);
+      console.error("Failed to clear cookie:", error);
       toast.error("Failed to logout. Please try again.");
     } finally {
       setIsLoggingOut(false);

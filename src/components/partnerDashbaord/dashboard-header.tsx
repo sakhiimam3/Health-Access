@@ -16,7 +16,6 @@ export function DashboardHeader() {
   const { data: partnerProfile, isLoading: isLoadingProfile } = useGetPartnerProfile();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  console.log(partnerProfile,"baba");
 
   const handleLogout = async () => {
     try {

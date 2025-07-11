@@ -10,7 +10,6 @@ import { useGetPartnerProfile } from "@/lib/hooks";
 
 const CustomDropdownMenu = () => {
   const { user, logout } = useUserContext();
-  console.log(user, "baba321");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { data: partnerProfile } = useGetPartnerProfile();
