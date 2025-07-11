@@ -1,19 +1,7 @@
 "use client"
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-
-export interface User {
-  email?: string;
-  firstName?: string;
-  id?: string;
-  isActive?: boolean;
-  isApproved?: boolean;
-  isVerified?: boolean;
-  lastName?: string;
-  role?: string;
-  token?: string;
-}
-
+import type { User } from "@/lib/type";
 
 export type UserContextType = {
   user: User | null;

@@ -12,14 +12,16 @@ interface ButtonThemeProps {
   margin?: string; 
   border?: string; 
   isLoading?: boolean;
+  disabled?:boolean
 }
 
-const ButtonTheme: React.FC<ButtonThemeProps> = ({ bgColor, textColor = 'text-black', children, onClick, paddingX = 'px-4', paddingY = 'py-2', margin, border, className, isLoading }) => {
+const ButtonTheme: React.FC<ButtonThemeProps> = ({ bgColor, textColor = 'text-black', children, onClick, paddingX = 'px-4', paddingY = 'py-2', margin, border, className, isLoading,disabled }) => {
   return (
     <button
       className={`${bgColor} ${className}  ${textColor}   font-ubantu  ${paddingY} ${paddingX} hover:bg-teal-700 ${margin} ${border}`}
       onClick={onClick}
-      disabled={isLoading}
+      disabled={isLoading || disabled}
+    
     >
       {isLoading ? `Processing.....` : children}
     </button>

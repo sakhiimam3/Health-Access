@@ -5,10 +5,12 @@ import Image, { StaticImageData } from "next/image"
 
 import { FC } from 'react';
 import { useRouter } from "next/navigation";
+import isValidUrl from "@/lib/isValidUrl";
+import NotfoundImage from "@public/images/notfound.jpg"
 
 interface NHSCardProps {
   id?:string
-  imageSrc: string | StaticImageData;
+  imageSrc: string ;
   title: string;
   description: string;
   author: string;
@@ -30,12 +32,12 @@ const NHSCard: FC<NHSCardProps> = ({
   height = "300px",
 }) => {
   const router = useRouter();
-  console.log(id,"idddd")
+  console.log(imageSrc,"imageSrc")
   return (
     <Card onClick={() => router.push(`/blogs/${id}`)} className=" cursor-pointer overflow-hidden border-none shadow-none">
       <div className={`relative ${height ? `h-[${height}]` : "h-[300px]"} rounded-[16px] w-full`}>
         <Image
-          src={imageSrc || ""}
+          src={isValidUrl(imageSrc) ? imageSrc : NotfoundImage}
           alt="Medical consultation"
           fill
           className="object-cover rounded-[10px]"
@@ -46,7 +48,7 @@ const NHSCard: FC<NHSCardProps> = ({
         <div className="space-y-4">
           <div>
             <h6 className="text-sm font-ubantu font-bold text-[#189BA3]">NHS Services</h6>
-            <h2 className={`text-lg font-bold mt-2   `}>{title}</h2>
+            <h2 className={`text-lg font-bold mt-2`}>{title}</h2>
             <p className="mt-2 font-roboto  text-sm  textColor">
               {description}
             </p>

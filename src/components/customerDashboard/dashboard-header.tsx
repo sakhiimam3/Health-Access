@@ -18,9 +18,12 @@ export function CustomerDashboardHeader() {
       setIsLoggingOut(true);
       logout();
       toast.success("Logout successfully");
+      await fetch("/api/clear-user-cookie", {
+        method: "POST",
+      });
       window.location.href = "/login";
     } catch (error) {
-      console.error("Failed to logout:", error);
+      console.error("Failed to clear cookie:", error);
       toast.error("Failed to logout. Please try again.");
     } finally {
       setIsLoggingOut(false);
@@ -96,7 +99,7 @@ export function CustomerDashboardHeader() {
                   <div className="py-1">
                     {/* Dashboard link */}
                     <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
-                      <Link href="/customer/dashboard">
+                      <Link href="/customer/appointment">
                         <span>Dashboard</span>
                       </Link>
                     </div>

@@ -12,19 +12,27 @@ import { useGetPublicPartnerServices } from "@/lib/hooks";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import isValidUrl from "@/lib/isValidUrl";
+import { Loader2 } from "lucide-react";
+import NHSServicesCard from "@/components/NHSServicesCard";
+import { useUserContext } from "@/context/userStore";
 
 const PharmacyNestedPage = () => {
   const { id } = useParams();
+  const {user}=useUserContext()
   const searchParams = useSearchParams();
   const serviceId = searchParams.get('service');
   const { data: servicesData, isLoading } = useGetPublicPartnerServices(id as string);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-10 w-10 animate-spin text-[#189BA3]" />
+      </div>
+    );
   }
 
   const service = servicesData?.data?.services?.find((s: any) => s.service.id === serviceId);
-  
+
   if (!service) {
     return <div>Service not found</div>;
   }
@@ -53,14 +61,30 @@ const PharmacyNestedPage = () => {
                 <p className="paragraphColor text-md font-roboto">
                   The cost of this service is £{service.price}.
                 </p>
-                <Link href={`/booking-form?partnerId=${id}&serviceId=${serviceId}`}>
-                  <ButtonTheme
-                    bgColor="bg-[#189BA3]"
-                    className="my-6 text-white py-3 text-lg rounded-[24px]"
-                    children="Book Now"
-                    paddingX="px-12"
-                  />
-                </Link>
+                {/* Only show Book Now for customers. If not logged in, disable and show tooltip. */}
+                {user?.data?.role === "customer" ? (
+                  <Link href={`/booking-form?partnerId=${id}&serviceId=${serviceId}&serviceName=${encodeURIComponent(service.service.name)}&address=${encodeURIComponent(servicesData?.data?.location?.name || '')}`}>
+                    <ButtonTheme
+                      bgColor="bg-[#189BA3]"
+                      className="my-6 text-white py-3 text-lg rounded-[24px]"
+                      children="Book Now"
+                      paddingX="px-12"
+                    />
+                  </Link>
+                ) : !user ? (
+                  <div className="relative group inline-block">
+                    <ButtonTheme
+                      bgColor="bg-[#189BA3]"
+                      className="my-6 text-white py-3 text-lg rounded-[24px] opacity-60 cursor-not-allowed"
+                      children="Book Now"
+                      paddingX="px-12"
+                      disabled={true}
+                    />
+                    <div className="absolute left-1/2 -translate-x-1/2  w-max bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                      You need to login first
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
             <div className="relative w-full h-[650px] mb-6 bg-white rounded-lg">
@@ -99,10 +123,34 @@ const PharmacyNestedPage = () => {
           ))}
 
           <div className="my-8">
-            <ContactUs />
+            {/* Extract contact info from service.partner or similar object */}
+            <ContactUs contactInfo={{
+              email: servicesData?.data?.user?.email || '',
+              phone: servicesData?.data?.phoneNumber || '',
+              address: servicesData?.data?.location?.name || '',
+              timings: servicesData?.data?.timings?.map((timing: any) =>
+                `${timing.dayOfWeek}: ${timing.isClosed ? "Closed" : `${timing.openTime} - ${timing.closeTime}`}`
+              ),
+              location: {
+                name: servicesData?.data?.location?.name || '',
+                latitude: servicesData?.data?.location?.latitude || '',
+                longitude: servicesData?.data?.location?.longitude || '',
+              }
+            }} />
           </div>
           <Blogs />
+         
         </LayoutWrapper>
+        <section className="mt-14">
+          <NHSServicesCard
+            serviceName={service.service?.name || ''}
+            pharmacyName={servicesData?.data?.businessName || ''}
+            pharmacyDescription={service.description || service.service?.description || ''}
+            serviceId={service.service?.id || ''}
+            partnerId={id as string}
+            address={servicesData?.data?.location?.name || ''}
+          />
+        </section>
       </div>
     </PagesWrapper>
   );
