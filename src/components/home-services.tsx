@@ -2,19 +2,23 @@
 import React from "react";
 import LayoutWrapper from "./layout/wrapper";
 import DifferentServices from "./different-services";
-import { useHomeServices } from "@/lib/hooks";
 import Notofound from "@public/images/notfound.jpg"
 import Skeleton from "./ui/Skeleton";
-const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
-  const { data:servicesData, isLoading, error, refetch } = useHomeServices();
 
+interface HomeServicesProps {
+  servicesData: any[];
+  link: string;
+  isNested: boolean;
+}
+
+const HomeServices = ({ servicesData, link, isNested }: HomeServicesProps) => {
   // Only show main services with children
-  const mainServicesWithChildren = servicesData?.data?.services?.filter((main: any) => Array.isArray(main.children) && main.children.length > 0) || [];
- 
+  const mainServicesWithChildren = servicesData?.filter((main: any) => Array.isArray(main.children) && main.children.length > 0) || [];
+
   return (
     <section className="mb-12">
       <LayoutWrapper>
-        {isLoading ? (
+        {servicesData === undefined ? (
           <div>
             {/* Simulate 2 main service sections with 4 cards each */}
             {[1, 2].map((sectionIdx) => (
@@ -70,4 +74,4 @@ const homeServices = ({link, isNested}: {link: string, isNested: boolean}) => {
   );
 };
 
-export default homeServices;
+export default HomeServices;

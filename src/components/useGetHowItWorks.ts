@@ -25,6 +25,7 @@ export function useGetHowItWorks() {
   const [faqs, setFaqs] = useState<FaqItem[]>([]);
   const [menuTypes, setMenuTypes] = useState<MenuType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [services,setServices]=useState([])
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,6 +39,7 @@ export function useGetHowItWorks() {
         setData(json.data?.howItWorks || []);
         setFaqs(json.data?.faqs || []);
         setMenuTypes(json.data?.menuTypes || []);
+        setServices(json.data || [])
         setLoading(false);
       })
       .catch((err) => {
@@ -46,5 +48,5 @@ export function useGetHowItWorks() {
       });
   }, []);
 
-  return { data, faqs, menuTypes, loading, error };
+  return { data, faqs, menuTypes, loading, error ,services};
 } 

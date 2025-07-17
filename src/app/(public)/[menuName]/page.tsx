@@ -87,13 +87,12 @@ const ServiceCarousel = ({ parentService, router }) => {
             <div
               key={service.id || index}
               className="w-[50%] cursor-pointer"
-              onClick={() =>
+              onClick={() => {
+                const slug = (service.title || service.name || "service").replace(/\s+/g, "-");
                 router.push(
-                  `/services/${service.title.replace(/\s+/g, "-")}?serviceName=${
-                    service.name || service.title
-                  }`
-                )
-              }
+                  `/services/${slug}?serviceName=${service.name || service.title || "Service"}`
+                );
+              }}
             >
 
               <div className="h-[200px] relative overflow-hidden">

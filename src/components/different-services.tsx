@@ -34,7 +34,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold mb-8 text-[#52525B]">{title}</h2>
 
-        {viewAllLink && services.length > 4 && (
+        {/* {viewAllLink && services.length > 4 && (
           <div>
             <Link
               href={`/services/?type=${type}`}
@@ -43,7 +43,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
               View All
             </Link>
           </div>
-        )}
+        )} */}
       </div>
       <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {services.map((service, index) => (

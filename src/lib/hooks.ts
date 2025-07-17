@@ -326,7 +326,7 @@ export const useGetAllBlogs = (params?: { page?: number; limit?: number }) => {
 
 export const useGetFeaturedBlogs = () => {
   const { data, isLoading, error, refetch } = useApiQuery({
-    endpoint: "/v1/api/admin/blogs/featured",
+    endpoint: "/v1/api/blogs/featured",
   });
   return { data, isLoading, error, refetch };
 };
