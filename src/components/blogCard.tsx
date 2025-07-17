@@ -32,7 +32,6 @@ const NHSCard: FC<NHSCardProps> = ({
   height = "300px",
 }) => {
   const router = useRouter();
-  console.log(imageSrc,"imageSrc")
   return (
     <Card onClick={() => router.push(`/blogs/${id}`)} className=" cursor-pointer overflow-hidden border-none shadow-none">
       <div className={`relative ${height ? `h-[${height}]` : "h-[300px]"} rounded-[16px] w-full`}>

@@ -1,35 +1,17 @@
+"use client"
 import Link from "next/link";
 import LayoutWrapper from "./wrapper";
 import Image from "next/image";
 import { NavItems } from "@/mockdata";
+import { FacebookIcon, InstagramIcon, LinkedInIcon, XIcon } from "../icons/icons";
 
-export default function Footer() {
-  const servicesData = [
-    {
-      title: "Travel Vaccines",
-      id:"12312313wd3413"
-    },
-    {
-      title: "Weight Management",
-      id:"12312313wd3443"
+interface FooterProps {
+  menuTypes: Array<{ id: string; name: string }>;
+  servicesData: Array<{ id: string; name: string }>;
+}
 
-    },
-    {
-      title: "Vitamin B12 Injections",
-      id:"12312313wg3443"
-
-    },
-    {
-      title: "Yellow Fever Clinic",
-      id:"12312313wd3493"
-
-    },
-    {
-        title: "Anti-Sweat Injections",
-        id:"12312313wd3494"
-    },
-      
-  ];
+export default function Footer({ menuTypes, servicesData }: FooterProps) {
+  console.log(servicesData,"servicesss")
   return (
     <footer className="bg-[#363636] text-[#BCBCBC] py-12">
       <LayoutWrapper>
@@ -61,18 +43,43 @@ export default function Footer() {
               Quick Links
             </h3>
             <ul className="space-y-5 ">
-              {NavItems.map(
-                (item,index) => (
-                  <li key={index}>
-                    <Link
-                      href={item.href}
-                      className="hover:text-white capitalize text-[#B8B8B8]  transition-colors duration-200"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                )
-              )}
+              {/* 1st static link */}
+              <li key={NavItems[0].label}>
+                <Link
+                  href={NavItems[0].href}
+                  className="hover:text-white capitalize text-[#B8B8B8]  transition-colors duration-200"
+                >
+                  {NavItems[0].label}
+                </Link>
+              </li>
+              {/* 2nd and 3rd dynamic or skeleton */}
+              {menuTypes?.slice(0, 2)?.map((type) => (
+                <li key={type.id}>
+                  <Link
+                    href={`/${type.name.replace(/\s+/g, "-")}?typeid=${type.id}&name=${encodeURIComponent(type.name)}`}
+                    className="hover:text-white capitalize text-[#B8B8B8]  transition-colors duration-200"
+                  >
+                    {type.name}
+                  </Link>
+                </li>
+              ))}
+              {/* Static How it works and About us */}
+              <li key={NavItems[3].label}>
+                <Link
+                  href={NavItems[3].href}
+                  className="hover:text-white capitalize text-[#B8B8B8]  transition-colors duration-200"
+                >
+                  {NavItems[3].label}
+                </Link>
+              </li>
+              <li key={NavItems[4].label}>
+                <Link
+                  href={NavItems[4].href}
+                  className="hover:text-white capitalize text-[#B8B8B8]  transition-colors duration-200"
+                >
+                  {NavItems[4].label}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -80,13 +87,13 @@ export default function Footer() {
           <div className="md:col-span-3">
             <h3 className="text-white font-semibold text-lg mb-4">Services</h3>
             <ul className="space-y-5">
-              {servicesData.map((item) => (
+              {servicesData?.map((item) => (
                 <li key={item.id}>
                   <Link
-                    href={`/services/?type=${item.title}`}
+                    href={`/services/${item.name.replace(/\s+/g, "-")}`}
                     className="hover:text-white font-roboto-slab transition-colors duration-200"
                   >
-                    {item.title}
+                    {item.name}
                   </Link>
                 </li>
               ))}
@@ -96,78 +103,41 @@ export default function Footer() {
           {/* Follow Us */}
           <div className="md:col-span-2">
             <h3 className="text-white font-semibold text-lg mb-4">Follow Us</h3>
-            <div className="space-y-3 ">
+            <div className="space-y-6">
               <Link
-                href="#"
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-3 hover:text-white transition-colors duration-200"
               >
-                <svg
-                  width="25"
-                  height="24"
-                  viewBox="0 0 25 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M22.667 12.3038C22.667 6.74719 18.1899 2.24268 12.667 2.24268C7.14414 2.24268 2.66699 6.74719 2.66699 12.3038C2.66699 17.3255 6.32383 21.4879 11.1045 22.2427V15.2121H8.56543V12.3038H11.1045V10.0872C11.1045 7.56564 12.5975 6.1728 14.8816 6.1728C15.9758 6.1728 17.1201 6.36931 17.1201 6.36931V8.84529H15.8592C14.617 8.84529 14.2295 9.6209 14.2295 10.4166V12.3038H17.0029L16.5596 15.2121H14.2295V22.2427C19.0102 21.4879 22.667 17.3257 22.667 12.3038Z"
-                    fill="#189BA3"
-                  />
-                </svg>
+                <FacebookIcon width={25} height={24} />
                 <span className="font-roboto-slab">Facebook</span>
               </Link>
               <Link
-                href="#"
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-3 hover:text-white transition-colors duration-200"
               >
-                <svg
-                  width="25"
-                  height="24"
-                  viewBox="0 0 25 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M22.667 12.3038C22.667 6.74719 18.1899 2.24268 12.667 2.24268C7.14414 2.24268 2.66699 6.74719 2.66699 12.3038C2.66699 17.3255 6.32383 21.4879 11.1045 22.2427V15.2121H8.56543V12.3038H11.1045V10.0872C11.1045 7.56564 12.5975 6.1728 14.8816 6.1728C15.9758 6.1728 17.1201 6.36931 17.1201 6.36931V8.84529H15.8592C14.617 8.84529 14.2295 9.6209 14.2295 10.4166V12.3038H17.0029L16.5596 15.2121H14.2295V22.2427C19.0102 21.4879 22.667 17.3257 22.667 12.3038Z"
-                    fill="#189BA3"
-                  />
-                </svg>
-
+                <InstagramIcon width={25} height={24} />
                 <span className="font-roboto-slab">Instagram</span>
               </Link>
               <Link
-                href="#"
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-3 hover:text-white transition-colors duration-200"
               >
-                <svg
-                  width="19"
-                  height="17"
-                  viewBox="0 0 19 17"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M14.8431 0.242676H17.6032L11.5731 7.02008L18.667 16.2427H13.1126L8.76209 10.6493L3.78422 16.2427H1.02243L7.47216 8.99348L0.666992 0.242676H6.36244L10.2949 5.3553L14.8431 0.242676ZM13.8743 14.6181H15.4038L5.5314 1.78196H3.89019L13.8743 14.6181Z"
-                    fill="#189BA3"
-                  />
-                </svg>
+                <XIcon width={19} height={17} />
                 <span className="font-roboto-slab">X</span>
               </Link>
               <Link
-                href="#"
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-3 hover:text-white transition-colors duration-200"
               >
-                <svg
-                  width="19"
-                  height="17"
-                  viewBox="0 0 19 17"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M14.8431 0.242676H17.6032L11.5731 7.02008L18.667 16.2427H13.1126L8.76209 10.6493L3.78422 16.2427H1.02243L7.47216 8.99348L0.666992 0.242676H6.36244L10.2949 5.3553L14.8431 0.242676ZM13.8743 14.6181H15.4038L5.5314 1.78196H3.89019L13.8743 14.6181Z"
-                    fill="#189BA3"
-                  />
-                </svg>
+                <LinkedInIcon width={19} height={17} />
                 <span className="font-roboto-slab">LinkedIn</span>
               </Link>
             </div>
@@ -212,3 +182,4 @@ export default function Footer() {
     </footer>
   );
 }
+

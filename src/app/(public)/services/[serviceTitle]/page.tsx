@@ -237,7 +237,6 @@ const Content = () => {
   );
 
   const data = serviceContent?.data;
-
   return (
     <>
       <PagesBanner

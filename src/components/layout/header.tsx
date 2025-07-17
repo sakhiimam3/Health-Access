@@ -12,14 +12,19 @@ import ButtonTheme from "../shared/ButtonTheme";
 import { usePathname, useRouter } from "next/navigation";
 import { useUserContext } from "@/context/userStore";
 import HeaderMenu from "../headerMenu";
-import { useGetHowItWorks } from "../useGetHowItWorks";
+// import { useGetHowItWorks } from "../useGetHowItWorks";
 
-const Header = () => {
+interface HeaderProps {
+  menuTypes: Array<{ id: string; name: string }>;
+}
+
+const Header = ({ menuTypes }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathName = usePathname();
   const { user } = useUserContext();
-  const { menuTypes, loading } = useGetHowItWorks();
+  // const { menuTypes, loading } = useGetHowItWorks();
+  const loading = false;
 
   const dropdownRef = useRef(null);
   const scrollPositionRef = useRef(0);
@@ -110,25 +115,16 @@ const Header = () => {
                         {NavItems[0].label}
                         <span className="absolute -bottom-1 left-0 w-full h-1 bg-teal-500 transform scale-x-0 transition-transform duration-500 group-hover:scale-x-100" />
                       </Link>
-                      {loading
-                        ? [0, 1].map((i) => (
-                            <div
-                              key={i}
-                              className="h-5 w-32 bg-gray-200 animate-pulse rounded"
-                            />
-                          ))
-                        : menuTypes.slice(0, 2).map((type, idx) => (
-                            <Link
-                              key={type.id}
-                              href={`/${type?.name?.replace(/\s+/g, "-")}?typeid=${
-                                type.id
-                              }&name=${encodeURIComponent(type.name)}`}
-                              className="capitalize text-sm font-[400] font-ubuntu relative group"
-                            >
-                              {type.name}
-                              <span className="absolute -bottom-1 left-0 w-full h-1 bg-teal-500 transform scale-x-0 transition-transform duration-500 group-hover:scale-x-100" />
-                            </Link>
-                          ))}
+                      {menuTypes?.slice(0, 2)?.map((type, idx) => (
+                        <Link
+                          key={type.id}
+                          href={`/${type?.name?.replace(/\s+/g, "-")}?typeid=${type.id}&name=${encodeURIComponent(type.name)}`}
+                          className="capitalize text-sm font-[400] font-ubuntu relative group"
+                        >
+                          {type.name}
+                          <span className="absolute -bottom-1 left-0 w-full h-1 bg-teal-500 transform scale-x-0 transition-transform duration-500 group-hover:scale-x-100" />
+                        </Link>
+                      ))}
                       {/* Static How it works and About us */}
                       <Link
                         href={NavItems[3].href}
