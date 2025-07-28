@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-
+console.log(userData,"userdata")
   // If user is logged in, prevent access to login/register/forgot-password pages
   if (userData && publicRoutes.includes(pathname)) {
     return NextResponse.redirect(new URL('/dashboard', request.url));

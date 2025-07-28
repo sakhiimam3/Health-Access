@@ -14,11 +14,12 @@ export default async function Home() {
   // Fetch data with error handling
   const howItWorksRes = await getHowItWorksData();
   const homeServicesRes = await getHomeServicesData();
+  console.log(howItWorksRes,"howItWorksRes")
 
   // Handle fallback data and collect errors
-  const menuTypes = howItWorksRes.success ? howItWorksRes.data?.menuTypes || [] : [];
-  const servicesData = homeServicesRes.success ? homeServicesRes.data?.services || [] : [];
-  const howItWorksData = howItWorksRes.success ? howItWorksRes.data?.howItWorks || [] : [];
+  const menuTypes = howItWorksRes.success ? howItWorksRes.data?.data?.menuTypes || [] : [];
+  const servicesData = homeServicesRes.success ? homeServicesRes.data?.data?.services || [] : [];
+  const howItWorksData = howItWorksRes.success ? howItWorksRes.data?.data?.howItWorks || [] : [];
 
   // Collect all errors for display
   const apiErrors: string[] = [];

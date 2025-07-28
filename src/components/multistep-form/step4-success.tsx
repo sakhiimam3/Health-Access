@@ -2,11 +2,9 @@
 
 import { CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function Step4Success() {
-  const router = useRouter()
-
   return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="max-w-md mx-auto text-center px-4">
@@ -24,12 +22,13 @@ export default function Step4Success() {
         </p>
 
         {/* Action Button */}
-        <Button
-          className="bg-teal-500 hover:bg-teal-600 text-white px-10 py-4 rounded-lg text-lg font-medium"
-          onClick={() => router.push('/dashboard')}
-        >
-          Go to Dashboard
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            className="bg-teal-500 hover:bg-teal-600 text-white px-12 py-6 rounded-2xl text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            Go to Dashboard
+          </Button>
+        </Link>
       </div>
     </div>
   )

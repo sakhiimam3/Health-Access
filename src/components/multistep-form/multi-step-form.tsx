@@ -61,6 +61,15 @@ export default function MultiStepForm() {
   const { mutate: uploadFile } = useUpload();
   const { mutate: submitOnboarding } = usePartnerOnboarding();
 
+  // Add setCookie function
+  const setCookie = async (userData: any) => {
+    await fetch('/api/set-user-cookie', {
+      method: 'POST',
+      body: JSON.stringify({ userData }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  };
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -192,6 +201,9 @@ export default function MultiStepForm() {
               },
             };
             setUserData(updatedUser);
+            
+            // Update cookies with the new user data including onboardingCompleted
+            setCookie(updatedUser);
           }
 
           toast.success("Pharmacy details submitted successfully!");
