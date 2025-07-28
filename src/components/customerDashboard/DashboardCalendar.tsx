@@ -15,15 +15,15 @@ function getFirstDayOfWeek(year: number, month: number) {
 const today = new Date();
 
 export default function DashboardCalendar({
-  selectedDate = today,
+  selectedDate,
   onSelectDate,
 }: {
   selectedDate?: Date;
   onSelectDate?: (date: Date) => void;
 }) {
-  const [currentMonth, setCurrentMonth] = useState(selectedDate.getMonth());
-  const [currentYear, setCurrentYear] = useState(selectedDate.getFullYear());
-  const [selectedDay, setSelectedDay] = useState(selectedDate.getDate());
+  const [currentMonth, setCurrentMonth] = useState(selectedDate?.getMonth() ?? today.getMonth());
+  const [currentYear, setCurrentYear] = useState(selectedDate?.getFullYear() ?? today.getFullYear());
+  const [selectedDay, setSelectedDay] = useState<number | null>(selectedDate?.getDate() ?? null);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDayOfWeek = getFirstDayOfWeek(currentYear, currentMonth);
@@ -50,7 +50,7 @@ export default function DashboardCalendar({
     } else {
       setCurrentMonth(currentMonth - 1);
     }
-    setSelectedDay(1);
+    setSelectedDay(null);
   };
 
   const handleNextMonth = () => {
@@ -60,7 +60,7 @@ export default function DashboardCalendar({
     } else {
       setCurrentMonth(currentMonth + 1);
     }
-    setSelectedDay(1);
+    setSelectedDay(null);
   };
 
   const handleSelectDay = (day: number | null) => {
@@ -100,7 +100,7 @@ export default function DashboardCalendar({
                   {day ? (
                     <button
                       className={`w-7 h-7 rounded-full transition-colors
-                        ${day === selectedDay ? "bg-cyan-600 text-white" : "hover:bg-cyan-100"}
+                        ${selectedDay !== null && day === selectedDay ? "bg-cyan-600 text-white" : "hover:bg-cyan-100"}
                         ${day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear() && day !== selectedDay ? "border border-cyan-400" : ""}
                       `}
                       onClick={() => handleSelectDay(day)}

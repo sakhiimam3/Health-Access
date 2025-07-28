@@ -5,7 +5,7 @@ import React from "react";
 const page = () => {
   return (
     <>
-      <Header />
+      <Header  />
       <div className="my-4">
         <MultiStepForm />
       </div>

@@ -15,7 +15,7 @@ import HeaderMenu from "../headerMenu";
 // import { useGetHowItWorks } from "../useGetHowItWorks";
 
 interface HeaderProps {
-  menuTypes: Array<{ id: string; name: string }>;
+  menuTypes?: Array<{ id: string; name: string }>;
 }
 
 const Header = ({ menuTypes }: HeaderProps) => {

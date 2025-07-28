@@ -7,6 +7,14 @@ interface HealthStatsProps {
 }
 
 export default function HealthStats({ height, weight, onEdit }: HealthStatsProps) {
+  // Realistic human maximum values
+  const MAX_HEIGHT = 250; // cm (accounting for tallest humans ~220-250cm)
+  const MAX_WEIGHT = 300;  // kg (accounting for extreme medical cases)
+  
+  // Calculate progress percentages with overflow protection
+  const heightProgress = Math.min((height / MAX_HEIGHT) * 100, 100);
+  const weightProgress = Math.min((weight / MAX_WEIGHT) * 100, 100);
+
   return (
     <div className="bg-white rounded-xl p-6 mt-2 shadow">
       <div className="flex items-center justify-between mb-6">
@@ -38,10 +46,10 @@ export default function HealthStats({ height, weight, onEdit }: HealthStatsProps
                 />
               ))}
             </div>
-            {/* Active progress */}
+            {/* Active progress with overflow protection */}
             <div 
               className="absolute left-0 top-0 h-full bg-rose-500 rounded-full opacity-20"
-              style={{ width: `${(height / 200) * 100}%` }}
+              style={{ width: `${heightProgress}%` }}
             />
           </div>
         </div>
@@ -64,10 +72,10 @@ export default function HealthStats({ height, weight, onEdit }: HealthStatsProps
                 />
               ))}
             </div>
-            {/* Active progress */}
+            {/* Active progress with overflow protection */}
             <div 
               className="absolute left-0 top-0 h-full bg-emerald-500 rounded-full opacity-20"
-              style={{ width: `${(weight / 100) * 100}%` }}
+              style={{ width: `${weightProgress}%` }}
             />
           </div>
         </div>

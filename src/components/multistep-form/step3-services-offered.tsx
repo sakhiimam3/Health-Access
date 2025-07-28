@@ -97,15 +97,33 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
       parentId: selectedParentId || undefined,
     });
 
-  // Cache child services when they change
+  // Cache child services when they change and check if parent should be selectable
   useEffect(() => {
     if (childServicesData && selectedParentId) {
       setCachedChildServices((prev) => ({
         ...prev,
         [`parent_${selectedParentId}`]: childServicesData,
       }));
+
+      // If the fetched children data is empty, the parent service is a leaf node and should be selected
+      if (childServicesData.data.length === 0) {
+        // Find the parent service details
+        const parentService = Object.values(cachedMainServices)
+          .flatMap(services => services.data)
+          .find(service => service.id === selectedParentId);
+        
+        const currentSelectedServices = watch("selectedServices") || [];
+        if (parentService && !currentSelectedServices.includes(parentService.id)) {
+          toggleService({
+            id: parentService.id,
+            name: parentService.name,
+            typeId: parentService.typeId,
+            level: 0,
+          });
+        }
+      }
     }
-  }, [childServicesData, selectedParentId]);
+  }, [childServicesData, selectedParentId, cachedMainServices, watch]);
 
   // Fetch sub-child services based on selected sub-parent
   const { data: subChildServicesData, isLoading: subChildServicesLoading } =
@@ -113,15 +131,33 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
       parentId: selectedSubParentId || undefined,
     });
 
-  // Cache sub-child services when they change
+  // Cache sub-child services when they change and check if parent should be selectable
   useEffect(() => {
     if (subChildServicesData && selectedSubParentId) {
       setCachedSubChildServices((prev) => ({
         ...prev,
         [`subparent_${selectedSubParentId}`]: subChildServicesData,
       }));
+
+      // If the fetched sub-children data is empty, the parent service is a leaf node and should be selected
+      if (subChildServicesData.data.length === 0) {
+        // Find the parent service details
+        const parentService = Object.values(cachedChildServices)
+          .flatMap(services => services.data)
+          .find(service => service.id === selectedSubParentId);
+        
+        const currentSelectedServices = watch("selectedServices") || [];
+        if (parentService && !currentSelectedServices.includes(parentService.id)) {
+          toggleService({
+            id: parentService.id,
+            name: parentService.name,
+            parentId: parentService.parentId,
+            level: 1,
+          });
+        }
+      }
     }
-  }, [subChildServicesData, selectedSubParentId]);
+  }, [subChildServicesData, selectedSubParentId, cachedChildServices, watch]);
 
   const toggleService = (service: Service) => {
     const isSelected = selectedServices.some((s) => s === service.id);
@@ -165,10 +201,7 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
   };
 
   const isServiceSelected = (serviceId: string, level: number = 2) => {
-    return (
-      selectedServices.some((s) => s === serviceId) &&
-      isServiceSelectable(serviceId, level)
-    );
+    return selectedServices.some((s) => s === serviceId);
   };
 
   // Handle service type selection
@@ -183,43 +216,21 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
     setSelectedParentId(service.id);
     setSelectedSubParentId(null);
 
-    // Check if this service has child services
-    const childServices =
-      cachedChildServices[`parent_${service.id}`]?.data || [];
-    if (childServices.length === 0) {
-      // If no children, this is the last level, so toggle selection
-      toggleService({
-        id: service.id,
-        name: service.name,
-        typeId: service.typeId,
-        level: 0,
-      });
-    }
-    // If it has children, don't select it - user must navigate to children
+    // Don't immediately add to selection - wait for child data to be fetched
+    // The selection will happen in the useEffect for childServicesData if no children are found
   };
 
   // Handle child service selection
   const handleChildServiceClick = (service: ServiceData) => {
     setSelectedSubParentId(service.id);
 
-    // Check if this service has sub-child services
-    const subChildServices =
-      cachedSubChildServices[`subparent_${service.id}`]?.data || [];
-    if (subChildServices.length === 0) {
-      // If no sub-children, this is the last level, so toggle selection
-      toggleService({
-        id: service.id,
-        name: service.name,
-        parentId: service.parentId,
-        level: 1,
-      });
-    }
-    // If it has sub-children, don't select it - user must navigate to sub-children
+    // Don't immediately add to selection - wait for sub-child data to be fetched
+    // The selection will happen in the useEffect for subChildServicesData if no sub-children are found
   };
 
   // Handle sub-child service selection
   const handleSubChildServiceClick = (service: ServiceData) => {
-    // This is always the last level, so toggle selection
+    // Sub-child services are always leaf nodes, so toggle selection immediately
     toggleService({
       id: service.id,
       name: service.name,
@@ -228,25 +239,7 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
     });
   };
 
-  // Add a function to check if a service is selectable (is at the deepest level)
-  const isServiceSelectable = (serviceId: string, level: number): boolean => {
-    // Main service is selectable only if it has no children
-    if (level === 0) {
-      const childServices =
-        cachedChildServices[`parent_${serviceId}`]?.data || [];
-      return childServices.length === 0;
-    }
 
-    // Child service is selectable only if it has no sub-children
-    if (level === 1) {
-      const subChildServices =
-        cachedSubChildServices[`subparent_${serviceId}`]?.data || [];
-      return subChildServices.length === 0;
-    }
-
-    // Sub-child services are always selectable
-    return true;
-  };
 
   // Update the counting functions to use cached data with prefixed keys
   const getSelectedServicesCountByType = (typeId: string) => {
@@ -428,27 +421,29 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
                       </div>
                     ) : (
                       mainServicesData?.data?.map((service: ServiceData) => {
-                        const hasChildren =
-                          (
-                            cachedChildServices[`parent_${service.id}`]?.data ||
-                            []
-                          ).length > 0;
+                        const childServices = cachedChildServices[`parent_${service.id}`]?.data || [];
+                        const hasChildren = childServices.length > 0;
+                        const isDataLoaded = cachedChildServices[`parent_${service.id}`] !== undefined;
+                        const isLeafNode = isDataLoaded && childServices.length === 0;
+                        const isFormSelected = isServiceSelected(service.id);
+                        const isNavigationActive = selectedParentId === service.id;
+                        
                         return (
                           <button
                             key={service.id}
                             type="button"
                             onClick={() => handleMainServiceClick(service)}
                             disabled={isSubmitting}
-                            className={`w-full h-12 p-3 text-left rounded-[20px] border border-[#E7E7E7] shadow-sm transition-all ${
-                              selectedParentId === service.id
+                            className={`w-full h-12 p-3 text-left rounded-[20px] border shadow-sm transition-all ${
+                              isFormSelected
                                 ? "border-teal-500 bg-teal-50"
-                                : "hover:border-gray-300"
+                                : isNavigationActive
+                                ? "border-teal-300 bg-teal-50/50"
+                                : "border-[#E7E7E7] hover:border-gray-300"
                             } ${
                               isSubmitting
                                 ? "opacity-50 cursor-not-allowed"
                                 : ""
-                            } ${
-                              hasChildren ? "cursor-pointer" : "cursor-pointer"
                             }`}
                           >
                             <div className="flex items-center justify-between">
@@ -464,12 +459,11 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
                                     )}
                                   </span>
                                 )}
-                                {!hasChildren &&
-                                  isServiceSelected(service.id, 0) && (
-                                    <Check className="w-4 h-4 text-teal-500" />
-                                  )}
+                                {isFormSelected && (
+                                  <Check className="w-4 h-4 text-teal-500" />
+                                )}
                               </div>
-                              {hasChildren ? (
+                              {hasChildren || !isDataLoaded ? (
                                 <ChevronRight className="w-4 h-4 text-gray-400" />
                               ) : (
                                 <div className="w-4 h-4"></div>
@@ -505,21 +499,25 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
                   </div>
                 ) : (
                   childServicesData?.data?.map((service: ServiceData) => {
-                    const hasSubChildren =
-                      (
-                        cachedSubChildServices[`subparent_${service.id}`]
-                          ?.data || []
-                      ).length > 0;
+                    const subChildServices = cachedSubChildServices[`subparent_${service.id}`]?.data || [];
+                    const hasSubChildren = subChildServices.length > 0;
+                    const isDataLoaded = cachedSubChildServices[`subparent_${service.id}`] !== undefined;
+                    const isLeafNode = isDataLoaded && subChildServices.length === 0;
+                    const isFormSelected = isServiceSelected(service.id);
+                    const isNavigationActive = selectedSubParentId === service.id;
+                    
                     return (
                       <button
                         key={service.id}
                         type="button"
                         onClick={() => handleChildServiceClick(service)}
                         disabled={isSubmitting}
-                        className={`w-full h-12 p-3 text-left rounded-[20px] border border-[#E7E7E7] shadow-sm transition-all ${
-                          selectedSubParentId === service.id
+                        className={`w-full h-12 p-3 text-left rounded-[20px] border shadow-sm transition-all ${
+                          isFormSelected
                             ? "border-teal-500 bg-teal-50"
-                            : "hover:border-gray-300"
+                            : isNavigationActive
+                            ? "border-teal-300 bg-teal-50/50"
+                            : "border-[#E7E7E7] hover:border-gray-300"
                         } ${
                           isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                         }`}
@@ -535,12 +533,11 @@ export default function Step3ServicesOffered({ form }: Step3Props) {
                                 {getSelectedServicesCountByParent(service.id)}
                               </span>
                             )}
-                            {!hasSubChildren &&
-                              isServiceSelected(service.id, 1) && (
-                                <Check className="w-4 h-4 text-teal-500" />
-                              )}
+                            {isFormSelected && (
+                              <Check className="w-4 h-4 text-teal-500" />
+                            )}
                           </div>
-                          {hasSubChildren ? (
+                          {hasSubChildren || !isDataLoaded ? (
                             <ChevronRight className="w-4 h-4 text-gray-400" />
                           ) : (
                             <div className="w-4 h-4"></div>

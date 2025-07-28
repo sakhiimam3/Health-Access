@@ -5,7 +5,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  // { name: "Dashboard", href: "/customer/dashboard" },
+  { name: "Dashboard", href: "/customer/dashboard" },
   { name: "Appointments", href: "/customer/appointment" },
 ];
 

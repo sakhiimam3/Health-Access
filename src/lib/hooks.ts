@@ -468,4 +468,12 @@ export const useUpdatePartnerAppointmentStatus = (id: string) => {
   return { mutate, isPending, error };
 };
 
+// Customer Dashboard API
+export const useGetCustomerDashboard = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/customer/dashboard",
+  });
+  return { data, isLoading, error, refetch };
+};
+
 

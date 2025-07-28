@@ -217,7 +217,7 @@ export default function Step1BasicDetails({ form }: Step1Props) {
               id="pharmacyName"
               {...register("pharmacyName")}
               placeholder="Warburtons Pharmacy"
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
+              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 text-[gray]"
             />
             {errors.pharmacyName && (
               <p className="text-red-500 text-sm mt-2">
@@ -238,8 +238,8 @@ export default function Step1BasicDetails({ form }: Step1Props) {
               id="pharmacyEmail"
               type="email"
               {...register("pharmacyEmail")}
-              placeholder="contact@warburtons pharmacy.co.uk"
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
+              placeholder="contact@warburtons-pharmacy.co.uk"
+              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 text-[gray]"
             />
             {errors.pharmacyEmail && (
               <p className="text-red-500 text-sm mt-2">
@@ -260,7 +260,7 @@ export default function Step1BasicDetails({ form }: Step1Props) {
               id="contactNumber"
               {...register("contactNumber")}
               placeholder="021 123 3212"
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
+              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 text-[gray]"
             />
             {errors.contactNumber && (
               <p className="text-red-500 text-sm mt-2">
@@ -280,8 +280,8 @@ export default function Step1BasicDetails({ form }: Step1Props) {
             <Input
               id="website"
               {...register("website")}
-              placeholder="https://warburtons pharmacy.co.uk"
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
+              placeholder="https://warburtons-pharmacy.co.uk"
+              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 text-[gray]"
             />
             {errors.website && (
               <p className="text-red-500 text-sm mt-2">
@@ -302,8 +302,8 @@ export default function Step1BasicDetails({ form }: Step1Props) {
           <textarea
             id="shortBio"
             {...register("shortBio")}
-            placeholder="Warburtons Pharmacy is a trusted and community-focused independent pharmacy located in Manchester, M3 2FW. Renowned for its friendly service and personalized care, Warburtons Pharmacy is dedicated to offering exceptional healthcare solutions and building strong relationships with every customer."
-            className="min-h-[120px] w-full text-base rounded-[20px] border border-[#E7E7E7] shadow-sm px-3 py-2 focus:border-teal-500 focus:ring-teal-500 resize-none"
+            placeholder="Add bio"
+            className="min-h-[120px] w-full border border-[#E7E7E7] shadow-sm px-3 py-2 focus:border-teal-500 focus:ring-teal-500 resize-none text-[gray]"
           />
           {errors.shortBio && (
             <p className="text-red-500 text-sm mt-2">
