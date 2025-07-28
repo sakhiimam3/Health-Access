@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, User, Mail, Phone, Calendar,Filter, Search,Clock, FileText, Settings, Users, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { toast } from "react-toastify";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -37,10 +38,10 @@ import {
 
 export function AppointmentsView() {
   // Filter state
-  const [showFilters, setShowFilters] = useState(false);
-  const [status, setStatus] = useState<string | undefined>("all");
-  const [dateFrom, setDateFrom] = useState<Date | null>(null);
-  const [dateTo, setDateTo] = useState<Date | null>(null);
+  // const [showFilters, setShowFilters] = useState(false);
+  // const [status, setStatus] = useState<string | undefined>("all");
+  // const [dateFrom, setDateFrom] = useState<Date | null>(null);
+  // const [dateTo, setDateTo] = useState<Date | null>(null);
   const [search, setSearch] = useState("");
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<
     string | null
@@ -49,11 +50,11 @@ export function AppointmentsView() {
 
   // Fetch appointments
   const { data, isLoading, error, refetch } = useGetPartnerAppointments({
-    status: status === "all" ? undefined : status,
+    // status: status === "all" ? undefined : status,
     // Only include dateFrom/dateTo if both are set
-    dateFrom:
-      dateFrom && dateTo ? dateFrom.toISOString().slice(0, 10) : undefined,
-    dateTo: dateFrom && dateTo ? dateTo.toISOString().slice(0, 10) : undefined,
+    // dateFrom:
+    //   dateFrom && dateTo ? dateFrom.toISOString().slice(0, 10) : undefined,
+    // dateTo: dateFrom && dateTo ? dateTo.toISOString().slice(0, 10) : undefined,
     limit: 10,
     page: 1,
   });
@@ -79,9 +80,27 @@ export function AppointmentsView() {
         onSuccess: () => {
           refetch();
           setUpdatingId(null);
+          toast.success(`Appointment status updated to ${newStatus} successfully!`);
+        },
+        onError: (error) => {
+          setUpdatingId(null);
+          toast.error("Failed to update appointment status. Please try again.");
         },
       }
     );
+  };
+
+  // Format date and time
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  const formatTime = (timeString: string) => {
+    return timeString?.slice(0, 5) || "--:--";
   };
 
   // Filtered by search
@@ -95,34 +114,49 @@ export function AppointmentsView() {
       )
     : appointments;
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="text-lg text-gray-600">Loading appointments...</div>
+      </div>
+    );
+  }
+
   return (
     <TooltipProvider>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-ubuntu font-semibold text-gray-900">
-            Appointments
-          </h1>
+          <div>
+            <h1 className="text-3xl font-ubuntu font-bold text-gray-900">
+              Appointments
+            </h1>
+            <p className="text-gray-600 mt-1">Manage your upcoming appointments</p>
+          </div>
+          <div className="bg-blue-50 px-4 py-2 rounded-lg">
+            <span className="text-blue-700 font-medium">{filteredAppointments.length} Total</span>
+          </div>
         </div>
 
-        {/* Filters */}
-        <Card>
+        {/* Search */}
+        <Card className="shadow-sm border-0 bg-gradient-to-r from-blue-50 to-indigo-50">
           <CardContent className="pt-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <Input
-                    placeholder="Search appointments..."
-                    className="pl-10 font-roboto"
+                    placeholder="Search by patient name or service..."
+                    className="pl-12 font-roboto h-12 border-white bg-white shadow-sm"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
               </div>
-              <Button
+              {/* Comment out filter buttons for now */}
+              {/* <Button
                 variant="outline"
-                className="font-roboto"
+                className="font-roboto h-12"
                 onClick={() => setShowFilters((f) => !f)}
               >
                 <Filter className="h-4 w-4 mr-2" />
@@ -130,7 +164,7 @@ export function AppointmentsView() {
               </Button>
               <Button
                 variant="outline"
-                className="font-roboto"
+                className="font-roboto h-12"
                 onClick={() => {
                   setDateFrom(new Date());
                   setDateTo(new Date());
@@ -138,16 +172,16 @@ export function AppointmentsView() {
               >
                 <Calendar className="h-4 w-4 mr-2" />
                 Today
-              </Button>
+              </Button> */}
             </div>
-            {showFilters && (
+            {/* Comment out filter section */}
+            {/* {showFilters && (
               <div className="flex flex-col sm:flex-row gap-4 mt-4">
                 <div className="w-40">
                   <Select value={status} onValueChange={setStatus}>
                     <SelectTrigger>
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
-                    {/* Add bg-white to SelectContent to fix transparency */}
                     <SelectContent className="bg-white">
                       <SelectItem value="all">All</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
@@ -170,7 +204,6 @@ export function AppointmentsView() {
                     placeholder="To date"
                   />
                 </div>
-                {/* Show range indicator if both dates are set */}
                 {dateFrom && dateTo && (
                   <div className="flex items-center text-sm text-gray-600 font-roboto">
                     {dateFrom.toLocaleDateString()} -{" "}
@@ -178,72 +211,109 @@ export function AppointmentsView() {
                   </div>
                 )}
               </div>
-            )}
+            )} */}
           </CardContent>
         </Card>
 
         {/* Appointments List */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-ubuntu">Appointments</CardTitle>
+        <Card className="shadow-sm border-0">
+          <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-lg">
+            <CardTitle className="font-ubuntu text-xl text-gray-800">Upcoming Appointments</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="p-0">
+            <div className="space-y-0">
               {filteredAppointments.length === 0 && (
-                <div className="text-center text-gray-500">
-                  No appointments found.
+                <div className="text-center py-12">
+                  <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No appointments found</h3>
+                  <p className="text-gray-500">
+                    {search ? "Try adjusting your search criteria" : "You don't have any appointments scheduled"}
+                  </p>
                 </div>
               )}
-              {filteredAppointments.map((appointment: any) => (
+              {filteredAppointments.map((appointment: any, index: number) => (
                 <div
                   key={appointment.appointmentId}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  className={`flex items-center justify-between p-6 hover:bg-gray-50 transition-all duration-200 group ${
+                    index !== filteredAppointments.length - 1 ? 'border-b border-gray-100' : ''
+                  }`}
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="text-center min-w-[60px]">
-                      <div className="text-lg font-bold text-gray-900 font-roboto">
-                        {appointment.appointmentTime?.slice(0, 5) || "--:--"}
+                  <div className="flex items-center space-x-6 flex-1">
+                    {/* Time Section */}
+                    <div className="flex flex-col items-center justify-center bg-blue-50 rounded-xl p-4 min-w-[100px] group-hover:bg-blue-100 transition-colors">
+                      <div className="text-xl font-bold text-blue-900 font-roboto">
+                        {formatTime(appointment.appointmentTime)}
+                      </div>
+                      <div className="text-xs text-blue-600 font-medium mt-1">
+                        {appointment.dayOfWeek}
+                      </div>
+                      <div className="text-xs text-blue-500 mt-1">
+                        {formatDate(appointment.appointmentDate)}
                       </div>
                     </div>
-                    <Avatar className="h-12 w-12">
+
+                    {/* Patient Avatar */}
+                    <Avatar className="h-14 w-14 border-2 border-gray-200 shadow-sm">
                       <AvatarImage
                         src={appointment.avatar || "/placeholder.svg"}
                       />
-                      <AvatarFallback>
+                      <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white font-semibold">
                         {`${appointment.customerFirstName?.[0] || ""}${
                           appointment.customerLastName?.[0] || ""
                         }`}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900 font-roboto">
-                        {appointment.customerFirstName}{" "}
-                        {appointment.customerLastName}
-                      </h3>
-                      <p className="text-sm text-gray-500 font-roboto">
-                        {appointment.serviceName}
-                      </p>
+
+                    {/* Patient & Service Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-semibold text-lg text-gray-900 font-roboto">
+                          {appointment.customerFirstName} {appointment.customerLastName}
+                        </h3>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                            appointment.status === "confirmed"
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                              : appointment.status === "pending"
+                              ? "bg-amber-100 text-amber-800 border border-amber-200"
+                              : appointment.status === "cancelled"
+                              ? "bg-red-100 text-red-800 border border-red-200"
+                              : "bg-gray-100 text-gray-800 border border-gray-200"
+                          }`}
+                        >
+                          {appointment.status}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600 mb-1">
+                        <FileText className="h-4 w-4" />
+                        <span className="font-medium">{appointment.serviceName}</span>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <Phone className="h-3 w-3" />
+                          <span>{appointment.customerPhone}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Mail className="h-3 w-3" />
+                          <span>{appointment.customerEmail}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium font-roboto ${
-                          appointment.status === "confirmed"
-                            ? "bg-green-100 text-green-800"
-                            : appointment.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : appointment.status === "cancelled"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {appointment.status}
-                      </span>
+
+                    {/* Service Price */}
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-green-600">
+                        £{appointment.serviceBasePrice}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {appointment.durationMinutes} min
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    {/* <Button variant="ghost" size="icon">
-                      <Phone className="h-4 w-4" />
-                    </Button> */}
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center space-x-3 ml-6">
+                    {/* View Details Button */}
                     <Dialog
                       open={
                         modalOpen &&
@@ -256,17 +326,20 @@ export function AppointmentsView() {
                     >
                       <DialogTrigger asChild>
                         <Button
-                          variant="ghost"
-                          size="icon"
+                          variant="outline"
+                          size="sm"
+                          className="h-10 px-4 font-roboto border-gray-300 hover:border-blue-500 hover:text-blue-600"
                           onClick={() => {
                             setSelectedAppointmentId(appointment.appointmentId);
                             setModalOpen(true);
                           }}
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-4 w-4 mr-2" />
+                          View
                         </Button>
                       </DialogTrigger>
-                      {/* Switch beside Eye icon, colored by status, with tooltip */}
+
+                      {/* Status Toggle Switch */}
                       <Tooltip>
                         <TooltipTrigger asChild>
                         <div
@@ -289,30 +362,35 @@ export function AppointmentsView() {
       );
     }
   }}
-  className={`relative inline-flex h-6 w-12 cursor-pointer items-center rounded-full transition-colors duration-300
-    ${appointment.status === "confirmed" ? "bg-emerald-500" : "bg-gray-300"}
-    ${updatingId === appointment.appointmentId ? "opacity-50 cursor-not-allowed" : ""}
+  className={`relative inline-flex h-8 w-14 cursor-pointer items-center rounded-full transition-all duration-300 shadow-sm ml-3
+    ${appointment.status === "confirmed" ? "bg-emerald-500 shadow-emerald-200" : "bg-gray-300"}
+    ${updatingId === appointment.appointmentId ? "opacity-50 cursor-not-allowed" : "hover:shadow-md"}
     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500
   `}
   style={{ pointerEvents: updatingId === appointment.appointmentId ? "none" : undefined }}
 >
   <span
-    className={`absolute left-1 top-1/2 -translate-y-1/2 h-4 w-4 flex items-center justify-center rounded-full bg-white shadow transition-transform duration-300
+    className={`absolute left-1 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center rounded-full bg-white shadow-md transition-transform duration-300
       ${appointment.status === "confirmed" ? "translate-x-6" : "translate-x-0"}
     `}
   >
-    {appointment.status === "confirmed" && (
-      <CheckCircle className="h-3 w-3 text-emerald-500" />
+    {updatingId === appointment.appointmentId ? (
+      <div className="h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+    ) : appointment.status === "confirmed" ? (
+      <CheckCircle className="h-4 w-4 text-emerald-500" />
+    ) : (
+      <XCircle className="h-4 w-4 text-gray-400" />
     )}
   </span>
 </div>
-
-
                         </TooltipTrigger>
                         <TooltipContent side="top">
-                          {"Update Status"}
+                          <p className="font-medium">
+                            {appointment.status === "confirmed" ? "Mark as Pending" : "Mark as Confirmed"}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
+
                       <DialogContent className="max-w-4xl w-full max-h-[80vh] overflow-y-auto p-8 rounded-2xl">
                         <DialogHeader>
                           <DialogTitle className="text-2xl mb-2">Appointment Details</DialogTitle>

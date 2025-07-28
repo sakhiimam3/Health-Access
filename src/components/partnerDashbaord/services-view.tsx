@@ -20,6 +20,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+interface ServiceData {
+  id: string;
+  name: string;
+  typeId?: string;
+  parentId?: string;
+}
+
+interface ServiceResponse {
+  data: ServiceData[];
+}
+
 export function ServicesView() {
   const router = useRouter();
   const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null);
@@ -29,6 +40,17 @@ export function ServicesView() {
   );
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Add caching for better performance and relationship tracking
+  const [cachedMainServices, setCachedMainServices] = useState<{
+    [key: string]: ServiceResponse;
+  }>({});
+  const [cachedChildServices, setCachedChildServices] = useState<{
+    [key: string]: ServiceResponse;
+  }>({});
+  const [cachedSubChildServices, setCachedSubChildServices] = useState<{
+    [key: string]: ServiceResponse;
+  }>({});
 
   // Cache for service relationships to improve counting logic
   const [serviceRelationships, setServiceRelationships] = useState<{
@@ -100,9 +122,15 @@ export function ServicesView() {
     }
   }, [mainServicesData]);
 
-  // Update service relationships for main services
+  // Cache main services when they change
   useEffect(() => {
-    if (mainServicesData?.data) {
+    if (mainServicesData && selectedTypeId) {
+      setCachedMainServices((prev) => ({
+        ...prev,
+        [`type_${selectedTypeId}`]: mainServicesData,
+      }));
+
+      // Update service relationships for main services
       const mainTypes: Record<string, string> = {};
       mainServicesData.data.forEach((service) => {
         if (service.typeId) {
@@ -115,11 +143,17 @@ export function ServicesView() {
         mainServiceTypes: { ...prev.mainServiceTypes, ...mainTypes },
       }));
     }
-  }, [mainServicesData]);
+  }, [mainServicesData, selectedTypeId]);
 
-  // Update service relationships for child services
+  // Cache child services and handle auto-selection for leaf nodes
   useEffect(() => {
-    if (childServicesData?.data && selectedParentId) {
+    if (childServicesData && selectedParentId) {
+      setCachedChildServices((prev) => ({
+        ...prev,
+        [`parent_${selectedParentId}`]: childServicesData,
+      }));
+
+      // Update service relationships for child services
       const childToParent: Record<string, string> = {};
       childServicesData.data.forEach((service) => {
         if (service.parentId) {
@@ -131,12 +165,29 @@ export function ServicesView() {
         ...prev,
         childToParent: { ...prev.childToParent, ...childToParent },
       }));
-    }
-  }, [childServicesData, selectedParentId]);
 
-  // Update service relationships for sub-child services
+      // If no children found, the parent is a leaf node - auto-select it
+      if (childServicesData.data.length === 0) {
+        const parentService = Object.values(cachedMainServices)
+          .flatMap(services => services.data)
+          .find(service => service.id === selectedParentId);
+        
+        if (parentService && !selectedServices.includes(parentService.id)) {
+          setSelectedServices(prev => [...prev, parentService.id]);
+        }
+      }
+    }
+  }, [childServicesData, selectedParentId, cachedMainServices, selectedServices]);
+
+  // Cache sub-child services and handle auto-selection for leaf nodes
   useEffect(() => {
-    if (subChildServicesData?.data && selectedSubParentId) {
+    if (subChildServicesData && selectedSubParentId) {
+      setCachedSubChildServices((prev) => ({
+        ...prev,
+        [`subparent_${selectedSubParentId}`]: subChildServicesData,
+      }));
+
+      // Update service relationships for sub-child services
       const subChildToChild: Record<string, string> = {};
       subChildServicesData.data.forEach((service) => {
         if (service.parentId) {
@@ -148,24 +199,40 @@ export function ServicesView() {
         ...prev,
         subChildToChild: { ...prev.subChildToChild, ...subChildToChild },
       }));
-    }
-  }, [subChildServicesData, selectedSubParentId]);
 
-  // Check if a service has children
-  const hasChildren = (serviceId: string) => {
-    // For a child service, check if it has sub-children
-    if (subChildServicesData?.data && subChildServicesData.data.length > 0) {
-      return subChildServicesData.data.some(
-        (service) => service.parentId === serviceId
-      );
+      // If no sub-children found, the parent is a leaf node - auto-select it
+      if (subChildServicesData.data.length === 0) {
+        const parentService = Object.values(cachedChildServices)
+          .flatMap(services => services.data)
+          .find(service => service.id === selectedSubParentId);
+        
+        if (parentService && !selectedServices.includes(parentService.id)) {
+          setSelectedServices(prev => [...prev, parentService.id]);
+        }
+      }
     }
-    // For a main service, check if it has children
-    if (childServicesData?.data && childServicesData.data.length > 0) {
-      return childServicesData.data.some(
-        (service) => service.parentId === serviceId
-      );
+  }, [subChildServicesData, selectedSubParentId, cachedChildServices, selectedServices]);
+
+  // Check if a service has children using cached data
+  const hasChildren = (serviceId: string, level: 0 | 1 = 0): boolean => {
+    if (level === 0) {
+      // Check if main service has children
+      const childServices = cachedChildServices[`parent_${serviceId}`];
+      return childServices ? childServices.data.length > 0 : false;
+    } else {
+      // Check if child service has sub-children
+      const subChildServices = cachedSubChildServices[`subparent_${serviceId}`];
+      return subChildServices ? subChildServices.data.length > 0 : false;
     }
-    return false;
+  };
+
+  // Check if data is loaded for a service
+  const isDataLoaded = (serviceId: string, level: 0 | 1 = 0): boolean => {
+    if (level === 0) {
+      return cachedChildServices[`parent_${serviceId}`] !== undefined;
+    } else {
+      return cachedSubChildServices[`subparent_${serviceId}`] !== undefined;
+    }
   };
 
   // Find the type ID for a service (even if it's a child or sub-child)
@@ -192,32 +259,36 @@ export function ServicesView() {
     return undefined;
   };
 
-  // Check if a service is selectable (only last level services are selectable)
-  const isServiceSelectable = (serviceId: string, level: number): boolean => {
-    // Main service is selectable only if it has no children
-    if (level === 0) {
-      return !hasChildren(serviceId);
-    }
-
-    // Child service is selectable only if it has no sub-children
-    if (level === 1) {
-      return !hasChildren(serviceId);
-    }
-
-    // Sub-child services are always selectable
-    return true;
-  };
-
-  // Calculate service counts for each type - only count last level services
+  // Calculate service counts for each type - only count leaf level services
   const calculateMyServiceCount = (typeId: string) => {
     if (!selectedServices || selectedServices.length === 0) return 0;
 
-    // Count only services that belong to this type and are at the last level
     return selectedServices.filter((serviceId) => {
       const serviceTypeId = findServiceTypeId(serviceId);
-      // Only count if it's a last level service (either a child without sub-children or a sub-child)
-      const isLastLevel = !hasChildren(serviceId);
-      return serviceTypeId === typeId && isLastLevel;
+      return serviceTypeId === typeId;
+    }).length;
+  };
+
+  // Get selected services count by parent
+  const getSelectedServicesCountByParent = (parentId: string) => {
+    return selectedServices.filter((serviceId) => {
+      // Check if this is a direct child
+      const childServices = cachedChildServices[`parent_${parentId}`] || { data: [] };
+      if (childServices.data.some((s) => s.id === serviceId)) return true;
+
+      // Check if this is a sub-child
+      let foundInSubChild = false;
+      Object.values(cachedSubChildServices).forEach((services) => {
+        const subService = services.data.find((s) => s.id === serviceId);
+        if (subService) {
+          const parentChildService = childServices.data.find(
+            (s) => s.id === subService.parentId
+          );
+          if (parentChildService) foundInSubChild = true;
+        }
+      });
+
+      return foundInSubChild;
     }).length;
   };
 
@@ -242,68 +313,36 @@ export function ServicesView() {
     </div>
   );
 
-  // Function to handle service selection
-  const handleServiceClick = (service: any) => {
-    if (service.parentId) {
-      // This is a child service
-      if (selectedSubParentId === service.id) {
-        setSelectedSubParentId(null);
-      } else {
-        setSelectedSubParentId(service.id);
-      }
-    } else if (service.typeId) {
-      // This is a main service
-      if (selectedParentId === service.id) {
-        setSelectedParentId(null);
-        setSelectedSubParentId(null);
-      } else {
-        setSelectedParentId(service.id);
-        setSelectedSubParentId(null);
-      }
-    }
+  // Handle main service click
+  const handleMainServiceClick = (service: ServiceData) => {
+    setSelectedParentId(service.id);
+    setSelectedSubParentId(null);
   };
 
-  // Function to handle sub-child service selection
-  const handleSubChildClick = (service: any) => {
-    // Sub-children are always selectable as they are the last level
+  // Handle child service click
+  const handleChildServiceClick = (service: ServiceData) => {
+    setSelectedSubParentId(service.id);
+  };
+
+  // Handle service selection (for leaf nodes only)
+  const handleServiceSelect = (serviceId: string) => {
     setSelectedServices((prev) => {
-      if (prev.includes(service.id)) {
-        return prev.filter((id) => id !== service.id);
+      if (prev.includes(serviceId)) {
+        return prev.filter((id) => id !== serviceId);
       } else {
-        return [...prev, service.id];
+        return [...prev, serviceId];
       }
     });
   };
 
-  // Function to handle child service selection for update
-  const handleChildServiceSelect = (service: any) => {
-    // Check if this child service has sub-children
-    const hasSubChildren = hasChildren(service.id);
-
-    // Only allow selection if it doesn't have sub-children
-    if (!hasSubChildren) {
-      setSelectedServices((prev) => {
-        if (prev.includes(service.id)) {
-          return prev.filter((id) => id !== service.id);
-        } else {
-          return [...prev, service.id];
-        }
-      });
-    }
-  };
-
   // Update services function
   const handleUpdateServices = () => {
-  
-
     setIsUpdating(true);
 
-    // Only send the currently selected services
-    const selectedLastLevelServices = selectedServices.filter(serviceId => !hasChildren(serviceId));
-
+    // Only send the currently selected services (they are already leaf nodes)
     updateProfile(
       {
-        serviceIds: selectedLastLevelServices,
+        serviceIds: selectedServices,
       },
       {
         onSuccess: () => {
@@ -429,31 +468,29 @@ export function ServicesView() {
               </TooltipProvider>
 
               {/* Update Button */}
-              
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        className="bg-teal-600 rounded-full hover:bg-teal-700 text-white"
-                        onClick={handleUpdateServices}
-                        disabled={isProfileUpdating || isUpdating}
-                      >
-                        {isProfileUpdating || isUpdating ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Updating...
-                          </>
-                        ) : (
-                          "Update Services"
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Save your service selection changes</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      className="bg-teal-600 rounded-full hover:bg-teal-700 text-white"
+                      onClick={handleUpdateServices}
+                      disabled={isProfileUpdating || isUpdating || !hasChanges()}
+                    >
+                      {isProfileUpdating || isUpdating ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        "Update Services"
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Save your service selection changes</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
 
@@ -469,45 +506,53 @@ export function ServicesView() {
                 </div>
               ) : (
                 mainServicesData?.data?.map((service) => {
-                  // Count selected services under this main service
-                  const childCount = selectedServices.filter((id) => {
-                    const parentId = serviceRelationships.childToParent[id];
-                    const childId = serviceRelationships.subChildToChild[id];
-
-                    if (childId) {
-                      // It's a sub-child service
-                      const parentOfChild =
-                        serviceRelationships.childToParent[childId];
-                      return parentOfChild === service.id;
-                    } else if (parentId) {
-                      // It's a child service
-                      return parentId === service.id;
-                    }
-                    return false;
-                  }).length;
+                  const hasSubChildren = hasChildren(service.id, 0);
+                  const isDataLoadedForService = isDataLoaded(service.id, 0);
+                  const isLeafNode = isDataLoadedForService && !hasSubChildren;
+                  const isFormSelected = isSelectedForUpdate(service.id);
+                  const isNavigationActive = selectedParentId === service.id;
+                  const childCount = getSelectedServicesCountByParent(service.id);
 
                   return (
                     <button
                       key={service.id}
-                      onClick={() => handleServiceClick(service)}
+                      onClick={() => {
+                        handleMainServiceClick(service);
+                        // If it's a leaf node, also toggle selection
+                        if (isLeafNode) {
+                          handleServiceSelect(service.id);
+                        }
+                      }}
                       className={`w-full h-12 p-3 text-left rounded-[20px] border border-[#E7E7E7] shadow-sm transition-all ${
-                        selectedParentId === service.id
+                        isFormSelected
                           ? "border-teal-500 bg-teal-50"
+                          : isNavigationActive
+                          ? "border-teal-300 bg-teal-50/50"
                           : "hover:border-gray-300"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-900 text-sm">
-                          {service.name}
-                        </span>
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-900 text-sm">
+                            {service.name}
+                          </span>
                           {childCount > 0 && (
-                            <span className="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full mr-2">
+                            <span className="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full">
                               {childCount}
                             </span>
                           )}
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                          {isFormSelected && (
+                            <Check className="w-4 h-4 text-teal-500" />
+                          )}
+                          {isMyService(service.id) && (
+                            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                              Current
+                            </span>
+                          )}
                         </div>
+                        {(hasSubChildren || !isDataLoadedForService) && (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
                       </div>
                     </button>
                   );
@@ -529,68 +574,53 @@ export function ServicesView() {
                   </div>
                 ) : (
                   childServicesData?.data?.map((service) => {
-                    const hasSubChildren = hasChildren(service.id);
-
-                    // Count sub-child services under this child service
-                    const subChildCount = hasSubChildren
-                      ? selectedServices.filter((id) => {
-                          return (
-                            serviceRelationships.subChildToChild[id] ===
-                            service.id
-                          );
-                        }).length
-                      : 0;
+                    const hasSubChildren = hasChildren(service.id, 1);
+                    const isDataLoadedForService = isDataLoaded(service.id, 1);
+                    const isLeafNode = isDataLoadedForService && !hasSubChildren;
+                    const isFormSelected = isSelectedForUpdate(service.id);
+                    const isNavigationActive = selectedSubParentId === service.id;
+                    const subChildCount = getSelectedServicesCountByParent(service.id);
 
                     return (
                       <button
                         key={service.id}
                         onClick={() => {
-                          handleServiceClick(service);
-                          if (!hasSubChildren) {
-                            handleChildServiceSelect(service);
+                          handleChildServiceClick(service);
+                          // If it's a leaf node, also toggle selection
+                          if (isLeafNode) {
+                            handleServiceSelect(service.id);
                           }
                         }}
                         className={`w-full h-12 p-3 text-left rounded-[20px] border ${
-                          isSelectedForUpdate(service.id) && !hasSubChildren
+                          isFormSelected
                             ? "border-teal-500 bg-teal-50"
+                            : isNavigationActive
+                            ? "border-teal-300 bg-teal-50/50"
                             : "border-[#E7E7E7] hover:border-gray-300"
-                        } shadow-sm transition-all ${
-                          selectedSubParentId === service.id
-                            ? "ring-2 ring-teal-200"
-                            : ""
-                        } ${
-                          hasSubChildren
-                            ? "cursor-pointer bg-gray-50"
-                            : "cursor-pointer hover:border-teal-200"
-                        }`}
+                        } shadow-sm transition-all`}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center">
+                          <div className="flex items-center gap-2">
                             <span className="font-medium text-gray-900 text-sm">
                               {service.name}
                             </span>
-                          </div>
-                          <div className="flex items-center">
-                            {!hasSubChildren &&
-                              isSelectedForUpdate(service.id) && (
-                                <Check className="w-4 h-4 text-teal-500 mr-2" />
-                              )}
-                            {isMyService(service.id) && !hasSubChildren && (
-                              <span className="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full mr-2">
+                            {subChildCount > 0 && (
+                              <span className="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full">
+                                {subChildCount}
+                              </span>
+                            )}
+                            {isFormSelected && (
+                              <Check className="w-4 h-4 text-teal-500" />
+                            )}
+                            {isMyService(service.id) && (
+                              <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                                 Current
                               </span>
                             )}
-                            {hasSubChildren && (
-                              <>
-                                {subChildCount > 0 && (
-                                  <span className="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full mr-2">
-                                    {subChildCount}
-                                  </span>
-                                )}
-                                <ChevronRight className="w-4 h-4 text-gray-400" />
-                              </>
-                            )}
                           </div>
+                          {(hasSubChildren || !isDataLoadedForService) && (
+                            <ChevronRight className="w-4 h-4 text-gray-400" />
+                          )}
                         </div>
                       </button>
                     );
@@ -599,6 +629,7 @@ export function ServicesView() {
               </div>
             )}
 
+            {/* Column 3: Sub-Child Services */}
             {selectedSubParentId && (
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold text-teal-600 mb-4">
@@ -611,33 +642,37 @@ export function ServicesView() {
                     No additional options available
                   </div>
                 ) : (
-                  subChildServicesData?.data?.map((service) => (
-                    <button
-                      key={service.id}
-                      onClick={() => handleSubChildClick(service)}
-                      className={`w-full h-12 p-3 text-left rounded-[20px] border ${
-                        isSelectedForUpdate(service.id)
-                          ? "border-teal-500 bg-teal-50"
-                          : "border-[#E7E7E7] hover:border-gray-300"
-                      } shadow-sm transition-all`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-900 text-sm">
-                          {service.name}
-                        </span>
-                        <div className="flex items-center">
-                          {isSelectedForUpdate(service.id) && (
-                            <Check className="w-4 h-4 text-teal-500 mr-2" />
-                          )}
-                          {isMyService(service.id) && (
-                            <span className="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full">
-                              Current
+                  subChildServicesData?.data?.map((service) => {
+                    const isFormSelected = isSelectedForUpdate(service.id);
+
+                    return (
+                      <button
+                        key={service.id}
+                        onClick={() => handleServiceSelect(service.id)}
+                        className={`w-full h-12 p-3 text-left rounded-[20px] border ${
+                          isFormSelected
+                            ? "border-teal-500 bg-teal-50"
+                            : "border-[#E7E7E7] hover:border-gray-300"
+                        } shadow-sm transition-all`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-900 text-sm">
+                              {service.name}
                             </span>
-                          )}
+                            {isFormSelected && (
+                              <Check className="w-4 h-4 text-teal-500" />
+                            )}
+                            {isMyService(service.id) && (
+                              <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                Current
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  ))
+                      </button>
+                    );
+                  })
                 )}
               </div>
             )}

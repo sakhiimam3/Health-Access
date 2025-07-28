@@ -468,6 +468,88 @@ export const useUpdatePartnerAppointmentStatus = (id: string) => {
   return { mutate, isPending, error };
 };
 
+// Partner Dashboard API hooks
+
+// Get partner dashboard overview
+export const useGetPartnerDashboard = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get appointment analytics
+export const useGetAppointmentAnalytics = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/analytics",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get overall appointment analytics for the year
+export const useGetOverallAppointmentAnalytics = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/analytics/overall",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get upcoming appointments
+export const useGetDashboardUpcomingAppointments = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/upcoming-appointments",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get next patient information
+export const useGetNextPatient = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/next-patient",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get partner services with statistics
+export const useGetDashboardServices = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/services",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get dashboard statistics
+export const useGetDashboardStats = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/stats",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get revenue analytics
+export const useGetRevenueAnalytics = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/revenue-analytics",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get service performance analytics
+export const useGetServicePerformance = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/service-performance",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get patient demographics
+export const useGetPatientDemographics = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/patient-demographics",
+  });
+  return { data, isLoading, error, refetch };
+};
+
 // Customer Dashboard API
 export const useGetCustomerDashboard = () => {
   const { data, isLoading, error, refetch } = useApiQuery({
@@ -475,5 +557,7 @@ export const useGetCustomerDashboard = () => {
   });
   return { data, isLoading, error, refetch };
 };
+
+
 
 

@@ -26,9 +26,7 @@ export function CustomerDashboardTabs() {
               href={tab.href}
               className={cn(
                 "px-6 py-3 text-base font-roboto font-medium rounded-[20px] transition-colors",
-                isActive
-                  ? "bg-teal-600 text-white"
-                  : "bg-black text-white hover:bg-gray-800"
+                isActive ? "bg-black text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300",
               )}
             >
               {tab.name}
