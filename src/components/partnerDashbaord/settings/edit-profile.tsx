@@ -300,7 +300,7 @@ export function EditProfile() {
             <Input
               id="businessName"
               {...register("businessName")}
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
+              className="h-12 text-base text-[gray] rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
             />
             {errors.businessName && <p className="text-red-500 text-sm mt-1">{errors.businessName.message}</p>}
           </div>
@@ -313,7 +313,7 @@ export function EditProfile() {
               id="email"
               type="email"
               {...register("email")}
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
+              className="h-12 text-base text-[gray] rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           </div>
@@ -325,7 +325,7 @@ export function EditProfile() {
             <Input
               id="phoneNumber"
               {...register("phoneNumber")}
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
+              className="h-12 text-base text-[gray] rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
             />
             {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber.message}</p>}
           </div>
@@ -337,7 +337,7 @@ export function EditProfile() {
             <Input
               id="website"
               {...register("website")}
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
+              className="h-12 text-base text-[gray] rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500"
             />
             {errors.website && <p className="text-red-500 text-sm mt-1">{errors.website.message}</p>}
           </div>
@@ -351,7 +351,7 @@ export function EditProfile() {
           <Textarea
             id="describeYourBusiness"
             {...register("describeYourBusiness")}
-            className="min-h-[120px] w-full text-base rounded-[20px] border border-[#E7E7E7] shadow-sm px-3 py-2 focus:border-teal-500 focus:ring-teal-500 resize-none"
+            className="min-h-[120px] w-full text-base text-[gray] rounded-[20px] border border-[#E7E7E7] shadow-sm px-3 py-2 focus:border-teal-500 focus:ring-teal-500 resize-none"
           />
           {errors.describeYourBusiness && (
             <p className="text-red-500 text-sm mt-1">{errors.describeYourBusiness.message}</p>
