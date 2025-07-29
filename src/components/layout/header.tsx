@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -47,13 +47,26 @@ const AirbnbStyleSearch = () => {
   const [showServiceDropdown, setShowServiceDropdown] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [locationInput, setLocationInput] = useState('');
+  const [serviceSearchInput, setServiceSearchInput] = useState('');
+  const [debouncedServiceSearch, setDebouncedServiceSearch] = useState('');
   const router = useRouter();
   const pathname = usePathname();
   const urlSearchParams = useSearchParams();
   const searchRef = useRef<HTMLDivElement>(null);
   
+  // Debounce service search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedServiceSearch(serviceSearchInput);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [serviceSearchInput]);
+  
   // Get services and service types from API
-  const { data: servicesData, isLoading: servicesLoading } = useGetServices();
+  const { data: servicesData, isLoading: servicesLoading } = useGetServices({
+    search: debouncedServiceSearch
+  });
   const { data: serviceTypesData } = useGetSeriveTypes();
 
   // Close dropdowns when clicking outside
@@ -64,6 +77,9 @@ const AirbnbStyleSearch = () => {
         setShowServiceDropdown(false);
         setShowDatePicker(false);
         setActiveTab(null);
+        // Reset service search when closing dropdown
+        setServiceSearchInput('');
+        setDebouncedServiceSearch('');
       }
     };
 
@@ -134,6 +150,8 @@ const AirbnbStyleSearch = () => {
       longitude: undefined,
     });
     setLocationInput('');
+    setServiceSearchInput('');
+    setDebouncedServiceSearch('');
     setActiveTab(null);
     setShowLocationDropdown(false);
     setShowServiceDropdown(false);
@@ -377,6 +395,9 @@ const AirbnbStyleSearch = () => {
             setShowServiceDropdown(true);
             setShowLocationDropdown(false);
             setShowDatePicker(false);
+            // Reset service search when opening dropdown
+            setServiceSearchInput('');
+            setDebouncedServiceSearch('');
           }}
         >
           <div className="p-4 cursor-pointer">
@@ -473,6 +494,9 @@ const AirbnbStyleSearch = () => {
             setShowServiceDropdown(true);
             setShowLocationDropdown(false);
             setShowDatePicker(false);
+            // Reset service search when opening dropdown
+            setServiceSearchInput('');
+            setDebouncedServiceSearch('');
           }}
         >
           <div className="flex items-center gap-3">
@@ -584,38 +608,96 @@ const AirbnbStyleSearch = () => {
 
       {/* Service Dropdown */}
       {showServiceDropdown && activeTab === 'service' && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-4 bg-white rounded-lg shadow-xl border z-50 max-h-80 overflow-y-auto">
-          {servicesLoading ? (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 className="h-5 w-5 animate-spin text-[#189BA3]" />
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <div className="text-sm font-medium text-gray-900 mb-3">Available services</div>
-              {servicesData?.data?.map((service: any) => (
-                <div
-                  key={service.id}
-                  className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer flex items-center gap-3 transition-colors"
-                  onClick={() => handleServiceSelect(service)}
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-50">
+          <div className="p-4">
+            {/* Service Search Input */}
+            <div className="relative mb-4">
+              <input
+                type="text"
+                placeholder="Search for services..."
+                value={serviceSearchInput}
+                onChange={(e) => setServiceSearchInput(e.target.value)}
+                className="w-full h-12 px-4 text-base rounded-lg border border-gray-200 shadow-sm focus:border-[#189BA3] focus:ring-1 focus:ring-[#189BA3] focus:outline-none transition-colors"
+                autoFocus
+                autoComplete="off"
+              />
+              {serviceSearchInput && (
+                <button
+                  onClick={() => {
+                    setServiceSearchInput('');
+                    setDebouncedServiceSearch('');
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  <Stethoscope className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <div className="font-medium">{service.name}</div>
-                    {service.description && (
-                      <div className="text-sm text-gray-500 line-clamp-1">
-                        {service.description}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {(!servicesData?.data || servicesData.data.length === 0) && (
-                <div className="text-center py-4 text-gray-500">
-                  No services available
-                </div>
+                  ✕
+                </button>
               )}
             </div>
-          )}
+
+            {/* Services List */}
+            <div className="space-y-1 max-h-64 overflow-y-auto">
+              {servicesLoading ? (
+                // Skeleton Loading
+                <div className="space-y-2">
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="p-3 rounded-lg animate-pulse">
+                      <div className="flex items-center gap-3">
+                        <div className="h-4 w-4 bg-gray-200 rounded"></div>
+                        <div className="flex-1">
+                          <div className="h-4 bg-gray-200 rounded mb-2 w-3/4"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="text-sm font-medium text-gray-900 mb-3">
+                    {serviceSearchInput ? `Search results for "${serviceSearchInput}"` : 'Available services'}
+                  </div>
+                  {servicesData?.data?.map((service: any) => (
+                    <div
+                      key={service.id}
+                      className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer flex items-center gap-3 transition-colors"
+                      onClick={() => handleServiceSelect(service)}
+                    >
+                      <Stethoscope className="h-4 w-4 text-[#189BA3]" />
+                      <div>
+                        <div className="font-medium text-gray-900">{service.name}</div>
+                        {service.description && (
+                          <div className="text-sm text-gray-500 line-clamp-1">
+                            {service.description}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* No results message */}
+                  {(!servicesData?.data || servicesData.data.length === 0) && !servicesLoading && (
+                    <div className="p-4 text-center text-gray-500">
+                      <Stethoscope className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <p className="text-sm">
+                        {serviceSearchInput ? 'No services found' : 'No services available'}
+                      </p>
+                      {serviceSearchInput && (
+                        <p className="text-xs">Try a different search term</p>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Helper text */}
+            <div className="mt-4 pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-500 flex items-center">
+                <Stethoscope className="h-3 w-3 mr-1" />
+                Type to search for healthcare services
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
