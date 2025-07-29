@@ -558,6 +558,35 @@ export const useGetCustomerDashboard = () => {
   return { data, isLoading, error, refetch };
 };
 
+// Search partners API hook
+export const useSearchPartners = (params?: {
+  search?: string;
+  location?: string;
+  serviceId?: string;
+  availableDate?: string;
+  latitude?: number;
+  longitude?: number;
+  radius?: number;
+  page?: number;
+  limit?: number;
+}) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partners/search",
+    params: {
+      search: params?.search,
+      location: params?.location,
+      serviceId: params?.serviceId,
+      availableDate: params?.availableDate,
+      latitude: params?.latitude,
+      longitude: params?.longitude,
+      radius: params?.radius || 25,
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+    }
+  });
+  return { data, isLoading, error, refetch };
+};
+
 
 
 

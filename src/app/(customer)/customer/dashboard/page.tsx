@@ -30,6 +30,9 @@ export default function CustomerDashboardPage() {
 
   const userData = dashboardData?.data;
   const hasUpcomingAppointments = userData?.upcomingAppointments && userData.upcomingAppointments.length > 0;
+  
+  // Convert appointment dates to Date objects for the calendar
+  const appointmentDates = userData?.upcomingAppointments?.map((appointment: any) => new Date(appointment.date)) || [];
 
   return (
     <div className="p-6 min-h-screen bg-gray-50">
@@ -97,9 +100,9 @@ export default function CustomerDashboardPage() {
               </svg>
             </button> */}
           </div>
-          {/* Custom Calendar */}
+          {/* Custom Calendar with all appointment dates highlighted */}
           <DashboardCalendar 
-            selectedDate={hasUpcomingAppointments ? new Date(userData?.upcomingAppointments?.[0]?.date) : undefined} 
+            appointmentDates={appointmentDates}
           />
           
           {/* No Appointments Alert or Appointments List */}

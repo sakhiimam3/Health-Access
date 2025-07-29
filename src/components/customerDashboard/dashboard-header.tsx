@@ -2,7 +2,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Bell, User, Loader2, ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { useUserContext } from "@/context/userStore";
 import { useState, useRef, useEffect } from "react";

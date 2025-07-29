@@ -17,10 +17,13 @@ const FrequentlyAsked = ({ btnColor }: { btnColor: string }) => {
     <section className="py-16 bg-white">
       <LayoutWrapper>
         <div>
-          <div className="max-w-4xl">
+          <div className="">
             <h1 className="text-4xl font-bold mb-5">
               Frequently Asked Questions
             </h1>
+             <p className="text-[#52525B] text-sm mb-10">
+             Have questions? We’ve got answers! Explore our FAQs to learn more about our services, booking process, and <br /> how we ensure seamless healthcare access.
+             </p>
             {loading ? (
               <div className="flex justify-center items-center my-8">
                 <Loader2 className="w-8 h-8 animate-spin text-teal-500 mr-2" />
@@ -35,11 +38,11 @@ const FrequentlyAsked = ({ btnColor }: { btnColor: string }) => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 {faqsToShow.map((item, index) => (
-                  <div key={index} className="pb-6">
+                  <div key={index} className="pb-4">
                     <h3 className="font-semibold text-lg mb-2">
                       {item.question}
                     </h3>
-                    <p className="font-roboto text-sm">{item.answer}</p>
+                    <p className="font-roboto text-sm text-[#52525B]">{item.answer}</p>
                   </div>
                 ))}
               </div>

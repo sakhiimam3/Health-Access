@@ -15,18 +15,36 @@ function getFirstDayOfWeek(year: number, month: number) {
 const today = new Date();
 
 export default function DashboardCalendar({
-  selectedDate,
+  appointmentDates = [],
   onSelectDate,
 }: {
-  selectedDate?: Date;
+  appointmentDates?: Date[];
   onSelectDate?: (date: Date) => void;
 }) {
-  const [currentMonth, setCurrentMonth] = useState(selectedDate?.getMonth() ?? today.getMonth());
-  const [currentYear, setCurrentYear] = useState(selectedDate?.getFullYear() ?? today.getFullYear());
-  const [selectedDay, setSelectedDay] = useState<number | null>(selectedDate?.getDate() ?? null);
+  // Use the first appointment date for initial month/year, or today if no appointments
+  const initialDate = appointmentDates.length > 0 ? appointmentDates[0] : today;
+  const [currentMonth, setCurrentMonth] = useState(initialDate.getMonth());
+  const [currentYear, setCurrentYear] = useState(initialDate.getFullYear());
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDayOfWeek = getFirstDayOfWeek(currentYear, currentMonth);
+
+  // Helper function to check if a day has an appointment
+  const hasAppointment = (day: number) => {
+    return appointmentDates.some(date => 
+      date.getDate() === day && 
+      date.getMonth() === currentMonth && 
+      date.getFullYear() === currentYear
+    );
+  };
+
+  // Helper function to check if a day is today
+  const isToday = (day: number) => {
+    return day === today.getDate() && 
+           currentMonth === today.getMonth() && 
+           currentYear === today.getFullYear();
+  };
 
   // Build calendar grid
   const calendarRows: (number | null)[][] = [];
@@ -100,8 +118,9 @@ export default function DashboardCalendar({
                   {day ? (
                     <button
                       className={`w-7 h-7 rounded-full transition-colors
-                        ${selectedDay !== null && day === selectedDay ? "bg-cyan-600 text-white" : "hover:bg-cyan-100"}
-                        ${day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear() && day !== selectedDay ? "border border-cyan-400" : ""}
+                        ${hasAppointment(day) ? "bg-cyan-600 text-white font-semibold" : "hover:bg-cyan-100"}
+                        ${selectedDay !== null && day === selectedDay && !hasAppointment(day) ? "bg-cyan-300 text-cyan-800" : ""}
+                        ${isToday(day) && !hasAppointment(day) && day !== selectedDay ? "border border-cyan-400" : ""}
                       `}
                       onClick={() => handleSelectDay(day)}
                     >
