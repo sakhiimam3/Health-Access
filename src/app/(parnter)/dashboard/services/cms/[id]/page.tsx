@@ -29,7 +29,7 @@ import {
 // import { usePublishSections } from "@/components/admin/cms/use-publish-sections";
 import { toast } from "react-toastify";
 import { useGetServiceSections, useCreateServiceSection, useUpload, useUploadVedio } from "@/lib/hooks";
-import axios from "axios";
+import { updateServiceSection, deleteServiceSection } from "@/lib/api/service-sections-api";
 
 // Map frontend layout to backend layout
 const mapLayout = (layout: Section['layout']) => {
@@ -252,26 +252,7 @@ const CmsBuilder = () => {
     }
   };
 
-  // Add API functions after imports
-  const updateServiceSection = async (serviceId: string, sectionId: string, payload: any, token: string) => {
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}v1/api/services/partner/${serviceId}/sections/${sectionId}`;
-    const response = await axios.put(url, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  };
 
-  const deleteServiceSection = async (serviceId: string, sectionId: string, token: string) => {
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}v1/api/services/partners/${serviceId}/sections/${sectionId}`;
-    const response = await axios.delete(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  };
 
   // Handle section save (create or update)
   const handleSaveSection = async (section: SectionWithFile) => {

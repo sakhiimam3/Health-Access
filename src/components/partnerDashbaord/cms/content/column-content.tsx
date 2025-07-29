@@ -73,7 +73,7 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
     if (!imageUrl || !isValidUrl) {
       // Show placeholder for missing images
       return (
-        <div className="w-full h-48 bg-gray-200 rounded-lg flex flex-col items-center justify-center">
+        <div className="w-full h-[250px] bg-gray-200 rounded-lg flex flex-col items-center justify-center">
           <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
           <p className="text-gray-500 text-sm">No image available</p>
         </div>
@@ -86,7 +86,7 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
         <img
           src={imageUrl}
           alt="Image"
-          className="w-full h-auto rounded-lg"
+          className="w-full h-[250px] object-cover rounded-lg"
           onError={() => setImageError(true)}
         />
         {imageUrl.startsWith('blob:') && (
@@ -200,7 +200,7 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
     if (!videoUrl || !isValidUrl) {
       // Show placeholder for missing videos
       return (
-        <div className="w-full h-48 bg-gray-200 rounded-lg flex flex-col items-center justify-center">
+        <div className="w-full h-[250px] bg-gray-200 rounded-lg flex flex-col items-center justify-center">
           <Video className="w-12 h-12 text-gray-400 mb-2" />
           <p className="text-gray-500 text-sm">No video available</p>
         </div>
@@ -233,7 +233,7 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
         // Show placeholder if image fails to load
         return (
           <div className="space-y-2">
-            <div className="w-full h-48 bg-gray-200 rounded-lg flex flex-col items-center justify-center">
+            <div className="w-full h-[250px] bg-gray-200 rounded-lg flex flex-col items-center justify-center">
               <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
               <p className="text-gray-500 text-sm">Image failed to load</p>
             </div>

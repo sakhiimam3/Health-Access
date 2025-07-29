@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { Textarea } from "@/components/ui/textarea"
-import type { Column } from "@/types/cmstype"
+import type { Column } from "@/lib/cms/cms-type"
 
 interface TextEditorProps {
   column: Column
