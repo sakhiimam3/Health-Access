@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Camera, Upload, X, Loader2 } from "lucide-react"
 import { useGetPartnerProfile, useUpdatePartnerProfile, useUpload } from "@/lib/hooks"
+import { useUserContext } from "@/context/userStore"
 import { toast } from "react-toastify"
 import { AxiosError } from "axios"
 import { z } from "zod"
@@ -26,6 +27,7 @@ const editProfileSchema = z.object({
 type EditProfileFormValues = z.infer<typeof editProfileSchema>
 
 export function EditProfile() {
+  const { user } = useUserContext()
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null)
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
   const [selectedProfileFile, setSelectedProfileFile] = useState<File | null>(null)
@@ -33,7 +35,10 @@ export function EditProfile() {
   const [isUploading, setIsUploading] = useState(false)
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null)
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null)
-  const { data: profile, isLoading,refetch } = useGetPartnerProfile()
+  
+  // Only call useGetPartnerProfile when user role is "partner"
+  const isPartnerUser = user?.data?.role === "partner"
+  const { data: profile, isLoading,refetch } = useGetPartnerProfile(isPartnerUser)
   const { mutate: updateProfile, isPending } = useUpdatePartnerProfile()
   const { mutate: uploadImage } = useUpload()
 

@@ -12,7 +12,11 @@ const CustomDropdownMenu = () => {
   const { user, logout } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { data: partnerProfile } = useGetPartnerProfile();
+  
+  // Only call useGetPartnerProfile when user role is "partner"
+  const isPartnerUser = user?.data?.user?.role === "partner";
+  console.log(isPartnerUser,"isPartnerUser")
+  const { data: partnerProfile } = useGetPartnerProfile(isPartnerUser);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -76,7 +80,7 @@ const CustomDropdownMenu = () => {
 
   // Determine role from user context first, fallback to API data
   const isCustomer = user?.data?.role === "customer" || partnerProfile?.data?.role === "customer";
-  const isPartner = user?.data?.role === "partner" || partnerProfile?.data?.role === "partner";
+  const isPartner = isPartnerUser || partnerProfile?.data?.role === "partner";
   
   // Get user data conditionally based on role
   let userImage, userName, userEmail;

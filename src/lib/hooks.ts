@@ -149,8 +149,11 @@ export const useCheckEmail = () => {
   return { mutate, isPending, error };
 };
 
-export const useGetPartnerProfile = () => {
-  const { data, isLoading, error, refetch } = useApiQuery("/v1/api/partners/my-profile");
+export const useGetPartnerProfile = (enabled = true) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partners/my-profile",
+    enabled
+  });
   return { data, isLoading, error, refetch };
 };
 

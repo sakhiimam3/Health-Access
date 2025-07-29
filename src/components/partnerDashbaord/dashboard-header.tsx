@@ -9,8 +9,11 @@ import { ProfileDropdown } from "@/components/shared/ProfileDropdown";
 
 export function DashboardHeader() {
   const { user } = useUserContext();
+  
+  // Only call useGetPartnerProfile when user role is "partner"
+  const isPartnerUser = user?.data?.role === "partner";
   const { data: partnerProfile, isLoading: isLoadingProfile } =
-    useGetPartnerProfile();
+    useGetPartnerProfile(isPartnerUser);
 
   // Get user data from partner profile
   const userData = {

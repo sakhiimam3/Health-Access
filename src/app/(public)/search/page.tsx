@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 import { useSearchPartners } from "@/lib/hooks";
 import { Loader2, MapPin, Star, Clock, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import InteractiveMap from "@/components/InteractiveMap";
 
 // Enhanced PharmacyCard component for search results
 const SearchPharmacyCard = ({ partner }: { partner: any }) => {
@@ -38,10 +39,12 @@ const SearchPharmacyCard = ({ partner }: { partner: any }) => {
           </div>
         </div>
         
-        <div className="flex items-center text-gray-600 mb-2">
+        <div className="flex items-start  flex-col text-gray-600 mb-2">
+          <div className="flex items-center gap-1 mb-4">
           <MapPin className="h-4 w-4 mr-1" />
-          <span className="text-sm">{partner.location?.name}</span>
-          <span className="text-sm ml-2 text-gray-500">({partner.distance} km away)</span>
+          <span className="text-xs  truncate">{partner.location?.name}</span>
+          </div>
+          <span className="text-xs text-gray-500"> Distance: {partner.distance} km away</span>
         </div>
         
         <p className="text-sm text-gray-600 mb-3 line-clamp-2">{partner.description}</p>
@@ -60,10 +63,10 @@ const SearchPharmacyCard = ({ partner }: { partner: any }) => {
         </div>
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center text-sm text-gray-600">
+          {/* <div className="flex items-center text-sm text-gray-600">
             <Clock className="h-4 w-4 mr-1" />
             <span>{partner.nextAvailableSlot}</span>
-          </div>
+          </div> */}
           
           <div className="flex flex-col sm:flex-row gap-2">
             <button 
@@ -72,11 +75,7 @@ const SearchPharmacyCard = ({ partner }: { partner: any }) => {
             >
               View Details
             </button>
-            {partner.acceptsOnlineBooking && (
-              <button className="bg-[#189BA3] text-white px-3 py-1 rounded text-sm hover:bg-teal-600 whitespace-nowrap">
-                Book Now
-              </button>
-            )}
+          
           </div>
         </div>
       </div>
@@ -145,6 +144,7 @@ const SearchPage = () => {
 
   const partners = data?.data?.partners || [];
   const stats = data?.data?.stats;
+  const searchArea = data?.data?.searchArea;
   const pagination = {
     page: data?.data?.page || 1,
     totalPages: data?.data?.totalPages || 1,
@@ -187,7 +187,7 @@ const SearchPage = () => {
                     Showing {((pagination.page - 1) * searchQuery.limit) + 1} – {Math.min(pagination.page * searchQuery.limit, pagination.total)} of {pagination.total} results
                   </p>
                 </div>
-                <div className="w-full sm:w-auto min-w-[200px] py-3 px-4 border border-gray-[#737373] rounded-[30px]">
+                {/* <div className="w-full sm:w-auto min-w-[200px] py-3 px-4 border border-gray-[#737373] rounded-[30px]">
                   <select 
                     className="w-full text-[#737373] outline-none border-none"
                     onChange={(e) => handleFilterChange('sortBy', e.target.value)}
@@ -197,7 +197,7 @@ const SearchPage = () => {
                     <option value="rating">Rating</option>
                     <option value="availability">Availability</option>
                   </select>
-                </div>
+                </div> */}
               </div>
 
               {/* Results Grid */}
@@ -258,30 +258,20 @@ const SearchPage = () => {
 
             {/* Map Section */}
             <div className="w-full lg:w-[40%] order-first lg:order-last">
-              <div className="lg:sticky lg:top-24">
-                <div className="relative w-full h-[300px] lg:h-[600px] bg-gray-100 rounded-lg overflow-hidden">
-                  <Image
-                    src="/images/search-map.png"
-                    alt="Map showing partner locations"
-                    fill
-                    className="object-cover"
-                  />
-                  
-                  {/* Map overlay with search area info */}
-                  <div className="absolute top-4 left-4 right-4 bg-white p-3 rounded-lg shadow-md">
-                    <div className="text-sm font-medium mb-1">Search Area</div>
-                    <div className="text-xs text-gray-600 flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {searchQuery.location || 'Current location'}
-                    </div>
-                    {stats && (
-                      <div className="text-xs text-gray-600 mt-1">
-                        Average distance: {stats.averageDistance} km
-                      </div>
-                    )}
+              {searchArea ? (
+                <InteractiveMap
+                  partners={partners}
+                  searchArea={searchArea}
+                  searchLocation={searchQuery.location}
+                  stats={stats}
+                />
+              ) : (
+                <div className="lg:sticky lg:top-24">
+                  <div className="relative w-full h-[300px] lg:h-[600px] bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                    <div className="text-gray-500">Loading map...</div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </section>

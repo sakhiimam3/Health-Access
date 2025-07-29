@@ -9,7 +9,7 @@ import { Search, Calendar, MapPin, Stethoscope, Loader2 } from "lucide-react";
 import LayoutWrapper from "./wrapper";
 import { NavItems } from "@/mockdata";
 import ButtonTheme from "../shared/ButtonTheme";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useUserContext } from "@/context/userStore";
 import HeaderMenu from "../headerMenu";
 import { useGetServices, useGetSeriveTypes } from "@/lib/hooks";
@@ -29,12 +29,8 @@ interface SearchParams {
 
 // Static location data for now (as requested)
 const staticLocations = [
-  { id: "1", name: "Manchester", latitude: 53.4808, longitude: -2.2426 },
-  { id: "2", name: "London", latitude: 51.5074, longitude: -0.1278 },
-  { id: "3", name: "Birmingham", latitude: 52.4862, longitude: -1.8904 },
-  { id: "4", name: "Glasgow", latitude: 55.8642, longitude: -4.2518 },
-  { id: "5", name: "Liverpool", latitude: 53.4084, longitude: -2.9916 },
-  { id: "6", name: "123 Main Street, San Francisco, CA 94105", latitude: 37.7749, longitude: -122.4194 },
+  { id: "1", name: "128 Main Street, San Francisco, CA 94105", latitude: 39.7749, longitude: -122.4194 },
+  { id: "2", name: "123 Main Street, San Francisco, CA 94105", latitude: 37.7749, longitude: -122.4194 },
 ];
 
 const AirbnbStyleSearch = () => {
@@ -52,6 +48,8 @@ const AirbnbStyleSearch = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [locationInput, setLocationInput] = useState('');
   const router = useRouter();
+  const pathname = usePathname();
+  const urlSearchParams = useSearchParams();
   const searchRef = useRef<HTMLDivElement>(null);
   
   // Get services and service types from API
@@ -73,6 +71,36 @@ const AirbnbStyleSearch = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Sync search params with URL parameters when on search page
+  useEffect(() => {
+    if (pathname === '/search' && urlSearchParams) {
+      const location = urlSearchParams.get('location') || '';
+      const serviceId = urlSearchParams.get('serviceId') || '';
+      const date = urlSearchParams.get('date') || '';
+      const latitude = urlSearchParams.get('latitude');
+      const longitude = urlSearchParams.get('longitude');
+      
+      // Find service name from serviceId if available
+      let serviceName = '';
+      if (serviceId && servicesData?.data) {
+        const service = servicesData.data.find((s: any) => s.id === serviceId);
+        serviceName = service?.name || '';
+      }
+
+      setSearchParams({
+        location,
+        serviceId,
+        serviceName,
+        date,
+        latitude: latitude ? parseFloat(latitude) : undefined,
+        longitude: longitude ? parseFloat(longitude) : undefined,
+      });
+      
+      // Set location input to match current location
+      setLocationInput(location);
+    }
+  }, [pathname, urlSearchParams, servicesData]);
+
   const handleLocationSelect = (location: typeof staticLocations[0]) => {
     setSearchParams(prev => ({
       ...prev,
@@ -87,7 +115,29 @@ const AirbnbStyleSearch = () => {
 
   const handleLocationInputChange = (value: string) => {
     setLocationInput(value);
-    setSearchParams(prev => ({ ...prev, location: value }));
+    setSearchParams(prev => ({ 
+      ...prev, 
+      location: value,
+      // Clear coordinates when manually typing location
+      latitude: undefined,
+      longitude: undefined
+    }));
+  };
+
+  const resetSearchParams = () => {
+    setSearchParams({
+      location: '',
+      serviceId: '',
+      serviceName: '',
+      date: '',
+      latitude: undefined,
+      longitude: undefined,
+    });
+    setLocationInput('');
+    setActiveTab(null);
+    setShowLocationDropdown(false);
+    setShowServiceDropdown(false);
+    setShowDatePicker(false);
   };
 
   const handleServiceSelect = (service: any) => {
@@ -112,17 +162,38 @@ const AirbnbStyleSearch = () => {
   };
 
   const handleSearch = (selectedDate?: string) => {
+    // Create fresh URLSearchParams to ensure no parameter conflicts
     const queryParams = new URLSearchParams();
-    if (searchParams.location) queryParams.append('location', searchParams.location);
-    if (searchParams.serviceId) queryParams.append('serviceId', searchParams.serviceId);
+    
+    // Only add parameters that have values
+    if (searchParams.location?.trim()) {
+      queryParams.set('location', searchParams.location.trim());
+    }
+    if (searchParams.serviceId?.trim()) {
+      queryParams.set('serviceId', searchParams.serviceId.trim());
+    }
     
     const dateToUse = selectedDate || searchParams.date;
-    if (dateToUse) queryParams.append('date', dateToUse);
+    if (dateToUse?.trim()) {
+      queryParams.set('date', dateToUse.trim());
+    }
     
-    if (searchParams.latitude) queryParams.append('latitude', searchParams.latitude.toString());
-    if (searchParams.longitude) queryParams.append('longitude', searchParams.longitude.toString());
+    if (searchParams.latitude !== undefined) {
+      queryParams.set('latitude', searchParams.latitude.toString());
+    }
+    if (searchParams.longitude !== undefined) {
+      queryParams.set('longitude', searchParams.longitude.toString());
+    }
     
-    router.push(`/search?${queryParams.toString()}`);
+    // Use the search path with completely new query parameters
+    const newUrl = `/search?${queryParams.toString()}`;
+    
+    // If we're already on search page, replace to avoid adding to history
+    if (pathname === '/search') {
+      router.replace(newUrl);
+    } else {
+      router.push(newUrl);
+    }
   };
 
   // Custom date picker component
