@@ -585,7 +585,8 @@ export const useSearchPartners = (params?: {
       radius: params?.radius || 25,
       page: params?.page || 1,
       limit: params?.limit || 10,
-    }
+    },
+    enabled: typeof window !== 'undefined' && !!(params?.latitude && params?.longitude), // Only run in browser with coordinates
   });
   return { data, isLoading, error, refetch };
 };

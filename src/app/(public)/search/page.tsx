@@ -2,7 +2,7 @@
 
 import PagesWrapper from "@/components/layout/pagesWrapper.tsx";
 import LayoutWrapper from "@/components/layout/wrapper";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { PharmacyCard } from "@/components/sliderCard";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -83,14 +83,26 @@ const SearchPharmacyCard = ({ partner }: { partner: any }) => {
   );
 };
 
-const SearchPage = () => {
+// Loading fallback component
+const SearchPageLoading = () => (
+  <PagesWrapper isSearchPage={true} bgColor="bg-[#189BA3]" btnColor="#189BA3">
+    <LayoutWrapper>
+      <div className="flex justify-center items-center h-64 mt-60">
+        <Loader2 className="w-10 h-10 animate-spin text-[#189BA3]" />
+      </div>
+    </LayoutWrapper>
+  </PagesWrapper>
+);
+
+// Main search component that uses useSearchParams
+const SearchPageContent = () => {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState({
-    location: searchParams.get('location') || '',
-    serviceId: searchParams.get('serviceId') || '',
-    date: searchParams.get('date') || '',
-    latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')!) : 53.4808, // Default to Manchester
-    longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')!) : -2.2426,
+    location: searchParams?.get('location') || '',
+    serviceId: searchParams?.get('serviceId') || '',
+    availableDate: searchParams?.get('date') || '',
+    latitude: searchParams?.get('latitude') ? parseFloat(searchParams.get('latitude')!) : 53.4808, // Default to Manchester
+    longitude: searchParams?.get('longitude') ? parseFloat(searchParams.get('longitude')!) : -2.2426,
     page: 1,
     limit: 10,
   });
@@ -99,15 +111,17 @@ const SearchPage = () => {
 
   useEffect(() => {
     // Update search query when URL parameters change
-    setSearchQuery({
-      location: searchParams.get('location') || '',
-      serviceId: searchParams.get('serviceId') || '',
-      date: searchParams.get('date') || '',
-      latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')!) : 53.4808,
-      longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')!) : -2.2426,
-      page: 1,
-      limit: 10,
-    });
+    if (searchParams) {
+      setSearchQuery({
+        location: searchParams.get('location') || '',
+        serviceId: searchParams.get('serviceId') || '',
+        availableDate: searchParams.get('date') || '',
+        latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')!) : 53.4808,
+        longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')!) : -2.2426,
+        page: 1,
+        limit: 10,
+      });
+    }
   }, [searchParams]);
 
   const handlePageChange = (newPage: number) => {
@@ -277,6 +291,15 @@ const SearchPage = () => {
         </section>
       </LayoutWrapper>
     </PagesWrapper>
+  );
+};
+
+// Main page component with Suspense boundary
+const SearchPage = () => {
+  return (
+    <Suspense fallback={<SearchPageLoading />}>
+      <SearchPageContent />
+    </Suspense>
   );
 };
 
