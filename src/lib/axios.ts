@@ -2,7 +2,7 @@ import axios from "axios"
 import { toast } from "react-toastify"
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "https://node.hostingladz.com:3837/",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "https://health.72.14.189.33.nip.io/",
   // Remove the default Content-Type header to allow dynamic setting
 })
 

@@ -28,7 +28,7 @@ interface HowItWorksData {
 
 async function getHowItWorksData(): Promise<HowItWorksItem[]> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/api/cms/how-it-works`, {
+    const response = await fetch(`https://health.72.14.189.33.nip.io/v1/api/cms/how-it-works`, {
       cache: 'no-store', // This ensures fresh data on each request
     });
 
