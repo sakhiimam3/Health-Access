@@ -149,8 +149,11 @@ export const useCheckEmail = () => {
   return { mutate, isPending, error };
 };
 
-export const useGetPartnerProfile = () => {
-  const { data, isLoading, error, refetch } = useApiQuery("/v1/api/partners/my-profile");
+export const useGetPartnerProfile = (enabled = true) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partners/my-profile",
+    enabled
+  });
   return { data, isLoading, error, refetch };
 };
 
@@ -467,5 +470,127 @@ export const useUpdatePartnerAppointmentStatus = (id: string) => {
   );
   return { mutate, isPending, error };
 };
+
+// Partner Dashboard API hooks
+
+// Get partner dashboard overview
+export const useGetPartnerDashboard = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get appointment analytics
+export const useGetAppointmentAnalytics = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/analytics",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get overall appointment analytics for the year
+export const useGetOverallAppointmentAnalytics = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/analytics/overall",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get upcoming appointments
+export const useGetDashboardUpcomingAppointments = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/upcoming-appointments",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get next patient information
+export const useGetNextPatient = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/next-patient",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get partner services with statistics
+export const useGetDashboardServices = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/services",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get dashboard statistics
+export const useGetDashboardStats = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/stats",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get revenue analytics
+export const useGetRevenueAnalytics = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/revenue-analytics",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get service performance analytics
+export const useGetServicePerformance = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/service-performance",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Get patient demographics
+export const useGetPatientDemographics = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partner/dashboard/patient-demographics",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Customer Dashboard API
+export const useGetCustomerDashboard = () => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/customer/dashboard",
+  });
+  return { data, isLoading, error, refetch };
+};
+
+// Search partners API hook
+export const useSearchPartners = (params?: {
+  search?: string;
+  location?: string;
+  serviceId?: string;
+  availableDate?: string;
+  latitude?: number;
+  longitude?: number;
+  radius?: number;
+  page?: number;
+  limit?: number;
+}) => {
+  const { data, isLoading, error, refetch } = useApiQuery({
+    endpoint: "/v1/api/partners/search",
+    params: {
+      search: params?.search,
+      location: params?.location,
+      serviceId: params?.serviceId,
+      availableDate: params?.availableDate,
+      latitude: params?.latitude,
+      longitude: params?.longitude,
+      radius: params?.radius || 25,
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+    },
+    enabled: typeof window !== 'undefined' && !!(params?.latitude && params?.longitude), // Only run in browser with coordinates
+  });
+  return { data, isLoading, error, refetch };
+};
+
+
 
 

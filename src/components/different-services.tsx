@@ -1,12 +1,12 @@
 "use client";
 import Image, { StaticImageData } from "next/image";
-import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/navigation";
 
 interface Service {
   title: string;
   image: StaticImageData | string;
+  id?: string;
 }
 
 interface VaccinationServicesProps {
@@ -29,6 +29,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
 
   const router = useRouter();
 
+
   return (
     <section className="py-8 ">
       <div className="flex justify-between items-center">
@@ -49,7 +50,7 @@ const VaccinationServices: React.FC<VaccinationServicesProps> = ({
         {services.map((service, index) => (
           <div
             key={index}
-            onClick={() => router.push(`${isNested ? `${link}` :  `${link}/${service?.title.replace(/\s+/g, "-")}?serviceName=${service.title.replace(/\s+/g, "-")}`}`)}
+            onClick={() => router.push(`${isNested ? `${link}` :  `${link}/${service?.title.replace(/\s+/g, "-")}?serviceName=${service.title.replace(/\s+/g, "-")}&serviceId=${service.id}`}`)}
             className="rounded-lg cursor-pointer overflow-hidden min-h-[200px] group"
           >
             <div className="relative rounded">

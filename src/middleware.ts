@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 
 // Define public routes that don't require authentication
 const publicRoutes = ['/login', '/register', '/forgot-password']
-const onboardingRoutes = ['/onboarding']
+const onboardingRoutes = ['/partner/onboarding']
 
 export function middleware(request: NextRequest) {
   const userDataCookie = request.cookies.get('user_data')?.value
@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-
+console.log(userData,"userdata")
   // If user is logged in, prevent access to login/register/forgot-password pages
   if (userData && publicRoutes.includes(pathname)) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
@@ -37,9 +37,9 @@ export function middleware(request: NextRequest) {
 
   // If user is logged in but onboarding is not completed, redirect to onboarding
   // unless they are already on an onboarding route
-  // if (userData && !userData.onboardingCompleted && !onboardingRoutes.some(route => pathname.startsWith(route))) {
-  //   return NextResponse.redirect(new URL('/partner/onboarding', request.url));
-  // }
+  if (userData && userData.data && !userData.data.onboardingCompleted && userData.data.user?.role === "partner" && !onboardingRoutes.some(route => pathname.startsWith(route))) {
+    return NextResponse.redirect(new URL('/partner/onboarding', request.url));
+  }
 
   return NextResponse.next()
 }
@@ -48,7 +48,7 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/onboarding/:path*',
+    '/partner/onboarding/:path*',
     '/login',
     '/register',
     '/forgot-password'

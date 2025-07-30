@@ -79,9 +79,9 @@ const Step3: React.FC<props> = ({appointmentTime}) => {
 
         <button
           className="bg-teal-600 text-white px-8 py-3 rounded-[16px] hover:bg-teal-700 transition-colors"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/customer/appointment")}
         >
-          Back
+          View My Appointments
         </button>
       </div>
     </div>

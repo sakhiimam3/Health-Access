@@ -192,10 +192,10 @@ export default function Step2LocationHours({ form }: Step2Props) {
     const dayLabel = DAYS_OF_WEEK.find(d => d.id === day)?.label || day
     const existingTiming = timings.find(t => t.dayOfWeek === dayLabel)
     
+    let updatedTimings
     if (existingTiming) {
       // Remove the day if it exists
-      const updatedTimings = timings.filter(t => t.dayOfWeek !== dayLabel)
-      setValue("timings", updatedTimings, { shouldValidate: true })
+      updatedTimings = timings.filter(t => t.dayOfWeek !== dayLabel)
     } else {
       // Add new day with default times
       const newTiming = {
@@ -204,9 +204,18 @@ export default function Step2LocationHours({ form }: Step2Props) {
         closeTime: "18:00",
         isClosed: false
       }
-      setValue("timings", [...timings, newTiming], { shouldValidate: true })
+      updatedTimings = [...timings, newTiming]
     }
-    clearErrors("timings")
+    
+    setValue("timings", updatedTimings, { shouldValidate: true })
+    
+    // Validate the updated timings
+    const validationError = validateTimings(updatedTimings)
+    if (validationError) {
+      form.setError("timings", { message: validationError })
+    } else {
+      clearErrors("timings")
+    }
   }
 
   const updateTiming = (dayOfWeek: string, field: "openTime" | "closeTime", value: string) => {
@@ -216,12 +225,50 @@ export default function Step2LocationHours({ form }: Step2Props) {
         : timing
     )
     setValue("timings", updatedTimings, { shouldValidate: true })
+    validateTimings(updatedTimings)
   }
 
+  // Validation function for working days and times
+  const validateTimings = (currentTimings: typeof timings) => {
+    // Check if at least one day is selected
+    if (currentTimings.length === 0) {
+      return "Please select at least one working day"
+    }
+
+    // Check for time conflicts (open time same as close time)
+    for (const timing of currentTimings) {
+      if (timing.openTime === timing.closeTime) {
+        return `Open time and close time cannot be the same for ${timing.dayOfWeek}`
+      }
+      if (timing.openTime > timing.closeTime) {
+        return `Open time cannot be later than close time for ${timing.dayOfWeek}`
+      }
+    }
+
+    clearErrors("timings")
+    return null
+  }
+
+  // Validate timings whenever they change
+  useEffect(() => {
+    const validationError = validateTimings(timings)
+    if (validationError) {
+      form.setError("timings", { message: validationError })
+    }
+  }, [timings])
+
+  // Initial validation on component mount
+  useEffect(() => {
+    if (timings.length === 0) {
+      form.setError("timings", { message: "Please select at least one working day" })
+    }
+  }, [])
+
   const getSelectedDaysLabel = () => {
-    if (timings.length === 0) return "Select working days"
-    if (timings.length === 7) return "All days"
-    return timings.map(t => t.dayOfWeek).join(", ")
+    if (timings.length === 0) return "Click to select your working days"
+    if (timings.length === 7) return "All days selected"
+    if (timings.length === 1) return `${timings[0].dayOfWeek} selected`
+    return `${timings.length} days selected: ${timings.map(t => t.dayOfWeek).join(", ")}`
   }
 
   // Close dropdown when clicking outside
@@ -247,6 +294,7 @@ export default function Step2LocationHours({ form }: Step2Props) {
         {/* Working Days Section */}
         <div>
           <Label className="text-sm font-medium text-gray-900 mb-2 block">Working Days</Label>
+          <p className="text-xs text-gray-500 mb-3">Select the days you'll be available and set your hours for each day</p>
           <div className="relative" ref={daysDropdownRef}>
             <button
               type="button"
@@ -264,7 +312,7 @@ export default function Step2LocationHours({ form }: Step2Props) {
             </button>
 
             {isDaysDropdownOpen && (
-              <div className="absolute z-50 w-full mt-1 bg-white rounded-lg border border-gray-200 shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute z-50 w-full mt-1 bg-white rounded-lg border border-gray-200 shadow-lg max-h-96 overflow-y-auto">
                 {DAYS_OF_WEEK.map((day) => {
                   const isSelected = timings.some(t => t.dayOfWeek === day.label)
                   return (
@@ -297,7 +345,14 @@ export default function Step2LocationHours({ form }: Step2Props) {
                                 type="time"
                                 value={timings.find(t => t.dayOfWeek === day.label)?.openTime || "09:00"}
                                 onChange={(e) => updateTiming(day.label, "openTime", e.target.value)}
-                                className="h-8 text-sm"
+                                className={`h-8 text-sm ${
+                                  (() => {
+                                    const timing = timings.find(t => t.dayOfWeek === day.label)
+                                    return timing && (timing.openTime === timing.closeTime || timing.openTime > timing.closeTime)
+                                      ? "border-red-500 focus:border-red-500"
+                                      : ""
+                                  })()
+                                }`}
                               />
                             </div>
                             <div>
@@ -306,10 +361,27 @@ export default function Step2LocationHours({ form }: Step2Props) {
                                 type="time"
                                 value={timings.find(t => t.dayOfWeek === day.label)?.closeTime || "18:00"}
                                 onChange={(e) => updateTiming(day.label, "closeTime", e.target.value)}
-                                className="h-8 text-sm"
+                                className={`h-8 text-sm ${
+                                  (() => {
+                                    const timing = timings.find(t => t.dayOfWeek === day.label)
+                                    return timing && (timing.openTime === timing.closeTime || timing.openTime > timing.closeTime)
+                                      ? "border-red-500 focus:border-red-500"
+                                      : ""
+                                  })()
+                                }`}
                               />
                             </div>
                           </div>
+                          {(() => {
+                            const timing = timings.find(t => t.dayOfWeek === day.label)
+                            if (timing && timing.openTime === timing.closeTime) {
+                              return <p className="text-red-500 text-xs mt-1">Open and close times cannot be the same</p>
+                            }
+                            if (timing && timing.openTime > timing.closeTime) {
+                              return <p className="text-red-500 text-xs mt-1">Open time cannot be later than close time</p>
+                            }
+                            return null
+                          })()}
                         </div>
                       )}
                     </div>

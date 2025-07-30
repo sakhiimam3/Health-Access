@@ -1,28 +1,46 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Avatar } from "@/components/ui/avatar";
 import Link from "next/link";
-import { useUserContext } from "@/context/userStore";
 import Image from "next/image";
+import { ChevronDown, LayoutDashboard, LogOut, Settings, User, Loader2 } from "lucide-react";
+import { Avatar } from "@/components/ui/avatar";
+import { useUserContext } from "@/context/userStore";
 import { toast } from "react-toastify";
-import { Loader2, User, ChevronDown, LayoutDashboard, LogOut, Settings } from "lucide-react";
-import { useGetPartnerProfile } from "@/lib/hooks";
 
-const CustomDropdownMenu = () => {
-  const { user, logout } = useUserContext();
+interface ProfileDropdownProps {
+  userType: "Partner" | "Customer";
+  showSettings?: boolean;
+  userData?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    image?: string;
+  };
+  isLoading?: boolean;
+  dashboardUrl?: string;
+  settingsUrl?: string;
+}
+
+export function ProfileDropdown({
+  userType,
+  showSettings = false,
+  userData,
+  isLoading = false,
+  dashboardUrl = "/dashboard",
+  settingsUrl = "/dashboard/settings"
+}: ProfileDropdownProps) {
+  const { logout } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  
-  // Only call useGetPartnerProfile when user role is "partner"
-  const isPartnerUser = user?.data?.user?.role === "partner";
-  console.log(isPartnerUser,"isPartnerUser")
-  const { data: partnerProfile } = useGetPartnerProfile(isPartnerUser);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -78,29 +96,14 @@ const CustomDropdownMenu = () => {
     setIsOpen(false);
   };
 
-  // Determine role from user context first, fallback to API data
-  const isCustomer = user?.data?.role === "customer" || partnerProfile?.data?.role === "customer";
-  const isPartner = isPartnerUser || partnerProfile?.data?.role === "partner";
-  
-  // Get user data conditionally based on role
-  let userImage, userName, userEmail;
-  
-  if (isCustomer) {
-    // For customers, use user context data
-    userImage = user?.data?.image;
-    userName = `${user?.data?.firstName || ""} ${user?.data?.lastName || ""}`.trim();
-    userEmail = user?.data?.email;
-  } else if (isPartner) {
-    // For partners, use API data
-    userImage = partnerProfile?.data?.image;
-    userName = `${partnerProfile?.data?.user?.firstName || ""} ${partnerProfile?.data?.user?.lastName || ""}`.trim();
-    userEmail = partnerProfile?.data?.user?.email;
-  } else {
-    // Fallback for when role is not determined
-    userImage = user?.data?.image || partnerProfile?.data?.image;
-    userName = `${user?.data?.firstName || partnerProfile?.data?.user?.firstName || ""} ${user?.data?.lastName || partnerProfile?.data?.user?.lastName || ""}`.trim();
-    userEmail = user?.data?.email || partnerProfile?.data?.user?.email;
-  }
+  const userName = `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim();
+  const userEmail = userData?.email;
+  const userImage = userData?.image;
+
+  // Badge styling based on user type
+  const badgeStyles = userType === "Partner" 
+    ? "bg-blue-100 text-blue-800" 
+    : "bg-green-100 text-green-800";
 
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
@@ -113,7 +116,9 @@ const CustomDropdownMenu = () => {
         aria-haspopup="true"
       >
         <Avatar className="h-9 w-9 flex items-center justify-center border-2 border-gray-200 hover:border-blue-300 transition-colors">
-          {userImage ? (
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : userImage ? (
             <Image
               src={userImage}
               width={36}
@@ -125,7 +130,14 @@ const CustomDropdownMenu = () => {
             <User className="w-5 h-5 text-gray-400" />
           )}
         </Avatar>
-        <ChevronDown 
+        {userType === "Customer" && (
+          <div className="hidden sm:block">
+            <span className="text-gray-700 font-medium text-sm">
+              {userName || 'Customer'}
+            </span>
+          </div>
+        )}
+        <ChevronDown
           className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
@@ -136,15 +148,20 @@ const CustomDropdownMenu = () => {
       {isOpen && (
         <>
           {/* Backdrop for mobile */}
-          <div className="fixed inset-0 z-10 md:hidden" onClick={closeDropdown} />
-          
+          <div
+            className="fixed inset-0 z-10 md:hidden"
+            onClick={closeDropdown}
+          />
+
           <div className="absolute right-0 z-20 w-72 mt-2 origin-top-right bg-white border border-gray-200 rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none animate-in fade-in-0 zoom-in-95 duration-200">
             <div className="py-2">
               {/* User Info Section */}
               <div className="px-4 py-3 border-b border-gray-100">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-12 w-12 flex items-center justify-center border-2 border-gray-200">
-                    {userImage ? (
+                    {isLoading ? (
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    ) : userImage ? (
                       <Image
                         src={userImage}
                         width={48}
@@ -158,15 +175,15 @@ const CustomDropdownMenu = () => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-900 truncate">
-                      {userName || "User"}
+                      {userName || userType}
                     </p>
                     {userEmail && (
                       <p className="text-sm text-gray-500 truncate">
                         {userEmail}
                       </p>
                     )}
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-1">
-                      {isCustomer ? "Customer" : "Partner"}
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-1 ${badgeStyles}`}>
+                      {userType}
                     </span>
                   </div>
                 </div>
@@ -175,7 +192,7 @@ const CustomDropdownMenu = () => {
               {/* Menu Items */}
               <div className="py-1">
                 <Link
-                  href={isCustomer ? "/customer/appointment" : "/dashboard"}
+                  href={dashboardUrl}
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
                   onClick={closeDropdown}
                 >
@@ -183,9 +200,9 @@ const CustomDropdownMenu = () => {
                   Dashboard
                 </Link>
 
-                {!isCustomer && (
+                {showSettings && (
                   <Link
-                    href="/dashboard/settings"
+                    href={settingsUrl}
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
                     onClick={closeDropdown}
                   >
@@ -221,6 +238,4 @@ const CustomDropdownMenu = () => {
       )}
     </div>
   );
-};
-
-export default CustomDropdownMenu;
+} 

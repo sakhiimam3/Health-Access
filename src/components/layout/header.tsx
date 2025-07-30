@@ -1,37 +1,739 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Calendar } from "lucide-react";
+import { Search, Calendar, MapPin, Stethoscope, Loader2 } from "lucide-react";
 import LayoutWrapper from "./wrapper";
 import { NavItems } from "@/mockdata";
 import ButtonTheme from "../shared/ButtonTheme";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useUserContext } from "@/context/userStore";
 import HeaderMenu from "../headerMenu";
-// import { useGetHowItWorks } from "../useGetHowItWorks";
+import { useGetServices, useGetSeriveTypes } from "@/lib/hooks";
+import { useGetHowItWorks } from "../useGetHowItWorks";
 
-interface HeaderProps {
-  menuTypes: Array<{ id: string; name: string }>;
+interface HeaderProps {}
+
+interface SearchParams {
+  location: string;
+  serviceId: string;
+  serviceName: string;
+  date: string;
+  latitude?: number;
+  longitude?: number;
 }
 
-const Header = ({ menuTypes }: HeaderProps) => {
+// Static location data for now (as requested)
+const staticLocations = [
+  { id: "1", name: "128 Main Street, San Francisco, CA 94105", latitude: 39.7749, longitude: -122.4194 },
+  { id: "2", name: "123 Main Street, San Francisco, CA 94105", latitude: 37.7749, longitude: -122.4194 },
+];
+
+const AirbnbStyleSearch = () => {
+  const [activeTab, setActiveTab] = useState<'location' | 'service' | 'date' | null>(null);
+  const [searchParams, setSearchParams] = useState<SearchParams>({
+    location: '',
+    serviceId: '',
+    serviceName: '',
+    date: '',
+    latitude: undefined,
+    longitude: undefined,
+  });
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [showServiceDropdown, setShowServiceDropdown] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [locationInput, setLocationInput] = useState('');
+  const [serviceSearchInput, setServiceSearchInput] = useState('');
+  const [debouncedServiceSearch, setDebouncedServiceSearch] = useState('');
+  const router = useRouter();
+  const pathname = usePathname();
+  const urlSearchParams = useSearchParams();
+  const searchRef = useRef<HTMLDivElement>(null);
+  
+  // Debounce service search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedServiceSearch(serviceSearchInput);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [serviceSearchInput]);
+  
+  // Get services and service types from API
+  const { data: servicesData, isLoading: servicesLoading } = useGetServices({
+    search: debouncedServiceSearch
+  });
+  const { data: serviceTypesData } = useGetSeriveTypes();
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowLocationDropdown(false);
+        setShowServiceDropdown(false);
+        setShowDatePicker(false);
+        setActiveTab(null);
+        // Reset service search when closing dropdown
+        setServiceSearchInput('');
+        setDebouncedServiceSearch('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Sync search params with URL parameters when on search page
+  useEffect(() => {
+    if (pathname === '/search' && urlSearchParams) {
+      const location = urlSearchParams.get('location') || '';
+      const serviceId = urlSearchParams.get('serviceId') || '';
+      const date = urlSearchParams.get('date') || '';
+      const latitude = urlSearchParams.get('latitude');
+      const longitude = urlSearchParams.get('longitude');
+      
+      // Find service name from serviceId if available
+      let serviceName = '';
+      if (serviceId && servicesData?.data) {
+        const service = servicesData.data.find((s: any) => s.id === serviceId);
+        serviceName = service?.name || '';
+      }
+
+      setSearchParams({
+        location,
+        serviceId,
+        serviceName,
+        date,
+        latitude: latitude ? parseFloat(latitude) : undefined,
+        longitude: longitude ? parseFloat(longitude) : undefined,
+      });
+      
+      // Set location input to match current location
+      setLocationInput(location);
+    }
+  }, [pathname, urlSearchParams, servicesData]);
+
+  const handleLocationSelect = (location: typeof staticLocations[0]) => {
+    setSearchParams(prev => ({
+      ...prev,
+      location: location.name,
+      latitude: location.latitude,
+      longitude: location.longitude,
+    }));
+    setLocationInput(location.name);
+    setShowLocationDropdown(false);
+    setActiveTab('service'); // Auto-progress to next tab
+  };
+
+  const handleLocationInputChange = (value: string) => {
+    setLocationInput(value);
+    setSearchParams(prev => ({ 
+      ...prev, 
+      location: value,
+      // Clear coordinates when manually typing location
+      latitude: undefined,
+      longitude: undefined
+    }));
+  };
+
+  const resetSearchParams = () => {
+    setSearchParams({
+      location: '',
+      serviceId: '',
+      serviceName: '',
+      date: '',
+      latitude: undefined,
+      longitude: undefined,
+    });
+    setLocationInput('');
+    setServiceSearchInput('');
+    setDebouncedServiceSearch('');
+    setActiveTab(null);
+    setShowLocationDropdown(false);
+    setShowServiceDropdown(false);
+    setShowDatePicker(false);
+  };
+
+  const handleServiceSelect = (service: any) => {
+    setSearchParams(prev => ({
+      ...prev,
+      serviceId: service.id,
+      serviceName: service.name,
+    }));
+    setShowServiceDropdown(false);
+    setActiveTab('date'); // Auto-progress to next tab
+    setShowDatePicker(true);
+  };
+
+  const handleDateSelect = (date: string) => {
+    setSearchParams(prev => ({ ...prev, date }));
+    setShowDatePicker(false);
+    setActiveTab(null);
+    // Auto-search after all fields are filled
+    if (searchParams.location && searchParams.serviceId && date) {
+      setTimeout(() => handleSearch(date), 300);
+    }
+  };
+
+  const handleSearch = (selectedDate?: string) => {
+    // Create fresh URLSearchParams to ensure no parameter conflicts
+    const queryParams = new URLSearchParams();
+    
+    // Only add parameters that have values
+    if (searchParams.location?.trim()) {
+      queryParams.set('location', searchParams.location.trim());
+    }
+    if (searchParams.serviceId?.trim()) {
+      queryParams.set('serviceId', searchParams.serviceId.trim());
+    }
+    
+    const dateToUse = selectedDate || searchParams.date;
+    if (dateToUse?.trim()) {
+      queryParams.set('date', dateToUse.trim());
+    }
+    
+    if (searchParams.latitude !== undefined) {
+      queryParams.set('latitude', searchParams.latitude.toString());
+    }
+    if (searchParams.longitude !== undefined) {
+      queryParams.set('longitude', searchParams.longitude.toString());
+    }
+    
+    // Use the search path with completely new query parameters
+    const newUrl = `/search?${queryParams.toString()}`;
+    
+    // If we're already on search page, replace to avoid adding to history
+    if (pathname === '/search') {
+      router.replace(newUrl);
+    } else {
+      router.push(newUrl);
+    }
+  };
+
+  // Custom date picker component
+  const CustomDatePicker = () => {
+    const today = new Date();
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+    
+    const generateCalendarDays = (startDate: Date) => {
+      const days = [];
+      const firstDay = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+      const lastDay = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+      const startCalendar = new Date(firstDay);
+      startCalendar.setDate(startCalendar.getDate() - firstDay.getDay());
+      
+      for (let i = 0; i < 42; i++) {
+        const currentDate = new Date(startCalendar);
+        currentDate.setDate(startCalendar.getDate() + i);
+        days.push(currentDate);
+      }
+      return days;
+    };
+
+    const formatDate = (date: Date) => {
+      return date.toISOString().split('T')[0];
+    };
+
+    const isToday = (date: Date) => {
+      return formatDate(date) === formatDate(today);
+    };
+
+    const isSelected = (date: Date) => {
+      return searchParams.date === formatDate(date);
+    };
+
+    const isDisabled = (date: Date) => {
+      return date < today;
+    };
+
+    const currentMonthDays = generateCalendarDays(today);
+    const nextMonthDays = generateCalendarDays(nextMonth);
+
+    return (
+      <div className="p-6 bg-white rounded-lg shadow-xl border">
+        <div className="text-lg font-semibold mb-4 text-center">Select a date</div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Current Month */}
+          <div>
+            <div className="text-center font-medium mb-3">
+              {today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center">
+              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                <div key={day} className="text-xs font-medium text-gray-500 p-2">
+                  {day}
+                </div>
+              ))}
+              {currentMonthDays.map((date, index) => {
+                const isCurrentMonth = date.getMonth() === today.getMonth();
+                return (
+                  <button
+                    key={index}
+                    onClick={() => !isDisabled(date) && handleDateSelect(formatDate(date))}
+                    disabled={isDisabled(date)}
+                    className={`
+                      p-2 text-sm rounded-full transition-all duration-200
+                      ${!isCurrentMonth ? 'text-gray-300' : ''}
+                      ${isDisabled(date) ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100'}
+                      ${isSelected(date) ? 'bg-[#189BA3] text-white' : ''}
+                      ${isToday(date) && !isSelected(date) ? 'bg-gray-200 font-medium' : ''}
+                    `}
+                  >
+                    {date.getDate()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Next Month */}
+          <div>
+            <div className="text-center font-medium mb-3">
+              {nextMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center">
+              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                <div key={day} className="text-xs font-medium text-gray-500 p-2">
+                  {day}
+                </div>
+              ))}
+              {nextMonthDays.map((date, index) => {
+                const isCurrentMonth = date.getMonth() === nextMonth.getMonth();
+                return (
+                  <button
+                    key={index}
+                    onClick={() => !isDisabled(date) && handleDateSelect(formatDate(date))}
+                    disabled={isDisabled(date)}
+                    className={`
+                      p-2 text-sm rounded-full transition-all duration-200
+                      ${!isCurrentMonth ? 'text-gray-300' : ''}
+                      ${isDisabled(date) ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100'}
+                      ${isSelected(date) ? 'bg-[#189BA3] text-white' : ''}
+                    `}
+                  >
+                    {date.getDate()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick date options */}
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <div className="text-sm font-medium mb-3">Quick options</div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: 'Today', date: today },
+              { label: 'Tomorrow', date: new Date(today.getTime() + 24 * 60 * 60 * 1000) },
+              { label: 'This Weekend', date: new Date(today.getTime() + (6 - today.getDay()) * 24 * 60 * 60 * 1000) },
+              { label: 'Next Week', date: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000) },
+            ].map((option) => (
+              <button
+                key={option.label}
+                onClick={() => handleDateSelect(formatDate(option.date))}
+                className="px-3 py-2 text-sm border rounded-full hover:bg-gray-50 transition-colors"
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div ref={searchRef} className="relative w-full max-w-4xl mx-auto">
+      {/* Desktop Search */}
+      <div className="hidden md:flex items-center bg-white rounded-full shadow-lg border border-gray-200 p-1">
+        {/* Location Tab */}
+        <div 
+          className={`flex-1 relative transition-all duration-200 ${
+            activeTab === 'location' ? 'bg-white shadow-md rounded-full z-10' : ''
+          }`}
+          onClick={() => {
+            setActiveTab('location');
+            setShowLocationDropdown(true);
+            setShowServiceDropdown(false);
+            setShowDatePicker(false);
+            // Sync locationInput with current location
+            if (!locationInput && searchParams.location) {
+              setLocationInput(searchParams.location);
+            }
+          }}
+        >
+          <div className="p-4 cursor-pointer">
+            <div className="flex items-center gap-3">
+              <MapPin className={`h-5 w-5 transition-colors ${
+                searchParams.location ? 'text-[#189BA3]' : 'text-gray-400'
+              }`} />
+              <div>
+                <div className="font-semibold text-sm">Location</div>
+                <div className={`text-sm ${
+                  searchParams.location ? 'text-gray-900' : 'text-gray-500'
+                }`}>
+                  {searchParams.location || 'Where to?'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Service Tab */}
+        <div 
+          className={`flex-1 relative border-l border-gray-200 transition-all duration-200 ${
+            activeTab === 'service' ? 'bg-white shadow-md rounded-full z-10' : ''
+          }`}
+          onClick={() => {
+            setActiveTab('service');
+            setShowServiceDropdown(true);
+            setShowLocationDropdown(false);
+            setShowDatePicker(false);
+            // Reset service search when opening dropdown
+            setServiceSearchInput('');
+            setDebouncedServiceSearch('');
+          }}
+        >
+          <div className="p-4 cursor-pointer">
+            <div className="flex items-center gap-3">
+              <Stethoscope className={`h-5 w-5 transition-colors ${
+                searchParams.serviceName ? 'text-[#189BA3]' : 'text-gray-400'
+              }`} />
+              <div>
+                <div className="font-semibold text-sm">Service</div>
+                <div className={`text-sm ${
+                  searchParams.serviceName ? 'text-gray-900' : 'text-gray-500'
+                }`}>
+                  {searchParams.serviceName || 'Add service'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Date Tab */}
+        <div 
+          className={`flex-1 relative border-l border-gray-200 transition-all duration-200 ${
+            activeTab === 'date' ? 'bg-white shadow-md rounded-full z-10' : ''
+          }`}
+          onClick={() => {
+            setActiveTab('date');
+            setShowDatePicker(true);
+            setShowLocationDropdown(false);
+            setShowServiceDropdown(false);
+          }}
+        >
+          <div className="p-4 cursor-pointer">
+            <div className="flex items-center gap-3">
+              <Calendar className={`h-5 w-5 transition-colors ${
+                searchParams.date ? 'text-[#189BA3]' : 'text-gray-400'
+              }`} />
+              <div>
+                <div className="font-semibold text-sm">Date</div>
+                <div className={`text-sm ${
+                  searchParams.date ? 'text-gray-900' : 'text-gray-500'
+                }`}>
+                  {searchParams.date ? new Date(searchParams.date).toLocaleDateString('en-US', { 
+                    month: 'short', day: 'numeric' 
+                  }) : 'Add date'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Search Button */}
+        <Button
+          size="icon"
+          onClick={() => handleSearch()}
+          disabled={!searchParams.location || !searchParams.serviceId}
+          className="bg-[#189BA3] hover:bg-teal-600 rounded-full h-12 w-12 ml-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+        >
+          <Search className="h-6 w-6 text-white" />
+        </Button>
+      </div>
+
+      {/* Mobile Search - keeping existing implementation */}
+      <div className="md:hidden bg-white rounded-lg shadow-lg border border-gray-200 p-4 space-y-4">
+        {/* Location */}
+        <div 
+          className="border border-gray-200 rounded-lg p-3 cursor-pointer"
+          onClick={() => {
+            setActiveTab('location');
+            setShowLocationDropdown(true);
+            setShowServiceDropdown(false);
+            setShowDatePicker(false);
+            // Sync locationInput with current location
+            if (!locationInput && searchParams.location) {
+              setLocationInput(searchParams.location);
+            }
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <MapPin className="h-5 w-5 text-[#189BA3]" />
+            <div>
+              <div className="font-semibold text-sm">Location</div>
+              <div className="text-gray-500 text-sm">
+                {searchParams.location || 'Where to?'}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Service */}
+        <div 
+          className="border border-gray-200 rounded-lg p-3 cursor-pointer"
+          onClick={() => {
+            setActiveTab('service');
+            setShowServiceDropdown(true);
+            setShowLocationDropdown(false);
+            setShowDatePicker(false);
+            // Reset service search when opening dropdown
+            setServiceSearchInput('');
+            setDebouncedServiceSearch('');
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <Stethoscope className="h-5 w-5 text-[#189BA3]" />
+            <div>
+              <div className="font-semibold text-sm">Service</div>
+              <div className="text-gray-500 text-sm">
+                {searchParams.serviceName || 'Add service'}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Date */}
+        <div 
+          className="border border-gray-200 rounded-lg p-3 cursor-pointer"
+          onClick={() => {
+            setActiveTab('date');
+            setShowDatePicker(true);
+            setShowLocationDropdown(false);
+            setShowServiceDropdown(false);
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <Calendar className="h-5 w-5 text-[#189BA3]" />
+            <div>
+              <div className="font-semibold text-sm">Date</div>
+              <div className="text-gray-500 text-sm">
+                {searchParams.date ? new Date(searchParams.date).toLocaleDateString() : 'Add date'}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Search Button */}
+        <Button
+          onClick={() => handleSearch()}
+          disabled={!searchParams.location || !searchParams.serviceId}
+          className="w-full bg-[#189BA3] hover:bg-teal-600 text-white py-3 disabled:opacity-50"
+        >
+          <Search className="h-5 w-5 mr-2" />
+          Search
+        </Button>
+      </div>
+
+      {/* Location Dropdown */}
+      {showLocationDropdown && activeTab === 'location' && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-50">
+          <div className="p-4">
+            {/* Autocomplete Input */}
+            <div className="relative mb-4">
+              <input
+                type="text"
+                placeholder="Start typing your location..."
+                value={locationInput}
+                onChange={(e) => handleLocationInputChange(e.target.value)}
+                className="w-full h-12 px-4 text-base rounded-lg border border-gray-200 shadow-sm focus:border-[#189BA3] focus:ring-1 focus:ring-[#189BA3] focus:outline-none transition-colors"
+                autoFocus
+                autoComplete="off"
+              />
+            </div>
+
+            {/* Filtered Locations */}
+            <div className="space-y-1 max-h-64 overflow-y-auto">
+              {staticLocations
+                .filter(location => 
+                  locationInput === '' || 
+                  location.name.toLowerCase().includes(locationInput.toLowerCase())
+                )
+                .map((location) => (
+                  <div
+                    key={location.id}
+                    className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer flex items-center gap-3 transition-colors"
+                    onClick={() => handleLocationSelect(location)}
+                  >
+                    <MapPin className="h-4 w-4 text-[#189BA3]" />
+                    <div>
+                      <div className="font-medium text-gray-900">{location.name}</div>
+                      <div className="text-sm text-gray-500">
+                        {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              
+              {/* No results message */}
+              {locationInput !== '' && 
+                staticLocations.filter(location => 
+                  location.name.toLowerCase().includes(locationInput.toLowerCase())
+                ).length === 0 && (
+                <div className="p-4 text-center text-gray-500">
+                  <MapPin className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                  <p className="text-sm">No locations found</p>
+                  <p className="text-xs">Try a different search term</p>
+                </div>
+              )}
+            </div>
+
+            {/* Helper text */}
+            <div className="mt-4 pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-500 flex items-center">
+                <MapPin className="h-3 w-3 mr-1" />
+                Type to search available locations
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Service Dropdown */}
+      {showServiceDropdown && activeTab === 'service' && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-50">
+          <div className="p-4">
+            {/* Service Search Input */}
+            <div className="relative mb-4">
+              <input
+                type="text"
+                placeholder="Search for services..."
+                value={serviceSearchInput}
+                onChange={(e) => setServiceSearchInput(e.target.value)}
+                className="w-full h-12 px-4 text-base rounded-lg border border-gray-200 shadow-sm focus:border-[#189BA3] focus:ring-1 focus:ring-[#189BA3] focus:outline-none transition-colors"
+                autoFocus
+                autoComplete="off"
+              />
+              {serviceSearchInput && (
+                <button
+                  onClick={() => {
+                    setServiceSearchInput('');
+                    setDebouncedServiceSearch('');
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Services List */}
+            <div className="space-y-1 max-h-64 overflow-y-auto">
+              {servicesLoading ? (
+                // Skeleton Loading
+                <div className="space-y-2">
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="p-3 rounded-lg animate-pulse">
+                      <div className="flex items-center gap-3">
+                        <div className="h-4 w-4 bg-gray-200 rounded"></div>
+                        <div className="flex-1">
+                          <div className="h-4 bg-gray-200 rounded mb-2 w-3/4"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="text-sm font-medium text-gray-900 mb-3">
+                    {serviceSearchInput ? `Search results for "${serviceSearchInput}"` : 'Available services'}
+                  </div>
+                  {servicesData?.data?.map((service: any) => (
+                    <div
+                      key={service.id}
+                      className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer flex items-center gap-3 transition-colors"
+                      onClick={() => handleServiceSelect(service)}
+                    >
+                      <Stethoscope className="h-4 w-4 text-[#189BA3]" />
+                      <div>
+                        <div className="font-medium text-gray-900">{service.name}</div>
+                        {service.description && (
+                          <div className="text-sm text-gray-500 line-clamp-1">
+                            {service.description}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* No results message */}
+                  {(!servicesData?.data || servicesData.data.length === 0) && !servicesLoading && (
+                    <div className="p-4 text-center text-gray-500">
+                      <Stethoscope className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <p className="text-sm">
+                        {serviceSearchInput ? 'No services found' : 'No services available'}
+                      </p>
+                      {serviceSearchInput && (
+                        <p className="text-xs">Try a different search term</p>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Helper text */}
+            <div className="mt-4 pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-500 flex items-center">
+                <Stethoscope className="h-3 w-3 mr-1" />
+                Type to search for healthcare services
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Date Picker */}
+      {showDatePicker && activeTab === 'date' && (
+        <div className="absolute top-full left-0 right-0 mt-2 z-50">
+          <CustomDatePicker />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Header = ({}: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [forceShowMainSearch, setForceShowMainSearch] = useState(false);
   const pathName = usePathname();
   const { user } = useUserContext();
-  // const { menuTypes, loading } = useGetHowItWorks();
-  const loading = false;
+  
+  // Fetch menuTypes using hook
+  const { menuTypes, loading: menuTypesLoading } = useGetHowItWorks();
+  const loading = menuTypesLoading;
 
   const dropdownRef = useRef(null);
   const scrollPositionRef = useRef(0);
   const router = useRouter();
+
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 50);
+      
+      // Reset forceShowMainSearch when scrolling back to top
+      if (scrollY <= 50) {
+        setForceShowMainSearch(false);
+      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -62,8 +764,15 @@ const Header = ({ menuTypes }: HeaderProps) => {
     };
   }, []);
 
+  const handleScrolledSearchClick = () => {
+    setForceShowMainSearch(true);
+  };
+
+  // Determine whether to show main search or scrolled search
+  const shouldShowMainSearch = !isScrolled || forceShowMainSearch;
+
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white z-50 ">
+    <header className="fixed top-0 left-0 right-0 bg-white z-50">
       <LayoutWrapper>
         {loading ? (
           <div className="w-full h-16 flex items-center px-4 animate-pulse">
@@ -105,9 +814,7 @@ const Header = ({ menuTypes }: HeaderProps) => {
               {pathName !== "/partner/onboarding" && (
                 <>
                   {!isScrolled && (
-                    <div
-                      className={`hidden md:flex items-center space-x-12 transition-opacity duration-300 }`}
-                    >
+                    <div className="hidden md:flex items-center space-x-12 transition-opacity duration-300">
                       <Link
                         href={NavItems[0].href}
                         className="capitalize text-sm font-[400] font-ubuntu relative group"
@@ -125,7 +832,6 @@ const Header = ({ menuTypes }: HeaderProps) => {
                           <span className="absolute -bottom-1 left-0 w-full h-1 bg-teal-500 transform scale-x-0 transition-transform duration-500 group-hover:scale-x-100" />
                         </Link>
                       ))}
-                      {/* Static How it works and About us */}
                       <Link
                         href={NavItems[3].href}
                         className="capitalize text-sm font-[400] font-ubuntu relative group"
@@ -143,45 +849,38 @@ const Header = ({ menuTypes }: HeaderProps) => {
                     </div>
                   )}
 
-                  {isScrolled && (
-                    <div className="flex justify-around items-center bg-white p-2 rounded-[25px] shadow-lg w-[30%] mx-auto">
-                      <div
-                        className="flex space-x-4"
-                        onClick={() => setIsScrolled(false)}
-                      >
-                        <div className="text-black">
-                          <span className="font-semibold text-xs">
-                            Locatiossn
-                          </span>
-                          <div className="text-gray-400 text-xs">
-                            Search Location
-                          </div>
+                  {isScrolled && !forceShowMainSearch && (
+                    <div 
+                      className="flex justify-center items-center w-full max-w-2xl mx-auto cursor-pointer"
+                      onClick={handleScrolledSearchClick}
+                    >
+                      <div className="bg-white p-2 rounded-full shadow-lg border border-gray-200 flex items-center gap-4 w-full max-w-lg hover:shadow-xl transition-shadow">
+                        <div className="flex items-center gap-2 flex-1">
+                          <MapPin className="h-4 w-4 text-[#189BA3]" />
+                          <span className="text-sm text-gray-600">Location</span>
                         </div>
-                        <div className="text-black">
-                          <span className="font-semibold text-xs">
-                            Type Vaccine
-                          </span>
-                          <div className="text-gray-400 text-xs">Add dates</div>
+                        <div className="flex items-center gap-2 flex-1 border-l border-gray-200 pl-4">
+                          <Stethoscope className="h-4 w-4 text-[#189BA3]" />
+                          <span className="text-sm text-gray-600">Service</span>
                         </div>
-                        <div className="text-black">
-                          <span className="font-semibold text-xs">
-                            No of people
-                          </span>
-                          <div className="text-gray-400 text-xs">
-                            Add No of people
-                          </div>
+                        <div className="flex items-center gap-2 flex-1 border-l border-gray-200 pl-4">
+                          <Calendar className="h-4 w-4 text-[#189BA3]" />
+                          <span className="text-sm text-gray-600">Date</span>
                         </div>
+                        <Button
+                          size="icon"
+                          className="bg-[#189BA3] hover:bg-teal-600 rounded-full h-8 w-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleScrolledSearchClick();
+                          }}
+                        >
+                          <Search className="h-4 w-4 text-white" />
+                        </Button>
                       </div>
-                      <Button
-                        size="icon"
-                        className="bg-[#189BA3] hover:bg-teal-600 rounded-full h-8 w-8 ml-2"
-                      >
-                        <span>
-                          <Search className="h-5 w-5 text-white" />
-                        </span>
-                      </Button>
                     </div>
                   )}
+
                   {user ? (
                     <HeaderMenu />
                   ) : (
@@ -211,7 +910,6 @@ const Header = ({ menuTypes }: HeaderProps) => {
                 ref={dropdownRef}
                 className="md:hidden absolute top-20 left-0 right-0 bg-white shadow-lg z-50 flex flex-col items-center py-6 space-y-4 border-b border-[#DCDCDC]"
               >
-                {/* Static Home */}
                 <Link
                   href={NavItems[0].href}
                   className="capitalize text-base font-[400] font-ubuntu py-2"
@@ -219,7 +917,6 @@ const Header = ({ menuTypes }: HeaderProps) => {
                 >
                   {NavItems[0].label}
                 </Link>
-                {/* Dynamic menuTypes (first two) or skeleton */}
                 {loading
                   ? [0, 1].map((i) => (
                       <div
@@ -227,7 +924,7 @@ const Header = ({ menuTypes }: HeaderProps) => {
                         className="h-6 w-40 bg-gray-200 animate-pulse rounded my-2"
                       />
                     ))
-                  : menuTypes.slice(0, 2).map((type, idx) => (
+                  : menuTypes?.slice(0, 2).map((type, idx) => (
                       <Link
                         key={type.id}
                         href={`${NavItems[idx + 1].href}?typeid=${
@@ -239,7 +936,6 @@ const Header = ({ menuTypes }: HeaderProps) => {
                         {type.name}
                       </Link>
                     ))}
-                {/* Static How it works and About us */}
                 <Link
                   href={NavItems[3].href}
                   className="capitalize text-base font-[400] font-ubuntu py-2"
@@ -259,133 +955,17 @@ const Header = ({ menuTypes }: HeaderProps) => {
             {pathName !== "/partner/onboarding" && (
               <div
                 className={`w-full bg-white transition-all z-50 duration-300 ${
-                  isScrolled ? "py-2 opacity-0 h-0" : "py-6 opacity-100 h-auto"
+                  shouldShowMainSearch ? "py-6 opacity-100 h-auto" : "py-2 opacity-0 h-0"
                 }`}
               >
-                <div className="max-w-4xl mx-auto px-4">
-                  <div className="flex items-center py-3 px-5 gap-2 bg-white rounded-full p-2 shadow-[0_0_10px_0_rgba(0,0,0,0.02)] border border-gray-100">
-                    {/* Location */}
-                    <div className="flex-1 flex flex-col items-start pl-4">
-                      <label className="font-bold mb-1">Location</label>
-                      <div className="flex items-center">
-                        <svg
-                          width="18"
-                          height="22"
-                          viewBox="0 0 18 22"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M17.4604 8.63C17.32 7.16892 16.8036 5.76909 15.9616 4.56682C15.1195 3.36456 13.9805 2.40083 12.6554 1.7695C11.3303 1.13816 9.86425 0.860724 8.40008 0.964207C6.93592 1.06769 5.5235 1.54856 4.30037 2.36C3.24957 3.06265 2.36742 3.9893 1.71731 5.07339C1.0672 6.15749 0.665264 7.37211 0.540369 8.63C0.417852 9.87966 0.575043 11.1409 1.00054 12.3223C1.42604 13.5036 2.10917 14.5755 3.00037 15.46L8.30037 20.77C8.39333 20.8637 8.50393 20.9381 8.62579 20.9889C8.74765 21.0397 8.87836 21.0658 9.01037 21.0658C9.14238 21.0658 9.27309 21.0397 9.39495 20.9889C9.51681 20.9381 9.62741 20.8637 9.72037 20.77L15.0004 15.46C15.8916 14.5755 16.5747 13.5036 17.0002 12.3223C17.4257 11.1409 17.5829 9.87966 17.4604 8.63ZM13.6004 14.05L9.00037 18.65L4.40037 14.05C3.72246 13.3721 3.20317 12.5523 2.87984 11.6498C2.5565 10.7472 2.43715 9.7842 2.53037 8.83C2.62419 7.86111 2.93213 6.92516 3.43194 6.08985C3.93175 5.25453 4.61093 4.54071 5.42037 4C6.48131 3.29524 7.72668 2.9193 9.00037 2.9193C10.2741 2.9193 11.5194 3.29524 12.5804 4C13.3874 4.53862 14.065 5.24928 14.5647 6.08094C15.0644 6.9126 15.3737 7.84461 15.4704 8.81C15.5666 9.76743 15.4488 10.7343 15.1254 11.6406C14.8019 12.5468 14.281 13.3698 13.6004 14.05ZM9.00037 5C8.11035 5 7.24032 5.26392 6.5003 5.75839C5.76028 6.25286 5.18351 6.95566 4.84291 7.77793C4.50232 8.6002 4.4132 9.505 4.58684 10.3779C4.76047 11.2508 5.18905 12.0526 5.81839 12.682C6.44773 13.3113 7.24955 13.7399 8.12246 13.9135C8.99538 14.0872 9.90018 13.9981 10.7224 13.6575C11.5447 13.3169 12.2475 12.7401 12.742 12.0001C13.2364 11.26 13.5004 10.39 13.5004 9.5C13.4977 8.30734 13.0228 7.16428 12.1794 6.32094C11.3361 5.4776 10.193 5.00265 9.00037 5ZM9.00037 12C8.50592 12 8.02257 11.8534 7.61144 11.5787C7.20032 11.304 6.87989 10.9135 6.69067 10.4567C6.50145 9.9999 6.45194 9.49723 6.54841 9.01228C6.64487 8.52733 6.88297 8.08187 7.2326 7.73224C7.58223 7.38261 8.02769 7.1445 8.51264 7.04804C8.9976 6.95158 9.50026 7.00109 9.95708 7.1903C10.4139 7.37952 10.8043 7.69996 11.079 8.11108C11.3537 8.5222 11.5004 9.00555 11.5004 9.5C11.5004 10.163 11.237 10.7989 10.7681 11.2678C10.2993 11.7366 9.66341 12 9.00037 12Z"
-                            fill="#189BA3"
-                          />
-                        </svg>
-                        <Input
-                          type="text"
-                          placeholder="Choose Location"
-                          className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-2 h-10 transition-none"
-                        />
-                      </div>
-                    </div>
-                    {/* Service */}
-                    <div className="flex-1  flex flex-col items-start border-l border-gray-200 pl-4">
-                      <label className="font-bold mb-1">Service</label>
-                      <div className="flex items-center">
-                        <svg
-                          width="23"
-                          height="23"
-                          viewBox="0 0 23 23"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M20.8996 4.93L22.3096 3.51L19.4896 0.690002L18.0696 2.1L18.7796 2.81L16.6596 4.93L15.2396 3.51L13.8296 2.1L12.4096 3.51L13.1196 4.22L6.04961 11.29C5.95588 11.383 5.88149 11.4936 5.83072 11.6154C5.77995 11.7373 5.75381 11.868 5.75381 12C5.75381 12.132 5.77995 12.2627 5.83072 12.3846C5.88149 12.5064 5.95588 12.617 6.04961 12.71L5.33961 13.41C4.90443 13.8502 4.61604 14.4141 4.514 15.0246C4.41195 15.6351 4.50123 16.2622 4.76961 16.82L0.0996094 21.49L1.50961 22.9L6.17961 18.23C6.57768 18.4267 7.0156 18.5293 7.45961 18.53C7.85443 18.5323 8.24582 18.4566 8.61133 18.3073C8.97684 18.158 9.30929 17.938 9.58961 17.66L10.2896 16.95C10.3826 17.0437 10.4932 17.1181 10.615 17.1689C10.7369 17.2197 10.8676 17.2458 10.9996 17.2458C11.1316 17.2458 11.2623 17.2197 11.3842 17.1689C11.506 17.1181 11.6166 17.0437 11.7096 16.95L18.7796 9.88L19.4896 10.59L20.8996 9.17L19.4896 7.76L18.0696 6.34L20.1896 4.22L20.8996 4.93ZM8.16961 16.24C8.07996 16.3447 7.96964 16.4297 7.84558 16.4897C7.72151 16.5498 7.58638 16.5835 7.44866 16.5888C7.31094 16.5941 7.17361 16.5709 7.04529 16.5206C6.91696 16.4704 6.80041 16.3941 6.70296 16.2967C6.6055 16.1992 6.52925 16.0827 6.47897 15.9543C6.4287 15.826 6.40549 15.6887 6.41081 15.5509C6.41613 15.4132 6.44986 15.2781 6.50988 15.154C6.56991 15.03 6.65493 14.9197 6.75961 14.83L7.45961 14.12L8.87961 15.54L8.16961 16.24ZM10.9996 14.83L8.16961 12L9.16961 11L14.1196 11.71L10.9996 14.83ZM15.8596 10L10.9096 9.29L14.5396 5.67L17.3596 8.49L15.8596 10Z"
-                            fill="#189BA3"
-                          />
-                        </svg>
-                        <div className="relative">
-                          <select
-                            defaultValue="service1"
-                            className="border-0 focus:ring-0 p-2 h-full flex items-center transition-none"
-                          >
-                            <option value="service1">Service 1</option>
-                            <option value="service2">Service 2</option>
-                            <option value="service3">Service 3</option>
-                            <option value="service4">Service 4</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    {/* No of People */}
-                    <div className="flex-1 flex flex-col items-start border-l border-gray-200 pl-4">
-                      <label className="font-bold mb-1">No of People</label>
-                      <div className="flex items-center">
-                        <svg
-                          width="25"
-                          height="24"
-                          viewBox="0 0 25 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g clipPath="url(#clip0_303_25194)">
-                            <path
-                              d="M15.9102 16.9781C16.6023 16.3005 17.0768 15.4321 17.2733 14.4837C17.4697 13.5352 17.3792 12.5498 17.0133 11.653C16.6473 10.7562 16.0226 9.9888 15.2187 9.44857C14.4148 8.90835 13.4682 8.61984 12.4996 8.61984C11.531 8.61984 10.5844 8.90835 9.78052 9.44857C8.97661 9.9888 8.35184 10.7562 7.98591 11.653C7.61998 12.5498 7.52947 13.5352 7.72593 14.4837C7.92239 15.4321 8.39691 16.3005 9.08897 16.9781C7.91723 17.601 6.94304 18.5391 6.27647 19.6866C6.13372 19.9445 6.09793 20.2482 6.1768 20.5323C6.25567 20.8163 6.44289 21.0581 6.6982 21.2055C6.9535 21.3529 7.25648 21.3943 7.54194 21.3206C7.8274 21.2469 8.07253 21.0641 8.22459 20.8116C8.6642 20.0688 9.28969 19.4534 10.0395 19.0259C10.7892 18.5984 11.6374 18.3736 12.5005 18.3736C13.3636 18.3736 14.2118 18.5984 14.9616 19.0259C15.7114 19.4534 16.3369 20.0688 16.7765 20.8116C16.8488 20.9423 16.9465 21.0574 17.0639 21.15C17.1812 21.2426 17.3158 21.3108 17.4598 21.3508C17.6038 21.3908 17.7544 21.4017 17.9027 21.3828C18.0509 21.364 18.194 21.3158 18.3234 21.2411C18.4528 21.1663 18.5661 21.0665 18.6565 20.9475C18.7469 20.8285 18.8127 20.6927 18.8501 20.548C18.8874 20.4033 18.8956 20.2525 18.874 20.1046C18.8525 19.9567 18.8017 19.8146 18.7246 19.6866C18.0575 18.5389 17.0826 17.6007 15.9102 16.9781ZM9.87459 13.5C9.87459 12.9808 10.0285 12.4733 10.317 12.0416C10.6054 11.6099 11.0154 11.2735 11.495 11.0748C11.9747 10.8761 12.5025 10.8241 13.0117 10.9254C13.5209 11.0267 13.9886 11.2767 14.3557 11.6438C14.7229 12.011 14.9729 12.4787 15.0742 12.9879C15.1754 13.4971 15.1235 14.0249 14.9248 14.5045C14.7261 14.9842 14.3896 15.3942 13.958 15.6826C13.5263 15.971 13.0188 16.125 12.4996 16.125C11.8034 16.125 11.1357 15.8484 10.6434 15.3562C10.1512 14.8639 9.87459 14.1962 9.87459 13.5ZM23.6755 14.3991C23.5574 14.4879 23.4229 14.5526 23.2797 14.5894C23.1365 14.6262 22.9875 14.6345 22.8411 14.6136C22.6948 14.5928 22.5539 14.5434 22.4267 14.4681C22.2995 14.3929 22.1883 14.2932 22.0996 14.175C21.3187 13.1353 20.2387 12.3384 19.3499 12.1462C19.1136 12.0951 18.9 11.9692 18.7409 11.7872C18.5817 11.6052 18.4854 11.3768 18.4663 11.1358C18.4471 10.8947 18.5061 10.654 18.6346 10.4491C18.763 10.2442 18.954 10.0862 19.1793 9.99843C19.4598 9.88894 19.7098 9.71351 19.9081 9.48698C20.1065 9.26045 20.2474 8.98948 20.3189 8.69699C20.3903 8.40449 20.3903 8.09909 20.3188 7.8066C20.2474 7.51411 20.1065 7.24313 19.9081 7.0166C19.7098 6.79007 19.4598 6.61464 19.1793 6.50515C18.8988 6.39566 18.5961 6.35533 18.2967 6.38757C17.9973 6.41982 17.7101 6.52368 17.4594 6.69039C17.2086 6.85709 17.0017 7.08173 16.8562 7.34531C16.7871 7.47888 16.692 7.59725 16.5765 7.69344C16.4609 7.78963 16.3272 7.86168 16.1833 7.90533C16.0395 7.94898 15.8883 7.96334 15.7388 7.94757C15.5892 7.93181 15.4444 7.88623 15.3128 7.81353C15.1812 7.74083 15.0655 7.64249 14.9725 7.52431C14.8796 7.40614 14.8112 7.27053 14.7716 7.1255C14.7319 6.98047 14.7217 6.82896 14.7416 6.67992C14.7615 6.53089 14.8111 6.38736 14.8874 6.25781C15.1658 5.76557 15.5424 5.33583 15.9939 4.99528C16.4453 4.65473 16.962 4.41064 17.5118 4.27818C18.0615 4.14572 18.6327 4.12771 19.1897 4.22528C19.7467 4.32285 20.2777 4.5339 20.7497 4.84534C21.2217 5.15677 21.6247 5.56194 21.9335 6.03566C22.2423 6.50938 22.4505 7.04155 22.545 7.59909C22.6395 8.15664 22.6183 8.72767 22.4828 9.2767C22.3474 9.82573 22.1004 10.341 21.7574 10.7906C22.5829 11.3405 23.3075 12.0283 23.8996 12.8241C24.0787 13.0626 24.1557 13.3626 24.1137 13.658C24.0717 13.9533 23.9141 14.2199 23.6755 14.3991ZM5.64928 12.1491C4.76053 12.3412 3.68053 13.1381 2.89959 14.1787C2.71995 14.4173 2.45289 14.5748 2.15717 14.6164C1.86145 14.6581 1.56129 14.5806 1.32272 14.4009C1.08415 14.2213 0.926711 13.9542 0.885042 13.6585C0.843374 13.3628 0.920887 13.0626 1.10053 12.8241C1.69288 12.0286 2.41748 11.3408 3.24272 10.7906C2.89969 10.341 2.65276 9.82573 2.51728 9.2767C2.38179 8.72767 2.36065 8.15664 2.45515 7.59909C2.54965 7.04155 2.75778 6.50938 3.06661 6.03566C3.37545 5.56194 3.77839 5.15677 4.2504 4.84534C4.72242 4.5339 5.25343 4.32285 5.81045 4.22528C6.36747 4.12771 6.9386 4.14572 7.48837 4.27818C8.03814 4.41064 8.5548 4.65473 9.00626 4.99528C9.45772 5.33583 9.83434 5.76557 10.1127 6.25781C10.189 6.38736 10.2386 6.53089 10.2585 6.67992C10.2784 6.82896 10.2682 6.98047 10.2285 7.1255C10.1889 7.27053 10.1206 7.40614 10.0276 7.52431C9.93465 7.64249 9.81894 7.74083 9.68733 7.81353C9.55572 7.88623 9.41088 7.93181 9.26135 7.94757C9.11183 7.96334 8.96066 7.94898 8.81678 7.90533C8.6729 7.86168 8.53923 7.78963 8.42367 7.69344C8.30811 7.59725 8.213 7.47888 8.14397 7.34531C7.9984 7.08173 7.79149 6.85709 7.54075 6.69039C7.29001 6.52368 7.00281 6.41982 6.70344 6.38757C6.40407 6.35533 6.10133 6.39566 5.82084 6.50515C5.54036 6.61464 5.29036 6.79007 5.092 7.0166C4.89365 7.24313 4.75276 7.51411 4.68127 7.8066C4.60978 8.09909 4.60978 8.40449 4.68127 8.69699C4.75276 8.98948 4.89365 9.26045 5.092 9.48698C5.29036 9.71351 5.54035 9.88894 5.82084 9.99843C6.04613 10.0862 6.23714 10.2442 6.36557 10.4491C6.494 10.654 6.55301 10.8947 6.53387 11.1358C6.51472 11.3768 6.41843 11.6052 6.25927 11.7872C6.1001 11.9692 5.88654 12.0951 5.65022 12.1462L5.64928 12.1491Z"
-                              fill="#189BA3"
-                            />
-                          </g>
-                          <defs>
-                            <clipPath id="clip0_303_25194">
-                              <rect
-                                width="24"
-                                height="24"
-                                fill="white"
-                                transform="translate(0.5)"
-                              />
-                            </clipPath>
-                          </defs>
-                        </svg>
-                        <select
-                          defaultValue="1"
-                          className="border-0 focus:ring-0 p-2 h-full flex items-center"
-                        >
-                          {[1, 2, 3, 4, 5].map((num) => (
-                            <option key={num} value={num.toString()}>
-                              {num}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    {/* Date */}
-                    <div className="flex-1 flex flex-col items-start border-l border-gray-200 pl-4">
-                      <label className="font-bold mb-1">Date</label>
-                      <div className="flex items-center">
-                        <Calendar className="h-5 w-5 text-teal-500 mr-2" />
-                        <Input
-                          type="date"
-                          defaultValue="2021-07-17"
-                          className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-2 h-10"
-                        />
-                      </div>
-                    </div>
-                    {/* Search Button */}
-                    <Button
-                      size="icon"
-                      onClick={() => router.push("/search")}
-                      className="bg-[#189BA3] hover:bg-teal-600 rounded-full h-10 w-10 ml-2"
-                    >
-                      <span>
-                        <Search className="h-6 w-6 text-white" />
-                      </span>
-                    </Button>
-                  </div>
+                <div className="px-4">
+                  <AirbnbStyleSearch />
                 </div>
               </div>
             )}
           </>
         )}
       </LayoutWrapper>
-
       <div className="border-b border-[#DCDCDC] border-width-2"></div>
     </header>
   );

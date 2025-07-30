@@ -12,7 +12,41 @@ import HowItWorksImage from "../../../public/images/howitworks.png";
 // } from "@/components/icons/icons";
 import HowItWorks from "@/components/howitworks";
 
-const HowItWorksPage = () => {
+interface HowItWorksItem {
+  _id: string;
+  title: string;
+  description: string;
+  icon: string;
+  image?: string;
+}
+
+interface HowItWorksData {
+  howItWorks: HowItWorksItem[];
+  faqs: any[];
+  menuTypes: any[];
+}
+
+async function getHowItWorksData(): Promise<HowItWorksItem[]> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/api/cms/how-it-works`, {
+      cache: 'no-store', // This ensures fresh data on each request
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch how-it-works data');
+    }
+
+    const json = await response.json();
+    return json.data?.howItWorks || [];
+  } catch (error) {
+    console.error('Error fetching how-it-works data:', error);
+    return [];
+  }
+}
+
+const HowItWorksPage = async () => {
+  const howItWorksData = await getHowItWorksData();
+
   return (
     <PagesWrapper bgColor="bg-[#189BA3]" btnColor="#189BA3">
       <div className="mt-56">
@@ -54,7 +88,7 @@ const HowItWorksPage = () => {
               </div>
             </div>
           </div> */}
-          <HowItWorks isNested={true} />
+          <HowItWorks data={howItWorksData} isNested={true} />
         </LayoutWrapper>
       </div>
     </PagesWrapper>

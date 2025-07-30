@@ -69,7 +69,7 @@ export function ChangePassword() {
               id="oldPassword"
               type={showCurrentPassword ? "text" : "password"}
               placeholder="Enter current password"
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 font-roboto pr-10"
+              className="h-12 text-base text-gray-600 rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 font-roboto pr-10"
               {...register("oldPassword")}
             />
             <button
@@ -78,9 +78,9 @@ export function ChangePassword() {
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
             >
               {showCurrentPassword ? (
-                <EyeOff className="h-4 w-4 text-gray-400" />
-              ) : (
                 <Eye className="h-4 w-4 text-gray-400" />
+              ) : (
+                <EyeOff className="h-4 w-4 text-gray-400" />
               )}
             </button>
           </div>
@@ -104,7 +104,7 @@ export function ChangePassword() {
               id="newPassword"
               type={showNewPassword ? "text" : "password"}
               placeholder="Enter new password"
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 font-roboto pr-10"
+              className="h-12 text-base text-gray-600 rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 font-roboto pr-10"
               {...register("newPassword")}
             />
             <button
@@ -113,9 +113,9 @@ export function ChangePassword() {
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
             >
               {showNewPassword ? (
-                <EyeOff className="h-4 w-4 text-gray-400" />
-              ) : (
                 <Eye className="h-4 w-4 text-gray-400" />
+              ) : (
+                <EyeOff className="h-4 w-4 text-gray-400" />
               )}
             </button>
           </div>
@@ -139,7 +139,7 @@ export function ChangePassword() {
               id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm new password"
-              className="h-12 text-base rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 font-roboto pr-10"
+              className="h-12 text-base text-gray-600 rounded-full border border-[#E7E7E7] shadow-sm focus:border-teal-500 focus:ring-teal-500 font-roboto pr-10"
               {...register("confirmPassword")}
             />
             <button
@@ -148,9 +148,9 @@ export function ChangePassword() {
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
             >
               {showConfirmPassword ? (
-                <EyeOff className="h-4 w-4 text-gray-400" />
-              ) : (
                 <Eye className="h-4 w-4 text-gray-400" />
+              ) : (
+                <EyeOff className="h-4 w-4 text-gray-400" />
               )}
             </button>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Clock, Check, X } from "lucide-react";
 import {
@@ -17,18 +17,52 @@ interface DayTiming {
   endTime: string;
 }
 
+const ALL_DAYS = [
+  "Monday",
+  "Tuesday", 
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
+];
+
 export function PharmacyTiming() {
   const { data: profile, isLoading } = useGetPartnerProfile();
+  console.log(profile,"profile2211")
 
   const { mutate: updateTiming, isPending } = useUpdatePartnerProfile();
-  const [timings, setTimings] = useState<DayTiming[]>([
-    { day: "Monday", enabled: true, startTime: "10:00", endTime: "01:00" },
-    { day: "Tuesday", enabled: true, startTime: "10:00", endTime: "01:00" },
-    { day: "Wednesday", enabled: true, startTime: "10:00", endTime: "01:00" },
-    { day: "Thursday", enabled: true, startTime: "10:00", endTime: "01:00" },
-    { day: "Friday", enabled: true, startTime: "10:00", endTime: "01:00" },
-    { day: "Saturday", enabled: true, startTime: "10:00", endTime: "01:00" },
-  ]);
+  const [timings, setTimings] = useState<DayTiming[]>([]);
+
+  // Initialize all 7 days with existing timings enabled and others disabled
+  useEffect(() => {
+    const initialTimings: DayTiming[] = ALL_DAYS.map((day) => {
+      // Check if this day exists in profile data
+      const existingTiming = profile?.data?.timings?.find(
+        (timing: any) => timing.dayOfWeek === day
+      );
+
+      if (existingTiming) {
+        // Use existing timing with enabled state
+        return {
+          day,
+          enabled: !existingTiming.isClosed,
+          startTime: existingTiming.openTime,
+          endTime: existingTiming.closeTime,
+        };
+      } else {
+        // Default timing for days not in profile (disabled by default)
+        return {
+          day,
+          enabled: false,
+          startTime: "10:00",
+          endTime: "18:00",
+        };
+      }
+    });
+
+    setTimings(initialTimings);
+  }, [profile]);
 
   const updateTimingState = (
     index: number,
@@ -97,6 +131,17 @@ export function PharmacyTiming() {
     } else {
       dayPairs.push([timings[i]]);
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <h2 className="text-2xl font-ubuntu font-bold text-gray-900">
+          Pharmacy Timing
+        </h2>
+        <div className="text-center py-8">Loading...</div>
+      </div>
+    );
   }
 
   return (

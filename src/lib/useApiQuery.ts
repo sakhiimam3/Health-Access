@@ -4,19 +4,22 @@ import api from './axios';
 interface QueryOptions {
   endpoint: string
   params?: Record<string, any>
+  enabled?: boolean
 }
 
 // Custom hook for GET requests
 export const useApiQuery = (options: string | QueryOptions) => {
   const endpoint = typeof options === "string" ? options : options.endpoint
   const params = typeof options === "string" ? undefined : options.params
+  const enabled = typeof options === "string" ? true : options.enabled ?? true
 
   return useQuery({
     queryKey: [endpoint, params],
     queryFn: async () => {
       const { data } = await api.get(endpoint, { params })
       return data
-    }
+    },
+    enabled
   })
 }
 

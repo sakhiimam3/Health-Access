@@ -20,12 +20,12 @@ const MyServiceListing = () => {
   const [filters, setFilters] = useState({
     isActive: undefined as boolean | undefined
   });
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
+  // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  // const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [serviceToEdit, setServiceToEdit] = useState<any>(null);
 
-  const limit = 10;
+  const limit = 10000;
 
   // Fetch services with the typeId from params
   const {
@@ -37,10 +37,11 @@ const MyServiceListing = () => {
     limit,
    
   });
+  console.log(services,"services")
 
-  const { mutate: deleteService, isPending: isDeleting } = useDeletePartnerService(
-    serviceToDelete || ""
-  );
+  // const { mutate: deleteService, isPending: isDeleting } = useDeletePartnerService(
+  //   serviceToDelete || ""
+  // );
   
 //   const handleDelete = (id: string) => {
 //     setServiceToDelete(id);
@@ -50,10 +51,10 @@ const MyServiceListing = () => {
   const handleEdit = (service: any) => {
     // Format the service data to match what the modal expects
     const formattedService = {
-      price: service.service?.basePrice || 0,
-      description: service.description || "",
+      price: service?.service?.basePrice || 0,
+      description: service?.service?.description || "",
       isActive: service.isActive || false,
-      image: service.image || "",
+      image: service?.service?.image || "",
     };
     
     setServiceToEdit({
@@ -168,7 +169,7 @@ const MyServiceListing = () => {
                     <div className="h-10 w-10 relative">
                       {service.image ? (
                         <Image
-                          src={isValidUrl(service.image) ? service.image : NotFound}
+                          src={isValidUrl(service?.service?.image) ? service?.service?.image : NotFound}
                           alt={service.service?.name || "Service"}
                           fill
                           className="rounded-full object-cover"

@@ -28,7 +28,7 @@ const PharmacyContent = () => {
   const { id } = useParams();
   const { data: partnersData, isLoading: partnersLoading } = useGetPartners();
   const { data: servicesData, isLoading: servicesLoading } = useGetPublicPartnerServices(id as string);
-  console.log(servicesData, "servicesData");
+ 
   const pharmacy = partnersData?.data?.find((pharmacy: any) => pharmacy?.id === id);
   const pharmacyName = pharmacy?.businessName.replace(/\s+/g, "-");
   const imageSrc = typeof pharmacy?.image === "string" ? pharmacy?.image : pharmacy1.src;

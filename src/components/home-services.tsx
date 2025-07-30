@@ -48,6 +48,7 @@ const HomeServices = ({ servicesData, link, isNested }: HomeServicesProps) => {
                 services={main.children.map((child: any) => ({
                   title: child.name,
                   image: child.image || Notofound, // You can set a default image or use child.image if available
+                  id: child.id,
                 }))}
                 link={link}
                 isNested={isNested}
