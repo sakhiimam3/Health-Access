@@ -1,17 +1,29 @@
-"use client"
+"use client";
+
 import Link from "next/link";
 import LayoutWrapper from "./wrapper";
 import Image from "next/image";
 import { NavItems } from "@/mockdata";
 import { FacebookIcon, InstagramIcon, LinkedInIcon, XIcon } from "../icons/icons";
+import { useGetHowItWorks } from "../useGetHowItWorks";
+import { useHomeServices } from "@/lib/hooks";
+import { ApiErrorNotice } from "../ui/error-message";
 
-interface FooterProps {
-  menuTypes: Array<{ id: string; name: string }>;
-  servicesData: Array<{ id: string; name: string }>;
-}
+export default function Footer() {
+  // Fetch menuTypes and services using hooks
+  const { menuTypes, loading: menuTypesLoading } = useGetHowItWorks();
+  const { data: homeServicesData, isLoading: servicesLoading, error: servicesError } = useHomeServices();
+  
+  const apiErrors: string[] = [];
 
-export default function Footer({ menuTypes, servicesData }: FooterProps) {
-  console.log(servicesData,"servicesss")
+  // Handle fallback data and collect errors
+  if (servicesError) {
+    console.error('Home Services data fetch failed:', servicesError);
+    apiErrors.push(`Home Services: ${servicesError}`);
+  }
+
+  const servicesData = homeServicesData?.data?.services || [];
+  
   return (
     <footer className="bg-[#363636] text-[#BCBCBC] py-12">
       <LayoutWrapper>
@@ -53,16 +65,23 @@ export default function Footer({ menuTypes, servicesData }: FooterProps) {
                 </Link>
               </li>
               {/* 2nd and 3rd dynamic or skeleton */}
-              {menuTypes?.slice(0, 2)?.map((type) => (
-                <li key={type.id}>
-                  <Link
-                    href={`/${type.name.replace(/\s+/g, "-")}?typeid=${type.id}&name=${encodeURIComponent(type.name)}`}
-                    className="hover:text-white capitalize text-[#B8B8B8]  transition-colors duration-200"
-                  >
-                    {type.name}
-                  </Link>
-                </li>
-              ))}
+              {menuTypesLoading ? (
+                <>
+                  <li><div className="h-5 w-24 bg-gray-600 animate-pulse rounded"></div></li>
+                  <li><div className="h-5 w-32 bg-gray-600 animate-pulse rounded"></div></li>
+                </>
+              ) : (
+                menuTypes?.slice(0, 2)?.map((type) => (
+                  <li key={type.id}>
+                    <Link
+                      href={`/${type.name.replace(/\s+/g, "-")}?typeid=${type.id}&name=${encodeURIComponent(type.name)}`}
+                      className="hover:text-white capitalize text-[#B8B8B8]  transition-colors duration-200"
+                    >
+                      {type.name}
+                    </Link>
+                  </li>
+                ))
+              )}
               {/* Static How it works and About us */}
               <li key={NavItems[3].label}>
                 <Link
@@ -87,16 +106,24 @@ export default function Footer({ menuTypes, servicesData }: FooterProps) {
           <div className="md:col-span-3">
             <h3 className="text-white font-semibold text-lg mb-4">Services</h3>
             <ul className="space-y-5">
-              {servicesData?.map((item) => (
-                <li key={item.id}>
-                  <Link
-                    href={`/services/${item.name.replace(/\s+/g, "-")}`}
-                    className="hover:text-white font-roboto-slab transition-colors duration-200"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
+              {servicesLoading ? (
+                <>
+                  <li><div className="h-5 w-32 bg-gray-600 animate-pulse rounded"></div></li>
+                  <li><div className="h-5 w-28 bg-gray-600 animate-pulse rounded"></div></li>
+                  <li><div className="h-5 w-36 bg-gray-600 animate-pulse rounded"></div></li>
+                </>
+              ) : (
+                servicesData?.map((item) => (
+                  <li key={item.id}>
+                    <Link
+                      href={`/services/${item.name.replace(/\s+/g, "-")}`}
+                      className="hover:text-white font-roboto-slab transition-colors duration-200"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))
+              )}
             </ul>
           </div>
 
@@ -178,6 +205,9 @@ export default function Footer({ menuTypes, servicesData }: FooterProps) {
             </div>
           </div>
         </div>
+        {(process.env.NODE_ENV === 'development' || apiErrors.length > 0) && (
+        <ApiErrorNotice errors={apiErrors} />
+      )}
       </LayoutWrapper>
     </footer>
   );

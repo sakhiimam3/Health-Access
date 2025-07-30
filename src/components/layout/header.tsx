@@ -13,10 +13,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useUserContext } from "@/context/userStore";
 import HeaderMenu from "../headerMenu";
 import { useGetServices, useGetSeriveTypes } from "@/lib/hooks";
+import { useGetHowItWorks } from "../useGetHowItWorks";
 
-interface HeaderProps {
-  menuTypes?: Array<{ id: string; name: string }>;
-}
+interface HeaderProps {}
 
 interface SearchParams {
   location: string;
@@ -711,13 +710,16 @@ const AirbnbStyleSearch = () => {
   );
 };
 
-const Header = ({ menuTypes }: HeaderProps) => {
+const Header = ({}: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [forceShowMainSearch, setForceShowMainSearch] = useState(false);
   const pathName = usePathname();
   const { user } = useUserContext();
-  const loading = false;
+  
+  // Fetch menuTypes using hook
+  const { menuTypes, loading: menuTypesLoading } = useGetHowItWorks();
+  const loading = menuTypesLoading;
 
   const dropdownRef = useRef(null);
   const scrollPositionRef = useRef(0);

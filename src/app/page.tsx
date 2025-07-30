@@ -11,12 +11,11 @@ import { getHowItWorksData, getHomeServicesData } from "@/lib/api/cms-utils";
 import { ApiErrorNotice } from "@/components/ui/error-message";
 
 export default async function Home() {
-  // Fetch data with error handling
+  // Fetch data with error handling - only for home page components
   const howItWorksRes = await getHowItWorksData();
   const homeServicesRes = await getHomeServicesData();
 
   // Handle fallback data and collect errors
-  const menuTypes = howItWorksRes.success ? howItWorksRes.data?.data?.menuTypes || [] : [];
   const servicesData = homeServicesRes.success ? homeServicesRes.data?.data?.services || [] : [];
   const howItWorksData = howItWorksRes.success ? howItWorksRes.data?.data?.howItWorks || [] : [];
 
@@ -35,7 +34,7 @@ export default async function Home() {
 
   return (
     <>
-      <Header menuTypes={menuTypes} />
+      <Header />
       <HowItWorks data={howItWorksData} />
       <HomeServices servicesData={servicesData} isNested={false} link="/services" />
       <PharmacySlider />
@@ -43,7 +42,7 @@ export default async function Home() {
       <FrequentlyAsked btnColor="#189BA3" />
       <PartnerSection bgColor="bg-[#189BA3]" />
       <Blogs />
-      <Footer menuTypes={menuTypes} servicesData={servicesData} />
+      <Footer />
       
       {/* Show API errors only in development or when there are critical failures */}
       {(process.env.NODE_ENV === 'development' || apiErrors.length > 0) && (
