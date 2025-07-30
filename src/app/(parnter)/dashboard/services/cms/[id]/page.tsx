@@ -11,6 +11,7 @@ import {
   Columns2,
   Grid3X3,
   Grid2X2,
+  Save,
 } from "lucide-react";
 import type {
   Section,
@@ -74,7 +75,7 @@ const CmsBuilder = () => {
   const uploadVideoMutation = useUploadVedio();
 
   // Fetch service sections
-  const { data: serviceSectionsData, isLoading,refetch } = useGetServiceSections(params?.id as string  || "");
+  const { data: serviceSectionsData, isLoading, refetch } = useGetServiceSections(params?.id as string || "");
 
   // Initialize sections state with fetched data or empty array
   const [sections, setSections] = useState<Section[]>([]);
@@ -83,6 +84,8 @@ const CmsBuilder = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isSavingAdminCms, setIsSavingAdminCms] = useState(false);
+  const [hasUserSavedAdminCms, setHasUserSavedAdminCms] = useState(false);
   // Add state to track all selected files
   const [pendingUploads, setPendingUploads] = useState<Array<{
     file: File;
@@ -143,6 +146,13 @@ const CmsBuilder = () => {
     if (serviceSectionsData) {
       const mappedSections = serviceSectionsData?.data?.map(section => validateSection(section));
       setSections(mappedSections);
+      
+      // Check if user has any sections (if there are sections but user hasn't saved admin CMS yet)
+      if (mappedSections.length > 0) {
+        // You can add logic here to determine if these are admin sections or user sections
+        // For now, we'll assume if there are sections, user might want to save admin CMS
+        setHasUserSavedAdminCms(false);
+      }
     }
   }, [serviceSectionsData]);
 
@@ -316,8 +326,9 @@ const CmsBuilder = () => {
         setPendingSection(null);
         // Force refetch the data
         // await queryClient.invalidateQueries({ queryKey: ['serviceSections', params.id] });
-        await refetch();
+       
         toast.success("Section created successfully");
+        await refetch();
       } else {
         const serviceId = params.id as string;
         const sectionId = section.id;
@@ -499,6 +510,54 @@ const CmsBuilder = () => {
     return '';
   };
 
+  // Handle saving all admin CMS sections as user's own sections
+  const handleSaveAdminCms = async () => {
+    if (!sections.length) return;
+    
+    try {
+      setIsSavingAdminCms(true);
+      
+      // Save all current sections as new user sections sequentially
+      for (const section of sections) {
+        const sectionToSave = {
+          title: section.title,
+          layout: mapLayout(section.layout),
+          columns: section.columns.map(col => ({
+            type: col.type,
+            content: (col.type === 'image' || col.type === 'video')
+              ? (typeof col.content === 'string'
+                  ? col.content
+                  : JSON.stringify({ src: (col.content as any).src || col.content }))
+              : (typeof col.content === 'string' ? col.content : String(col.content || '')),
+            columnOrder: col.columnOrder,
+            isActive: col.isActive
+          }))
+        };
+        
+        // Use a Promise wrapper to handle the mutation
+        await new Promise<void>((resolve, reject) => {
+          createSectionMutation.mutate(sectionToSave, {
+            onSuccess: () => resolve(),
+            onError: (error) => reject(error)
+          });
+        });
+      }
+      
+      // Mark that user has saved admin CMS
+      setHasUserSavedAdminCms(true);
+      
+      // Refetch to get the updated data
+      await refetch();
+      toast.success("Admin CMS data saved successfully! You can now edit these sections.");
+      
+    } catch (error) {
+      console.error("Save admin CMS error:", error);
+      toast.error("Failed to save admin CMS data");
+    } finally {
+      setIsSavingAdminCms(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -533,13 +592,35 @@ const CmsBuilder = () => {
 
         <div className="flex-1 p-8">
           <div className="mx-auto">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Content Management System
-              </h1>
-              <p className="text-gray-600">
-                Build your content by adding sections from the sidebar
-              </p>
+            <div className="mb-8 flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Content Management System
+                </h1>
+                <p className="text-gray-600">
+                  {sections.length > 0 && !hasUserSavedAdminCms 
+                    ? "Admin template sections loaded. Save them to make them yours, or start creating new sections."
+                    : "Build your content by adding sections from the sidebar"
+                  }
+                </p>
+              </div>
+              
+              {/* Save Admin CMS Button - Show when there are sections and user hasn't saved admin CMS yet */}
+              {sections.length > 0 && !hasUserSavedAdminCms && (
+                <div className="flex flex-col items-end gap-2">
+                  <button
+                    onClick={handleSaveAdminCms}
+                    disabled={isSavingAdminCms}
+                    className="flex items-center gap-2 px-4 py-2 bg-[green] text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Save className="h-4 w-4" />
+                    {isSavingAdminCms ? "Saving..." : "Save Admin CMS"}
+                  </button>
+                  <p className="text-xs text-gray-500 text-right max-w-48">
+                    Save admin sections to your service and make them editable
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="space-y-8">

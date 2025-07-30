@@ -3,7 +3,7 @@
 import type React from "react"
 import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { Section } from "@/types/cmstype"
+import type { Section } from "@/lib/cms/cms-type"
 import { ColumnContent } from "./column-content"
 import { getColumnGridClass } from "@/lib/cms/cms-utils"
 

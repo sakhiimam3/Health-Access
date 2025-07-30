@@ -402,11 +402,11 @@ export function AppointmentsView() {
                                   <h3 className="font-semibold text-lg flex items-center gap-2 mb-2"><User className="h-5 w-5 text-blue-500" /> Patient Info</h3>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                      <span className="font-medium">Name:</span> {appointmentDetail?.partner?.user?.firstName || "N/A"} {appointmentDetail?.partner?.user?.lastName || ""}
+                                      <span className="font-medium">Name:</span> {appointmentDetail?.customer?.user?.firstName || "N/A"} {appointmentDetail?.customer?.user?.lastName || ""}
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <Mail className="h-4 w-4 text-gray-500" />
-                                      <span>{appointmentDetail?.partner?.user?.email || "N/A"}</span>
+                                      <span>{appointmentDetail?.customer?.user?.email || "N/A"}</span>
                                     </div>
                                    
                                   </div>

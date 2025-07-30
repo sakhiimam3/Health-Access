@@ -64,7 +64,7 @@ export const PharmacyCard = ({
               }}
               //   fill
               //   className="object-cover"
-              priority
+              // priority
             />
           </div>{" "}
         </CardHeader>
@@ -73,7 +73,7 @@ export const PharmacyCard = ({
             {!isSearch && (
               <div className="flex flex-wrap gap-2 my-4">
               {services.length > 0 ? (
-                services.map((service) => {
+                services?.slice(0, 3).map((service) => {
                   const randomColor =
                     colors[Math.floor(Math.random() * colors.length)];
                   return (

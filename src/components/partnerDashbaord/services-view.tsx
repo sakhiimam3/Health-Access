@@ -523,7 +523,7 @@ export function ServicesView() {
                           handleServiceSelect(service.id);
                         }
                       }}
-                      className={`w-full h-12 p-3 text-left rounded-[20px] border border-[#E7E7E7] shadow-sm transition-all ${
+                      className={`w-full h-12 flex items-center px-3 text-left rounded-[20px] border border-[#E7E7E7] shadow-sm transition-all ${
                         isFormSelected
                           ? "border-teal-500 bg-teal-50"
                           : isNavigationActive
@@ -531,7 +531,7 @@ export function ServicesView() {
                           : "hover:border-gray-300"
                       }`}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-gray-900 text-sm">
                             {service.name}
@@ -591,7 +591,7 @@ export function ServicesView() {
                             handleServiceSelect(service.id);
                           }
                         }}
-                        className={`w-full h-12 p-3 text-left rounded-[20px] border ${
+                        className={`w-full h-12 flex items-center px-3 text-left rounded-[20px] border ${
                           isFormSelected
                             ? "border-teal-500 bg-teal-50"
                             : isNavigationActive
@@ -599,7 +599,7 @@ export function ServicesView() {
                             : "border-[#E7E7E7] hover:border-gray-300"
                         } shadow-sm transition-all`}
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-gray-900 text-sm">
                               {service.name}
@@ -649,13 +649,13 @@ export function ServicesView() {
                       <button
                         key={service.id}
                         onClick={() => handleServiceSelect(service.id)}
-                        className={`w-full h-12 p-3 text-left rounded-[20px] border ${
+                        className={`w-full h-12 flex items-center px-3 text-left rounded-[20px] border ${
                           isFormSelected
                             ? "border-teal-500 bg-teal-50"
                             : "border-[#E7E7E7] hover:border-gray-300"
                         } shadow-sm transition-all`}
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-gray-900 text-sm">
                               {service.name}
