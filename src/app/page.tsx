@@ -18,7 +18,7 @@ export default async function Home() {
   // Handle fallback data and collect errors
   const servicesData = homeServicesRes.success ? homeServicesRes.data?.data?.services || [] : [];
   const howItWorksData = howItWorksRes.success ? howItWorksRes.data?.data?.howItWorks || [] : [];
-
+  // console.log(howItWorksData,'howItWorksData');
   // Collect all errors for display
   const apiErrors: string[] = [];
   
