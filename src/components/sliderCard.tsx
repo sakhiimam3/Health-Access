@@ -16,7 +16,9 @@ import pharmacy1 from "../../public/images/pharmacy-1.png";
 
 interface PharmacyService {
   id: string;
-  name: string;
+  service: {
+    name: string;
+  };
 }
 
 import { X } from 'lucide-react'; // Optional: For a nicer close icon
@@ -47,11 +49,13 @@ export const PharmacyCard = ({
   const colors = ["#63DBA3", "#79A6F2", "#AA23DB"];
   const router = useRouter();
   const imageSrc = typeof image === 'string' ? image : pharmacy1.src;
+
+
   return (
     <>
-      <Card   className={`overflow-hidden ${isSearch ? "shadow-none" : "shadow-sm"}  hover:bg-gray-50 ${isSearch && "border-none"} `}>
-        <CardHeader>
-          <div className={`relative rounded-t-[16px] ${isSearch ? "h-[130px]" : "h-[250px]"} `}>
+      <Card className={`overflow-hidden ${isSearch ? "shadow-none" : "shadow-sm"} hover:bg-gray-50 ${isSearch && "border-none"} h-full max-h-[500px] flex flex-col`}>
+        <CardHeader className="flex-shrink-0">
+          <div className={`relative rounded-t-[16px] ${isSearch ? "h-[130px]" : "h-[200px]"} `}>
             <img
               src={imageSrc}
               alt="Medical consultation"
@@ -68,8 +72,8 @@ export const PharmacyCard = ({
             />
           </div>{" "}
         </CardHeader>
-        <CardContent    >
-          <div className={`space-y-2 ${isSearch ? "min-h-[50px]" : "min-h-[100px]"} `} >
+        <CardContent className="flex-grow flex flex-col">
+          <div className={`space-y-2 ${isSearch ? "min-h-[50px]" : "min-h-[80px]"} flex-grow`} >
             {!isSearch && (
               <div className="flex flex-wrap gap-2 my-4">
               {services.length > 0 ? (
@@ -87,7 +91,7 @@ export const PharmacyCard = ({
                       className={`bg-transparent hover:bg-opacity-50 `}
                     >
                       <span className={`text-${"green"} font-roboto font-normal`}>
-                        {service.name || "NHS Services"}
+                        {service?.service?.name || "NHS Services"}
                       </span>
                     </Badge>
                   );
@@ -97,9 +101,9 @@ export const PharmacyCard = ({
               )}
             </div>
             )}
-            <h3 className={`text-lg  font-semibold my-2 `}>{title}</h3>
+            <h3 className={`text-lg font-semibold my-2`}>{title}</h3>
 
-            <div className={`flex ${isSearch ? "items-end" : "items-center"}  gap-2    text-[#52525B] font-roboto`}>
+            <div className={`flex ${isSearch ? "items-end" : "items-center"} gap-2 text-[#52525B] font-roboto mt-auto`}>
               <svg
                 width="14"
                 height="18"
@@ -116,7 +120,7 @@ export const PharmacyCard = ({
             </div>
           </div>
         </CardContent>
-        <CardFooter className="p-2 pt-0 flex  gap-4">
+        <CardFooter className="p-2 pt-0 flex gap-4 flex-shrink-0">
           {/* <ButtonTheme
             bgColor="bg-[#189BA3]"
             paddingX={isSearch ? "px-3" : "px-8"}
