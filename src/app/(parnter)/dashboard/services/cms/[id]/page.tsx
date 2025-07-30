@@ -276,7 +276,14 @@ const CmsBuilder = () => {
               content: JSON.stringify({ src: (column.content as any).src })
             } as BaseColumn;
           } else if (column.type === 'text' || column.type === 'list') {
-            const textContent = typeof column.content === 'string' ? column.content : "";
+            // Handle text content - ensure it's a string
+            let textContent = "";
+            if (typeof column.content === 'string') {
+              textContent = column.content;
+            } else if (typeof column.content === 'object' && column.content !== null) {
+              // If it's an object, try to extract text from common properties
+              textContent = (column.content as any).text || (column.content as any).content || "";
+            }
             return {
               ...column,
               content: textContent
@@ -289,7 +296,7 @@ const CmsBuilder = () => {
         ...section,
         columns: processedColumns
       };
-      const isNewSection = !section.id || pendingSection?.id === section.id;
+      const isNewSection = !section.id || section.id.startsWith('temp_') || pendingSection?.id === section.id;
       if (isNewSection) {
         await createSectionMutation.mutate({
           title: sectionToSave.title,
@@ -300,13 +307,16 @@ const CmsBuilder = () => {
               ? (typeof col.content === 'string'
                   ? col.content
                   : JSON.stringify({ src: (col.content as any).src || col.content }))
-              : (typeof col.content === 'string' ? col.content : ''),
+              : (typeof col.content === 'string' ? col.content : String(col.content || '')),
             columnOrder: col.columnOrder,
             isActive: col.isActive
           }))
         });
-        await queryClient.invalidateQueries({ queryKey: ['serviceSections'] });
-        refetch();
+        // Clear pending section state
+        setPendingSection(null);
+        // Force refetch the data
+        // await queryClient.invalidateQueries({ queryKey: ['serviceSections', params.id] });
+        await refetch();
         toast.success("Section created successfully");
       } else {
         const serviceId = params.id as string;
@@ -322,14 +332,15 @@ const CmsBuilder = () => {
               ? (typeof col.content === 'string'
                   ? col.content
                   : JSON.stringify({ src: (col.content as any).src || col.content }))
-              : (typeof col.content === 'string' ? col.content : ''),
+              : (typeof col.content === 'string' ? col.content : String(col.content || '')),
             columnOrder: col.columnOrder,
             isActive: col.isActive
           }))
         };
         await updateServiceSection(serviceId, sectionId, payload, token);
-        await queryClient.invalidateQueries({ queryKey: ['serviceSections', params.id] }); 
-        refetch();
+        // Force refetch the data
+        await queryClient.invalidateQueries({ queryKey: ['serviceSections', params.id] });
+        await refetch();
         toast.success("Section updated successfully");
       }
     } catch (error) {
@@ -346,7 +357,9 @@ const CmsBuilder = () => {
       const token = getToken();
 
       await deleteServiceSection(serviceId, sectionId, token);
-      refetch();
+      // Force refetch the data
+      await queryClient.invalidateQueries({ queryKey: ['serviceSections', params.id] });
+      await refetch();
       toast.success("Section deleted successfully");
     } catch (error) {
       console.error("Delete error:", error);
@@ -368,8 +381,12 @@ const CmsBuilder = () => {
       item.type === "video"
     ) {
       let content = "";
+      // Set default content for text type
+      if (item.type === "text") {
+        content = "";
+      }
       const newSection: SectionWithFile = {
-        id: generateId(),
+        id: `temp_${generateId()}`, // Use temp prefix to identify new sections
         title: `${item.label} Section`,
         layout: "one_column",
         isActive: true,
@@ -404,7 +421,7 @@ const CmsBuilder = () => {
       // Create a new section with NO columns by default
       const layoutType = item.type as "two_column" | "three_column" | "four_column";
       const newSection: SectionWithFile = {
-        id: generateId(),
+        id: `temp_${generateId()}`, // Use temp prefix to identify new sections
         title: `${item.label} Section`,
         layout: layoutType,
         isActive: true,
@@ -635,7 +652,19 @@ const CmsBuilder = () => {
           setSelectedFileForUpload(null);
         }}
         onSectionChange={section => setEditingSection(section as SectionWithFile)}
-        onColumnChange={column => setEditingColumn(column as ColumnWithFile)}
+        onColumnChange={column => {
+          setEditingColumn(column as ColumnWithFile);
+          // Also update the section with the modified column
+          if (editingSection) {
+            const updatedColumns = editingSection.columns.map(col =>
+              col.id === column.id ? column : col
+            );
+            setEditingSection({
+              ...editingSection,
+              columns: updatedColumns as ColumnWithFile[]
+            });
+          }
+        }}
         onEditColumn={(section: Section, columnId: string) => {
           const column = (section.columns as ColumnWithFile[]).find(
             (c) => c.id === columnId

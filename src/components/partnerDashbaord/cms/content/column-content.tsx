@@ -132,17 +132,10 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
         const lines = textContent.split("\n");
         
         return (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {lines.map((line, index) => {
-              if (index === 0 && line.trim().length > 0) {
-                return (
-                  <h3 key={index} className="text-xl font-bold text-gray-900">
-                    {line}
-                  </h3>
-                );
-              }
               return line.trim() ? (
-                <p key={index} className="text-gray-600">
+                <p key={index} className="text-gray-700 leading-relaxed">
                   {line}
                 </p>
               ) : (

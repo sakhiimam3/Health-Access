@@ -109,7 +109,7 @@ export const EditorModal: React.FC<EditorModalProps> = ({
   }[editingSection?.layout || ''] || 1;
 
   // Determine if this is a new section - check if section exists in the actual sections list
-  const isNewSection = modalType === 'section' && (!editingSection?.id || editingSection?.id.startsWith('new') || editingSection?.id.includes('temp'));
+  const isNewSection = modalType === 'section' && (!editingSection?.id || editingSection?.id.startsWith('temp_') || editingSection?.id.startsWith('new'));
 
   // Handle save button click
   const handleSave = () => {
