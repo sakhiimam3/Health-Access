@@ -14,6 +14,8 @@ interface ColumnEditorModalProps {
   previewFile: string | null
   onChange: (updatedColumn: Column) => void
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>, type: "image" | "video") => void
+  isUploading?: boolean
+  uploadProgress?: number
 }
 
 export const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
@@ -21,6 +23,8 @@ export const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
   previewFile,
   onChange,
   onFileUpload,
+  isUploading = false,
+  uploadProgress = 0,
 }) => {
   // Determine content type from column
   const contentType = column.type;
@@ -51,6 +55,8 @@ export const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
           previewFile={previewFile}
           onChange={onChange}
           onFileUpload={(e) => onFileUpload(e, "image")}
+          isUploading={isUploading}
+          uploadProgress={uploadProgress}
         />
       )}
 
@@ -60,6 +66,8 @@ export const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
           previewFile={previewFile}
           onChange={onChange}
           onFileUpload={(e) => onFileUpload(e, "video")}
+          isUploading={isUploading}
+          uploadProgress={uploadProgress}
         />
       )}
 

@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Save, X } from "lucide-react"
+import { Save, X, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { Section, Column } from "@/lib/cms/cms-type"
@@ -15,6 +15,8 @@ interface EditorModalProps {
   editingSection: Section | null
   editingColumn: Column | null
   previewFile: string | null
+  isUploading?: boolean
+  uploadProgress?: number
   onClose: () => void
   onSaveSection: () => void
   onSaveColumn: () => void
@@ -71,6 +73,8 @@ export const EditorModal: React.FC<EditorModalProps> = ({
   editingSection,
   editingColumn,
   previewFile,
+  isUploading = false,
+  uploadProgress = 0,
   onClose,
   onSaveSection,
   onSaveColumn,
@@ -125,11 +129,46 @@ export const EditorModal: React.FC<EditorModalProps> = ({
     onClose();
   };
 
+  // Handle back button click (for column editing)
+  const handleBack = () => {
+    if (modalType === "column") {
+      // Switch back to section editing
+      onSaveColumn();
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{getModalTitle()}</DialogTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              {modalType === "column" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBack}
+                  className="p-1"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+              )}
+              <DialogTitle>{getModalTitle()}</DialogTitle>
+            </div>
+            
+            {/* Upload Progress Indicator */}
+            {isUploading && (
+              <div className="flex items-center space-x-2">
+                <div className="w-32 bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+                <span className="text-sm text-gray-600">{Math.round(uploadProgress)}%</span>
+              </div>
+            )}
+          </div>
         </DialogHeader>
 
         <div className="py-4">
@@ -147,29 +186,48 @@ export const EditorModal: React.FC<EditorModalProps> = ({
               previewFile={previewFile}
               onChange={onColumnChange}
               onFileUpload={onFileUpload}
+              isUploading={isUploading}
+              uploadProgress={uploadProgress}
             />
           )}
         </div>
 
-        <div className="flex justify-end space-x-2 pt-4 border-t">
-          <Button variant="outline" onClick={handleClose}>
-            <X className="w-4 h-4 mr-2" />
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSave}
-            disabled={
-              (modalType === "section" && editingSection && editingSection.columns.length < requiredColumns)
-              || (modalType === "column" && !isCurrentColumnFilled())
-            }
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {modalType === "column" && !isCurrentColumnFilled() 
-              ? "Fill Column First" 
-              : modalType === 'section' 
-                ? (isNewSection ? 'Create' : 'Update')
-                : 'Save Changes'}
-          </Button>
+        <div className="flex justify-between items-center pt-4 border-t">
+          <div className="text-sm text-gray-500">
+            {modalType === "section" && editingSection && (
+              <span>
+                Layout: {editingSection.layout === 'two_column' ? '2 Columns' : 
+                         editingSection.layout === 'three_column' ? '2x2 Grid (4 Columns)' : 
+                         editingSection.layout === 'four_column' ? '3x3 Grid (9 Columns)' : 
+                         '1 Column'} - 
+                {editingSection.columns.length} of {requiredColumns} columns filled
+              </span>
+            )}
+          </div>
+          
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={handleClose}>
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSave}
+              disabled={
+                (modalType === "section" && editingSection && editingSection.columns.length < requiredColumns)
+                || (modalType === "column" && !isCurrentColumnFilled())
+                || isUploading
+              }
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {isUploading 
+                ? "Uploading..." 
+                : modalType === "column" && !isCurrentColumnFilled() 
+                  ? "Fill Column First" 
+                  : modalType === 'section' 
+                    ? (isNewSection ? 'Create' : 'Update')
+                    : 'Save Changes'}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

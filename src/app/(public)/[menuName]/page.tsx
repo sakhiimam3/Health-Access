@@ -90,7 +90,7 @@ const ServiceCarousel = ({ parentService, router }) => {
               onClick={() => {
                 const slug = (service.title || service.name || "service").replace(/\s+/g, "-");
                 router.push(
-                  `/services/${slug}?serviceName=${service.name || service.title || "Service"}`
+                  `/services/${slug}?serviceName=${service.name || service.title || "Service"}&serviceId=${service?.id}`
                 );
               }}
             >

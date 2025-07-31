@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getApiBaseUrl } from '@/lib/utils';
 
 export interface HowItWorksItem {
 
@@ -30,7 +31,7 @@ export function useGetHowItWorks() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`https://health.72.14.189.33.nip.io/v1/api/cms/how-it-works`)
+    fetch(`${getApiBaseUrl()}/v1/api/cms/how-it-works`)
       .then((res) => {
         if (!res.ok) throw new Error('Network response was not ok');
         return res.json();

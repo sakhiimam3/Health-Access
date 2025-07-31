@@ -63,14 +63,11 @@ const PharmacyContent = () => {
         </section>
         <section>
           <div className="h-[600px] w-[92%] rounded-lg relative">
-            <img
+            <Image
               src={imageSrc}
               alt={"pharmacy-detail"}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
+              fill
+              className="object-cover rounded-lg"
             />
             <div className="absolute top-[50px] right-[-100px] h-[250px] w-[240px] z-10">
               <Image
