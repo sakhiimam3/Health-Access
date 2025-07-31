@@ -154,3 +154,28 @@ export interface PartnerOnboarding {
 export interface UpdatePartnerServices {
   serviceIds: string[];
 }
+
+export interface ServiceSection {
+  id: string;
+  layout:
+    | "one_column"
+    | "two_column"
+    | "three_column"
+    | "two_by_two_column"
+    | "three_by_three_column";
+  title: string;
+  columns: Array<{
+    id: string;
+    type: "text" | "image" | "video" | "list";
+    content: string;
+    columnOrder: number;
+  }>;
+}
+
+export interface ServiceContentProps {
+  data: {
+    name: string;
+    sections: ServiceSection[];
+  } | null;
+  isLoading: boolean;
+}

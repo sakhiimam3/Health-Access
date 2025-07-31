@@ -12,6 +12,7 @@ import {
   Grid3X3,
   Grid2X2,
   Save,
+  Loader2,
 } from "lucide-react";
 import type {
   Section,
@@ -30,7 +31,7 @@ import {
 // import { usePublishSections } from "@/components/admin/cms/use-publish-sections";
 import { toast } from "react-toastify";
 import { useGetServiceSections, useCreateServiceSection, useUpload, useUploadVedio } from "@/lib/hooks";
-import { updateServiceSection, deleteServiceSection } from "@/lib/api/service-sections-api";
+import { updateServiceSection, deleteServiceSection, deleteServiceSectionColumn } from "@/lib/api/service-sections-api";
 
 // Map frontend layout to backend layout
 const mapLayout = (layout: Section['layout']) => {
@@ -86,6 +87,13 @@ const CmsBuilder = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isSavingAdminCms, setIsSavingAdminCms] = useState(false);
   const [hasUserSavedAdminCms, setHasUserSavedAdminCms] = useState(false);
+  const [isDeletingColumn, setIsDeletingColumn] = useState(false);
+  const [columnToDelete, setColumnToDelete] = useState<{sectionId: string, columnId: string} | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSavingSection, setIsSavingSection] = useState(false);
+  const [savingSectionId, setSavingSectionId] = useState<string | null>(null);
+  
   // Add state to track all selected files
   const [pendingUploads, setPendingUploads] = useState<Array<{
     file: File;
@@ -201,12 +209,23 @@ const CmsBuilder = () => {
     },
   ];
 
-  // Handle media upload
+  // Handle media upload with progress
   const handleMediaUpload = async (file: File, type: "image" | "video") => {
     const formData = new FormData();
     formData.append("file", file);
     
     try {
+      setIsUploading(true);
+      setUploadProgress(0);
+      
+      // Simulate progress for better UX
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) return prev;
+          return prev + Math.random() * 10;
+        });
+      }, 200);
+      
       let result;
       if (type === "video") {
         // Validate video file
@@ -235,6 +254,9 @@ const CmsBuilder = () => {
         result = await uploadMediaMutation.mutateAsync(formData);
       }
       
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+      
       // Get the URL from the response
       const url = result?.data?.url || result?.url;
       if (!url) {
@@ -259,14 +281,42 @@ const CmsBuilder = () => {
     } catch (error) {
       console.error("Upload error:", error);
       throw error;
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
+  // Handle column delete
+  const handleDeleteColumn = async (sectionId: string, columnId: string) => {
+    try {
+      setIsDeletingColumn(true);
+      const serviceId = params.id as string;
+      const token = getToken();
 
+      await deleteServiceSectionColumn(serviceId, sectionId, columnId, token);
+      
+      // Invalidate and refetch the data
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/v1/api/services/partner/${params.id}/sections`] 
+      });
+      await refetch();
+      toast.success("Column deleted successfully");
+    } catch (error) {
+      console.error("Delete column error:", error);
+      toast.error("Failed to delete column");
+    } finally {
+      setIsDeletingColumn(false);
+      setColumnToDelete(null);
+    }
+  };
 
   // Handle section save (create or update)
   const handleSaveSection = async (section: SectionWithFile) => {
     try {
+      setIsSavingSection(true);
+      setSavingSectionId(section.id);
+      
       const processedColumns = await Promise.all(
         section.columns.map(async (column) => {
           if ((column.type === "image" || column.type === "video") && column.content instanceof File) {
@@ -308,9 +358,12 @@ const CmsBuilder = () => {
       };
       const isNewSection = !section.id || section.id.startsWith('temp_') || pendingSection?.id === section.id;
       if (isNewSection) {
-        await createSectionMutation.mutate({
+        const mappedLayout = mapLayout(sectionToSave.layout) as "one_column" | "two_column" | "two_by_two_column" | "three_by_three_column";
+        
+        // Use mutateAsync with proper error handling and cache invalidation
+        await createSectionMutation.mutateAsync({
           title: sectionToSave.title,
-          layout: mapLayout(sectionToSave.layout),
+          layout: mappedLayout,
           columns: sectionToSave.columns.map(col => ({
             type: col.type,
             content: (col.type === 'image' || col.type === 'video')
@@ -322,20 +375,25 @@ const CmsBuilder = () => {
             isActive: col.isActive
           }))
         });
+        
         // Clear pending section state
         setPendingSection(null);
-        // Force refetch the data
-        // await queryClient.invalidateQueries({ queryKey: ['serviceSections', params.id] });
+        
+        // Invalidate and refetch the data
+        await queryClient.invalidateQueries({ 
+          queryKey: [`/v1/api/services/partner/${params.id}/sections`] 
+        });
+        await refetch();
        
         toast.success("Section created successfully");
-        await refetch();
       } else {
         const serviceId = params.id as string;
         const sectionId = section.id;
         const token = getToken();
+        const mappedLayout = mapLayout(sectionToSave.layout) as "one_column" | "two_column" | "two_by_two_column" | "three_by_three_column";
         const payload = {
           title: sectionToSave.title,
-          layout: mapLayout(sectionToSave.layout),
+          layout: mappedLayout,
           isActive: sectionToSave.isActive,
           columns: sectionToSave.columns.map(col => ({
             type: col.type,
@@ -349,14 +407,20 @@ const CmsBuilder = () => {
           }))
         };
         await updateServiceSection(serviceId, sectionId, payload, token);
-        // Force refetch the data
-        await queryClient.invalidateQueries({ queryKey: ['serviceSections', params.id] });
+        
+        // Invalidate and refetch the data
+        await queryClient.invalidateQueries({ 
+          queryKey: [`/v1/api/services/partner/${params.id}/sections`] 
+        });
         await refetch();
         toast.success("Section updated successfully");
       }
     } catch (error) {
       console.error("Save error:", error);
       toast.error("Failed to save section");
+    } finally {
+      setIsSavingSection(false);
+      setSavingSectionId(null);
     }
   };
 
@@ -368,8 +432,11 @@ const CmsBuilder = () => {
       const token = getToken();
 
       await deleteServiceSection(serviceId, sectionId, token);
-      // Force refetch the data
-      await queryClient.invalidateQueries({ queryKey: ['serviceSections', params.id] });
+      
+      // Invalidate and refetch the data
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/v1/api/services/partner/${params.id}/sections`] 
+      });
       await refetch();
       toast.success("Section deleted successfully");
     } catch (error) {
@@ -493,23 +560,6 @@ const CmsBuilder = () => {
     };
   }, [previewFile, isModalOpen]);
 
-  // When rendering image/video columns in the UI (e.g., in SectionCard or similar), use this logic to get the src:
-  const getMediaSrc = (column) => {
-    if ((column.type === 'image' || column.type === 'video') && typeof column.content === 'string') {
-      try {
-        const parsed = JSON.parse(column.content);
-        if (parsed && parsed.src) return parsed.src;
-      } catch {
-        // Not JSON, fallback to raw string
-        if (column.content.startsWith('http') || column.content.startsWith('/')) return column.content;
-      }
-    }
-    if ((column.type === 'image' || column.type === 'video') && typeof column.content === 'object' && column.content && 'src' in column.content) {
-      return column.content.src;
-    }
-    return '';
-  };
-
   // Handle saving all admin CMS sections as user's own sections
   const handleSaveAdminCms = async () => {
     if (!sections.length) return;
@@ -519,9 +569,10 @@ const CmsBuilder = () => {
       
       // Save all current sections as new user sections sequentially
       for (const section of sections) {
+        const mappedLayout = mapLayout(section.layout) as "one_column" | "two_column" | "two_by_two_column" | "three_by_three_column";
         const sectionToSave = {
           title: section.title,
-          layout: mapLayout(section.layout),
+          layout: mappedLayout,
           columns: section.columns.map(col => ({
             type: col.type,
             content: (col.type === 'image' || col.type === 'video')
@@ -534,19 +585,17 @@ const CmsBuilder = () => {
           }))
         };
         
-        // Use a Promise wrapper to handle the mutation
-        await new Promise<void>((resolve, reject) => {
-          createSectionMutation.mutate(sectionToSave, {
-            onSuccess: () => resolve(),
-            onError: (error) => reject(error)
-          });
-        });
+        // Use mutateAsync for better error handling
+        await createSectionMutation.mutateAsync(sectionToSave);
       }
       
       // Mark that user has saved admin CMS
       setHasUserSavedAdminCms(true);
       
-      // Refetch to get the updated data
+      // Invalidate and refetch to get the updated data
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/v1/api/services/partner/${params.id}/sections`] 
+      });
       await refetch();
       toast.success("Admin CMS data saved successfully! You can now edit these sections.");
       
@@ -624,6 +673,20 @@ const CmsBuilder = () => {
             </div>
 
             <div className="space-y-8">
+              {/* Loading Overlay for entire render area */}
+              {(isSavingSection || isDeleting || isSavingAdminCms) && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg p-6 flex items-center space-x-3">
+                    <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                    <span className="text-lg font-medium">
+                      {isSavingSection ? "Saving section..." : 
+                       isDeleting ? "Deleting section..." : 
+                       isSavingAdminCms ? "Saving admin CMS..." : "Processing..."}
+                    </span>
+                  </div>
+                </div>
+              )}
+              
               {sections.map((section) => (
                 <SectionCard
                   key={section.id}
@@ -692,6 +755,16 @@ const CmsBuilder = () => {
                     setSectionToDelete(sectionId);
                     setIsDeleteModalOpen(true);
                   }}
+                  onDeleteColumn={(sectionId: string, columnId: string) => {
+                    setColumnToDelete({ sectionId, columnId });
+                    handleDeleteColumn(sectionId, columnId);
+                  }}
+                  isDeletingColumn={isDeletingColumn}
+                  columnToDelete={columnToDelete}
+                  isSavingSection={isSavingSection}
+                  savingSectionId={savingSectionId}
+                  isDeleting={isDeleting}
+                  sectionToDelete={sectionToDelete}
                 />
               ))}
 
@@ -707,6 +780,8 @@ const CmsBuilder = () => {
         editingSection={editingSection as unknown as Section}
         editingColumn={editingColumn as unknown as Column}
         previewFile={previewFile}
+        isUploading={isUploading}
+        uploadProgress={uploadProgress}
         onClose={() => {
           setIsModalOpen(false);
           setEditingSection(null);

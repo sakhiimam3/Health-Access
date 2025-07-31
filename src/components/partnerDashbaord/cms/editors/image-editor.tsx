@@ -11,9 +11,18 @@ interface ImageEditorProps {
   previewFile: string | null
   onChange: (updatedColumn: Column) => void
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
+  isUploading?: boolean
+  uploadProgress?: number
 }
 
-export const ImageEditor: React.FC<ImageEditorProps> = ({ column, previewFile, onChange, onFileUpload }) => {
+export const ImageEditor: React.FC<ImageEditorProps> = ({ 
+  column, 
+  previewFile, 
+  onChange, 
+  onFileUpload,
+  isUploading = false,
+  uploadProgress = 0
+}) => {
   const [imageError, setImageError] = useState(false);
 
   // Get image URL from column content
@@ -72,12 +81,27 @@ export const ImageEditor: React.FC<ImageEditorProps> = ({ column, previewFile, o
               <p className="text-gray-600">{imageError ? "Image failed to load. Please select a new one." : "Click to upload or drag and drop"}</p>
             </>
           )}
+          
+          {/* Upload Progress Indicator */}
+          {isUploading && (
+            <div className="mt-4 space-y-2">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600">Uploading... {Math.round(uploadProgress)}%</p>
+            </div>
+          )}
+          
           {/* File input for selecting a new image */}
           <Input 
             type="file" 
             accept="image/*" 
             className="mt-4" 
-            onChange={onFileUpload} 
+            onChange={onFileUpload}
+            disabled={isUploading}
           />
         </div>
       </div>

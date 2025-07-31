@@ -20,4 +20,15 @@ export const deleteServiceSection = async (serviceId: string, sectionId: string,
     },
   });
   return response.data;
+};
+
+export const deleteServiceSectionColumn = async (serviceId: string, sectionId: string, columnId: string, token: string) => {
+  const url = `${getApiBaseUrl()}/v1/api/services/partner/${serviceId}/sections/${sectionId}/columns/${columnId}`;
+  console.log("Delete column URL:", url);
+  const response = await axios.delete(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
 }; 

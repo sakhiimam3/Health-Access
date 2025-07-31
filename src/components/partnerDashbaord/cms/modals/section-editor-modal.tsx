@@ -113,6 +113,22 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
   // Determine if this is a layout block
   const isLayoutBlock = ["two_column", "three_column", "four_column"].includes(section.layout);
 
+  // Get layout grid info
+  const getLayoutInfo = () => {
+    switch (section.layout) {
+      case 'two_column':
+        return { name: '2 Columns', grid: 'grid-cols-2', required: 2 };
+      case 'three_column':
+        return { name: '2x2 Grid', grid: 'grid-cols-2', required: 4 };
+      case 'four_column':
+        return { name: '3x3 Grid', grid: 'grid-cols-3', required: 9 };
+      default:
+        return { name: 'Single Column', grid: 'grid-cols-1', required: 1 };
+    }
+  };
+
+  const layoutInfo = getLayoutInfo();
+
   return (
     <div className="space-y-6">
       <div>
@@ -127,10 +143,43 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
       <div>
         <div className="flex items-center space-x-2 mb-4">
           <Badge variant="outline" className="text-sm">
-            Layout: {getLayoutDisplayName(section.layout)}
+            Layout: {layoutInfo.name}
           </Badge>
-          <span className="text-sm text-gray-500">(Fixed - selected from sidebar)</span>
+          <span className="text-sm text-gray-500">
+            ({section.columns.length} of {layoutInfo.required} columns)
+          </span>
         </div>
+        
+        {/* Layout Preview */}
+        {isLayoutBlock && (
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+            <div className={`grid ${layoutInfo.grid} gap-2`}>
+              {Array.from({ length: layoutInfo.required }, (_, i) => (
+                <div 
+                  key={i} 
+                  className={`h-16 rounded border-2 ${
+                    i < section.columns.length 
+                      ? 'border-green-300 bg-green-50' 
+                      : 'border-gray-300 bg-gray-100'
+                  } flex items-center justify-center text-xs`}
+                >
+                  {i < section.columns.length ? (
+                    <div className="text-center">
+                      <div className="font-medium">
+                        {section.columns[i].type.charAt(0).toUpperCase() + section.columns[i].type.slice(1)}
+                      </div>
+                      {isColumnFilled(section.columns[i]) && (
+                        <div className="text-green-600">✓ Filled</div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-gray-500">Empty</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div>
@@ -149,6 +198,9 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
                       </span>
                       {isColumnFilled(column) && (
                         <Badge variant="secondary" className="ml-2">Saved</Badge>
+                      )}
+                      {!isColumnFilled(column) && (
+                        <Badge variant="outline" className="ml-2 text-orange-600">Empty</Badge>
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
@@ -177,28 +229,38 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
               ))}
           </div>
         )}
+        
         {/* Add Column Controls - only for layout blocks */}
         {isLayoutBlock && (
-          <div className="flex items-center gap-2 mt-4">
-            <Select value={newColumnType} onValueChange={val => setNewColumnType(val as any)}>
-              <SelectTrigger className="w-40 bg-white">
-                <SelectValue>{newColumnType.charAt(0).toUpperCase() + newColumnType.slice(1)}</SelectValue>
-              </SelectTrigger>
-              <SelectContent className="bg-white cursor-pointer">
-  <SelectItem value="text">Text</SelectItem>
-  <SelectItem value="image">Image</SelectItem>
-  <SelectItem value="video">Video</SelectItem>
-  <SelectItem value="list">List</SelectItem>
-</SelectContent>
-            </Select>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleAddColumn}
-              disabled={section.columns.length >= maxColumns}
-            >
-              <Plus className="w-4 h-4 mr-1" /> Add Column
-            </Button>
+          <div className="flex items-center gap-2 mt-4 p-4 bg-blue-50 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium">Add new column:</span>
+              <Select value={newColumnType} onValueChange={val => setNewColumnType(val as any)}>
+                <SelectTrigger className="w-40 bg-white">
+                  <SelectValue>{newColumnType.charAt(0).toUpperCase() + newColumnType.slice(1)}</SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-white cursor-pointer">
+                  <SelectItem value="text">Text</SelectItem>
+                  <SelectItem value="image">Image</SelectItem>
+                  <SelectItem value="video">Video</SelectItem>
+                  <SelectItem value="list">List</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddColumn}
+                disabled={section.columns.length >= maxColumns}
+                className="bg-white"
+              >
+                <Plus className="w-4 h-4 mr-1" /> Add Column
+              </Button>
+            </div>
+            {section.columns.length >= maxColumns && (
+              <span className="text-sm text-gray-500 ml-2">
+                Maximum columns reached for this layout
+              </span>
+            )}
           </div>
         )}
       </div>

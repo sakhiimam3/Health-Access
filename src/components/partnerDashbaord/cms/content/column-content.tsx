@@ -82,7 +82,7 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
 
     // Valid image URL, display it
     return (
-      <div className="relative">
+      <div className="relative w-full h-[250px]">
         <img
           src={imageUrl}
           alt="Image"
@@ -132,7 +132,7 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
         const lines = textContent.split("\n");
         
         return (
-          <div className="space-y-2">
+          <div className="space-y-2 min-h-[100px]">
             {lines.map((line, index) => {
               return line.trim() ? (
                 <p key={index} className="text-gray-700 leading-relaxed">
@@ -147,10 +147,10 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
       }
       
       // Empty content
-      return <p className="text-gray-600">No content</p>;
+      return <p className="text-gray-600 min-h-[100px]">No content</p>;
     } catch (error) {
       console.error("Error rendering text content:", error);
-      return <p className="text-gray-600">Error displaying content</p>;
+      return <p className="text-gray-600 min-h-[100px]">Error displaying content</p>;
     }
   };
 
@@ -202,8 +202,8 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
 
     // Valid video URL, display it
     return (
-      <div className="relative">
-        <video controls className="w-full rounded-lg">
+      <div className="relative w-full h-[250px]">
+        <video controls className="w-full h-[250px] object-cover rounded-lg">
           <source src={videoUrl} type="video/mp4" />
           <p>Your browser does not support HTML video.</p>
         </video>
@@ -254,7 +254,7 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
         : [];
         
       return (
-        <div className="space-y-2">
+        <div className="space-y-2 min-h-[100px]">
           <ul className="list-disc list-inside space-y-1">
             {listItems.map((item, index) => (
               <li key={index} className="text-gray-600">
@@ -266,6 +266,6 @@ export const ColumnContent: React.FC<ColumnContentProps> = ({ column }) => {
       );
 
     default:
-      return <div className="text-gray-400">No content</div>
+      return <div className="text-gray-400 min-h-[100px]">No content</div>
   }
 }

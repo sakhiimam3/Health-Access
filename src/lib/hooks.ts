@@ -284,29 +284,29 @@ export const useGetServiceSections = (serviceId: string) => {
 
 // Create service section
 export const useCreateServiceSection = (serviceId: string) => {
-  const { mutate, isPending, error } = useApiMutation<ServiceSection, CreateServiceSectionPayload>(
+  const { mutate, mutateAsync, isPending, error } = useApiMutation<ServiceSection, CreateServiceSectionPayload>(
     `/v1/api/services/partner/${serviceId}/sections`,
     "POST"
   );
-  return { mutate, isPending, error };
+  return { mutate, mutateAsync, isPending, error };
 };
 
 // Update service section
 export const useUpdateServiceSection = (serviceId: string, sectionId: string) => {
-  const { mutate, isPending, error } = useApiMutation<ServiceSection, UpdateServiceSectionPayload>(
+  const { mutate, mutateAsync, isPending, error } = useApiMutation<ServiceSection, UpdateServiceSectionPayload>(
     `/v1/api/services/partner/${serviceId}/sections/${sectionId}`,
     "PUT"
   );
-  return { mutate, isPending, error };
+  return { mutate, mutateAsync, isPending, error };
 };
 
 // Delete service section
 export const useDeleteServiceSection = (serviceId: string, sectionId: string) => {
-  const { mutate, isPending, error } = useApiMutation<void, void>(
+  const { mutate, mutateAsync, isPending, error } = useApiMutation<void, void>(
     `/v1/api/services/partner/${serviceId}/sections/${sectionId}`,
     "DELETE"
   );
-  return { mutate, isPending, error };
+  return { mutate, mutateAsync, isPending, error };
 };
 
 export const useGetServiceContent = (serviceId: string) => {

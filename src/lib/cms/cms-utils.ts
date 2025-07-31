@@ -9,7 +9,7 @@ export const generateId = () => {
 }
 
 export const createNewSection = (layout: string): Section => {
-  const columnCount = layout === "one_column" ? 1 : layout === "two_column" ? 2 : layout === "three_column" ? 3 : 4
+  const columnCount = layout === "one_column" ? 1 : layout === "two_column" ? 2 : layout === "three_column" ? 4 : 9
   const newSection: Section = {
     id: generateId(),
     title: "New Section",
@@ -50,11 +50,11 @@ export const getColumnGridClass = (layout: string) => {
     case "one_column":
       return "grid-cols-1"
     case "two_column":
-      return "grid-cols-1 lg:grid-cols-2"
+      return "grid-cols-1 md:grid-cols-2"
     case "three_column":
-      return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      return "grid-cols-1 md:grid-cols-2" // 2x2 grid
     case "four_column":
-      return "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+      return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" // 3x3 grid
     default:
       return "grid-cols-1"
   }
@@ -72,5 +72,20 @@ export const getLayoutDisplayName = (layout: string) => {
       return "3x3 Grid Block"
     default:
       return layout.replace("_", " ")
+  }
+}
+
+export const getLayoutColumnCount = (layout: string) => {
+  switch (layout) {
+    case "one_column":
+      return 1
+    case "two_column":
+      return 2
+    case "three_column":
+      return 4 // 2x2 grid
+    case "four_column":
+      return 9 // 3x3 grid
+    default:
+      return 1
   }
 }
