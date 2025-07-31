@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from '../utils';
+
 // Define response types for better error handling
 interface ApiResponse<T> {
   success: boolean;
@@ -18,7 +20,7 @@ const fetchWithTimeout = (url: string, options: RequestInit = {}, timeout = 1000
 export async function getHowItWorksData(): Promise<ApiResponse<any>> {
   try {
     const res = await fetchWithTimeout(
-      `https://health.72.14.189.33.nip.io/v1/api/cms/how-it-works`, 
+      `${getApiBaseUrl()}/v1/api/cms/how-it-works`, 
       { 
         cache: "no-store",
         headers: {
@@ -70,7 +72,7 @@ export async function getHowItWorksData(): Promise<ApiResponse<any>> {
 export async function getHomeServicesData(): Promise<ApiResponse<any>> {
   try {
     const res = await fetchWithTimeout(
-      `https://health.72.14.189.33.nip.io/v1/api/cms/home`, 
+      `${getApiBaseUrl()}/v1/api/cms/home`, 
       { 
         cache: "no-store",
         headers: {

@@ -1,8 +1,9 @@
 import axios from "axios"
 import { toast } from "react-toastify"
+import { getApiBaseUrl } from "./utils"
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "https://health.72.14.189.33.nip.io",
+  baseURL: getApiBaseUrl(),
   // Remove the default Content-Type header to allow dynamic setting
 })
 

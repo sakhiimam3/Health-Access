@@ -78,12 +78,7 @@ const DynamicSection = ({ section }: { section: ServiceSection }) => {
       <div className="mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <Badge
-            variant="outline"
-            className="mb-4 text-[#189BA3] border-[#189BA3]"
-          >
-            {section.layout.replace(/_/g, " ").toUpperCase()}
-          </Badge>
+        
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
             {section.title}
           </h2>
@@ -98,21 +93,15 @@ const DynamicSection = ({ section }: { section: ServiceSection }) => {
         >
           {section.columns
             .sort((a, b) => a.columnOrder - b.columnOrder)
-            .map((column, index) => (
+            .map((column) => (
               <Card
                 key={column.id}
-                className={`group hover:shadow-xl transition-all duration-300 border-0 shadow-lg hover:-translate-y-1 ${
+                className={`group hover:shadow-xl transition-all duration-300 border-0 shadow-md  hover:-translate-y-1 ${
                   isOneColumn ? "text-center" : ""
                 } ${column.content === "" ? "opacity-50" : ""}`}
               >
                 <CardContent className="p-0 h-full">
-                  {/* Content Type Header */}
-                  <div className="flex items-center gap-2 p-4 bg-gradient-to-r from-[#189BA3]/5 to-[#14a085]/5 border-b">
-                    <ContentTypeIcon type={column.type} />
-                    <span className="text-sm font-medium text-[#189BA3] capitalize">
-                      {column.type}
-                    </span>
-                  </div>
+               
 
                   <div className="p-6">
                     {column.type === "text" && (
@@ -129,7 +118,7 @@ const DynamicSection = ({ section }: { section: ServiceSection }) => {
                     {column.type === "image" && column.content && (
                       <div className="relative aspect-video rounded-lg overflow-hidden group-hover:scale-[1.02] transition-transform duration-300">
                         <Image
-                          src={column.content || "/placeholder.svg"}
+                          src={column.content || "/images/notfound.jpg"}
                           alt={section.title}
                           fill
                           className="object-cover"
